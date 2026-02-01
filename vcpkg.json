@@ -1,0 +1,7 @@
+{
+  "name" : "open-holdem",
+  "version-string" : "0.1.0",
+  "dependencies" : [ {
+    "name" : "gtest"
+  } ]
+}

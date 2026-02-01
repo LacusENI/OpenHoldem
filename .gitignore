@@ -1,0 +1,7 @@
+/.idea
+
+/vcpkg
+
+/vcpkg_installed
+
+/cmake-build-*
