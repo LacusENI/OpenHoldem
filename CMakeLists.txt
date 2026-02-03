@@ -7,13 +7,16 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(PokerCore
         src/Card.cpp
-        include/Card.h)
+        include/Card.h
+        include/HandEvaluator.h
+        src/HandEvaluator.cpp)
 
 target_include_directories(PokerCore PUBLIC include)
 
 add_executable(poker_tests
         src/Card.cpp
-        tests/test_card.cpp)
+        tests/test_card.cpp
+        )
 
 target_link_libraries(poker_tests PRIVATE PokerCore GTest::gtest GTest::gtest_main)
 
