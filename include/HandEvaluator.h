@@ -34,15 +34,53 @@ public:
      * @param hand 玩家的出牌
      * @return 出牌对应的编码
      */
-    static HandValue getHandValue(const Hand5 &hand);
+    static HandValue getHandValue(const Hand5& hand);
 
     /**
      * 从玩家7张手牌中选取最好的5张手牌
      * @param hand7 玩家的手牌 (公共牌+私有牌)
      * @return 玩家的最佳出牌
      */
-    static Hand5 selectBest(Hand7& hand7);
+    static Hand5 selectBest(const Hand7& hand7);
 };
 } // namespace holdem
 
+namespace holdem::internal {
+
+/**
+ * 枚举所有可能的出牌组合(7选5)
+ * @param hand7 7张手牌
+ * @return 所有可能的5张出牌组合
+ */
+std::vector<Hand5> getCombinations(const Hand7& hand7);
+
+/**
+ * @brief 记录频次统计中的某一点数及其频次的数据结构
+ */
+struct RankCount {
+    Rank rank;
+    int count;
+
+    RankCount() : rank(), count() {};
+    RankCount(Rank rank, int count) : rank(rank), count(count) {}
+
+    bool operator>(const RankCount& other) const {
+        if (count != other.count) return count > other.count;
+        return rank > other.rank;
+    }
+
+    bool operator==(const RankCount& other) const {
+        return count == other.count && rank == other.rank;
+    }
+};
+
+/**
+ * 统计5张牌的频次，按频次从高到低排序，若频次相同，点数高者优先，如：
+ * - 5, 5, 4, 4, 2 -> 5:2, 4:2, 2:1
+ * - 6, 6, 6, 9, 9 -> 6:3, 9:2
+ * @param hand5 5张牌
+ * @return 频次统计(按频次、点数从高到低依次排列)
+ */
+std::vector<RankCount> getCounts(const Hand5& hand5);
+} // namespace holdem::internal
 #endif //OPENHOLDEM_HANDEVALUATOR_H

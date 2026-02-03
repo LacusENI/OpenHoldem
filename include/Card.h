@@ -17,9 +17,19 @@ struct Card {
     Suit suit;
     Rank rank;
 
+    Card() : suit(), rank() {};
     Card(Suit suit, Rank rank) : suit(suit), rank(rank) {};
 
     [[nodiscard]] std::string toString() const;
+
+    bool operator<(const Card& other) const {
+        if (rank == other.rank) return suit < other.suit;
+        return rank < other.rank;
+    }
+
+    bool operator==(const Card& other) const {
+        return suit == other.suit && rank == other.rank;
+    }
 };
 } // namespace holdem
 

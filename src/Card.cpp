@@ -1,8 +1,7 @@
 #include "Card.h"
 #include <vector>
 
-using namespace holdem;
-
+namespace holdem {
 std::string Card::toString() const {
     static std::vector<std::string> suits = {
         "C", "D", "H", "S" // Clubs, Diamonds, Hearts, Spades
@@ -15,4 +14,4 @@ std::string Card::toString() const {
     auto r_idx = static_cast<int>(rank);
     return std::string(suits[s_idx] + ranks[r_idx]);
 }
-
+}
