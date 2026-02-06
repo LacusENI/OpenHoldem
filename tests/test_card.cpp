@@ -3,6 +3,7 @@
 
 using namespace holdem;
 
+// 测试 Card 的 toString() 方法
 TEST(CardTest, ToStringFunction) {
     Card card1(Suit::CLUBS, Rank::ACE);
 

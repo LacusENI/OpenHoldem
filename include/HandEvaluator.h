@@ -8,20 +8,46 @@ namespace holdem {
 using Hand5 = std::array<Card, 5>;
 using Hand7 = std::array<Card, 7>;
 
+enum class HandType {
+    HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
+    FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
+};
+
 /**
  * @brief 表示手牌强度的分值类型
  *
  * 采用 32 位整数编码, 整数越大，牌越大, 格式为：0xTPSKKK,
- * - T: HandType (4 bits) 牌型等级(0-9)
- * - P: Primary Rank (4 bits) 主牌点数(如葫芦的三条的点数)
+ * - T: HandType (4 bits)       牌型等级(0-9)
+ * - P: Primary Rank (4 bits)   主牌点数(如葫芦的三条的点数)
  * - S: Secondary Rank (4 bits) 次高牌点数(如葫芦的对子的点数）
- * - K：Kickers (4 bits each) 踢脚牌点数(按从大到小排序)
+ * - K：Kickers (4 bits each)   踢脚牌点数(按从大到小排序)
+ * - 按照比较顺序排列，不足的位置设置为零
+ * - 如: 葫芦: PS000，两条: PKKK0，两对：PSK00
  */
-using HandValue = uint32_t;
+struct HandValue {
+    uint32_t raw_value;
 
-enum class HandType {
-    HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
-    FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
+    explicit HandValue(int raw_value) : raw_value(raw_value) {};
+
+    [[nodiscard]] HandType getHandType() const {
+        return static_cast<HandType>(raw_value >> 20);
+    }
+
+    [[nodiscard]] Rank getRank(const int index) const {
+        return static_cast<Rank>((raw_value >> (16 - 4 * index)) & 0xF);
+    }
+
+    bool operator==(const HandValue &other) const {
+        return raw_value == other.raw_value;
+    }
+
+    bool operator>(const HandValue &other) const {
+        return raw_value > other.raw_value;
+    }
+
+    bool operator<(const HandValue &other) const {
+        return raw_value < other.raw_value;
+    }
 };
 
 /**
@@ -38,7 +64,7 @@ public:
 
     /**
      * 从玩家7张手牌中选取最好的5张手牌
-     * @param hand7 玩家的手牌 (公共牌+私有牌)
+     * @param hand7 玩家的手牌 (公共牌+底牌)
      * @return 玩家的最佳出牌
      */
     static Hand5 selectBest(const Hand7& hand7);
@@ -74,6 +100,8 @@ struct RankCount {
     }
 };
 
+using SortedCounts = std::vector<RankCount>;
+
 /**
  * 统计5张牌的频次，按频次从高到低排序，若频次相同，点数高者优先，如：
  * - 5, 5, 4, 4, 2 -> 5:2, 4:2, 2:1
@@ -81,6 +109,6 @@ struct RankCount {
  * @param hand5 5张牌
  * @return 频次统计(按频次、点数从高到低依次排列)
  */
-std::vector<RankCount> getCounts(const Hand5& hand5);
+SortedCounts getSortedCounts(Hand5 hand5);
 } // namespace holdem::internal
 #endif //OPENHOLDEM_HANDEVALUATOR_H
