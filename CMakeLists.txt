@@ -9,7 +9,9 @@ add_library(PokerCore
         src/Card.cpp
         include/Card.h
         include/HandEvaluator.h
-        src/HandEvaluator.cpp)
+        src/HandEvaluator.cpp
+        include/Deck.h
+)
 
 target_include_directories(PokerCore PUBLIC include)
 
