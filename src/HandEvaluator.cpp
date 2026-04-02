@@ -146,4 +146,8 @@ Hand5 HandEvaluator::selectBest(const Hand7 &hand7) {
     }
     return bestHand;
 }
+
+HandValue HandEvaluator::evaluate(const Hand7& hand7) {
+    return getHandValue(selectBest(hand7));
+}
 }

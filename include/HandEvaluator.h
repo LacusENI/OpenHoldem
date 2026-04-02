@@ -1,12 +1,12 @@
-#ifndef OPENHOLDEM_HANDEVALUATOR_H
-#define OPENHOLDEM_HANDEVALUATOR_H
+#ifndef OPENHOLDEM_HAND_EVALUATOR_H
+#define OPENHOLDEM_HAND_EVALUATOR_H
 #include <array>
 #include "Card.h"
 
 namespace holdem {
 
-using Hand5 = std::array<Card, 5>;
-using Hand7 = std::array<Card, 7>;
+using Hand5 = Cards5;
+using Hand7 = Cards7;
 
 enum class HandType {
     HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
@@ -27,7 +27,8 @@ enum class HandType {
 struct HandValue {
     uint32_t raw_value;
 
-    explicit HandValue(int raw_value) : raw_value(raw_value) {};
+    HandValue() : raw_value(0) {}
+    explicit HandValue(int raw_value) : raw_value(raw_value) {}
 
     [[nodiscard]] HandType getHandType() const {
         return static_cast<HandType>(raw_value >> 20);
@@ -68,6 +69,8 @@ public:
      * @return 玩家的最佳出牌
      */
     static Hand5 selectBest(const Hand7& hand7);
+
+    static HandValue evaluate(const Hand7& hand7);
 };
 } // namespace holdem
 
@@ -111,4 +114,4 @@ using SortedCounts = std::vector<RankCount>;
  */
 SortedCounts getSortedCounts(Hand5 hand5);
 } // namespace holdem::internal
-#endif //OPENHOLDEM_HANDEVALUATOR_H
+#endif //OPENHOLDEM_HAND_EVALUATOR_H
