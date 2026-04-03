@@ -39,22 +39,51 @@ public:
     const std::vector<Player>& getPlayers() const { return players; }
     const std::vector<Player *>& getWinners() const { return winners; }
 
+    /**
+     * 添加新玩家到玩家列表，并为此玩家分配ID
+     * @param new_player 新玩家
+     */
     void addPlayer(Player new_player) {
-        new_player.id = players.size();
+        new_player.id = players.size() + 1;
         players.push_back(new_player);
     }
-
-    /* 开始发放底牌 */
-    void dealHoleCards();
-    /* 进入下一个下注轮 */
-    void nextStreet();
-    /* 渲染控制台界面 */
-    void render();
-    /* 进入摊牌阶段，输出各玩家的牌型和胜者 */
-    void showdown();
-    /* 运行一局游戏 */
+    /**
+     * @brief 运行一局游戏
+     * @details 调用此函数后，将进行一局游戏，直到结束
+     */
     void run();
+    /**
+     * @brief 为每位玩家发放底牌
+     * @note 每位玩家一次性发放两张底牌
+     */
+    void dealHoleCards();
+    /**
+     * @brief 进入下一个下注轮，翻开此轮的公共牌
+     * @note 每次发公共牌前不烧牌
+     */
+    void nextStreet();
+    /**
+     * @brief 渲染控制台界面
+     */
+    void render();
+    /**
+     * @brief 进入摊牌阶段
+     * @details 评估每个玩家的牌型，并决出胜者
+     */
+    void showdown();
 };
-}
+
+namespace internal {
+/**
+ * 返回用于用户界面的牌型描述信息，例如:
+ * - Straight Flush, 9 to King
+ * - Full House, 6s full of Jacks
+ * @param hand_value 牌型值
+ * @return 牌型的描述信息
+ */
+std::string getHandMessage(HandValue hand_value);
+} // namespace holdem::internal
+
+} // namespace holdem
 
 #endif //OPENHOLDEM_GAME_H

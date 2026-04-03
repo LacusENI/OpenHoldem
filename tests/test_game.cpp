@@ -12,6 +12,7 @@ public:
 
 using testing::Return;
 
+// 测试是否正确发放底牌
 TEST(TestGame, DealHoleCards) {
     auto deck = std::make_unique<MockDeck>();
     EXPECT_CALL(*deck, deal())
@@ -38,6 +39,7 @@ TEST(TestGame, DealHoleCards) {
     EXPECT_EQ(player2.hole_cards[1], Card(Suit::SPADE, Rank::KING));
 }
 
+// 测试 Preflop 阶段发的公共牌是否正确
 TEST(TestGame, FlopDealCards) {
     auto deck = std::make_unique<MockDeck>();
     EXPECT_CALL(*deck, deal())
@@ -63,6 +65,7 @@ TEST(TestGame, FlopDealCards) {
     EXPECT_EQ(communityCards[2], Card(Suit::HEART, Rank::EIGHT));
 }
 
+// 测试三个阶段是否正确发放公共牌
 TEST(TestGame, DeclCommunityCards) {
     auto deck = std::make_unique<MockDeck>();
     EXPECT_CALL(*deck, deal())
@@ -94,6 +97,7 @@ TEST(TestGame, DeclCommunityCards) {
     EXPECT_EQ(communityCards[4], Card(Suit::DIAMOND, Rank::TEN));
 }
 
+// 测试是否得出正确的赢家
 TEST(TestGame, GetWinners) {
     auto deck = std::make_unique<MockDeck>();
     EXPECT_CALL(*deck, deal())
@@ -111,7 +115,11 @@ TEST(TestGame, GetWinners) {
     Game game(std::move(deck));
     game.addPlayer(Player());
     game.addPlayer(Player());
-    game.run();
+    game.dealHoleCards();
+    game.nextStreet(); // 进入 flop 阶段
+    game.nextStreet(); // 进入 turn 阶段
+    game.nextStreet(); // 进入 river 阶段
+    game.showdown(); // 摊牌
 
     auto& winners = game.getWinners();
     auto& players = game.getPlayers();
@@ -119,4 +127,17 @@ TEST(TestGame, GetWinners) {
 
     // 玩家1: 一对A, 玩家2: 一对K
     EXPECT_EQ(winners[0], &players[0]);
+}
+
+// 测试手牌描述信息是否正确
+TEST(TestGame, TestHandMessage) {
+    const Cards5 hand5 = {
+        Card("C7"), Card("D8"), Card("H9"),
+        Card("ST"), Card("SJ")
+    };
+    HandValue hand_value = HandEvaluator::getHandValue(hand5);
+    std::string hand_message = internal::getHandMessage(hand_value);
+
+    EXPECT_EQ(hand_value.getHandType(), HandType::STRAIGHT);
+    EXPECT_EQ(hand_message, "Straight, 7 to Jack");
 }
