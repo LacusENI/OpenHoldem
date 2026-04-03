@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(GTest CONFIG REQUIRED)
 
-add_library(PokerCore
+add_library(poker_core
         include/Card.h
         include/HandEvaluator.h
         include/Deck.h
@@ -15,14 +15,14 @@ add_library(PokerCore
         src/HandEvaluator.cpp
 )
 
-target_include_directories(PokerCore PUBLIC include)
+target_include_directories(poker_core PUBLIC include)
 
 add_executable(open_holdem
         src/main.cpp
 )
 
 target_link_libraries(open_holdem PRIVATE
-        PokerCore
+        poker_core
 )
 
 add_executable(poker_tests
@@ -32,7 +32,7 @@ add_executable(poker_tests
 )
 
 target_link_libraries(poker_tests PRIVATE
-        PokerCore
+        poker_core
         GTest::gtest
         GTest::gmock
         GTest::gtest_main
