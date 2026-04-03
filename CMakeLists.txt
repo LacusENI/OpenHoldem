@@ -9,11 +9,10 @@ add_library(PokerCore
         include/Card.h
         include/HandEvaluator.h
         include/Deck.h
-        src/Card.cpp
-        src/HandEvaluator.cpp
         include/Game.h
-        src/main.cpp
+        src/Card.cpp
         src/Game.cpp
+        src/HandEvaluator.cpp
 )
 
 target_include_directories(PokerCore PUBLIC include)
@@ -24,7 +23,12 @@ add_executable(poker_tests
         tests/test_game.cpp
 )
 
-target_link_libraries(poker_tests PRIVATE PokerCore GTest::gtest GTest::gtest_main)
+target_link_libraries(poker_tests PRIVATE
+        PokerCore
+        GTest::gtest
+        GTest::gmock
+        GTest::gtest_main
+)
 
 enable_testing()
 include(GoogleTest)
