@@ -17,6 +17,14 @@ add_library(PokerCore
 
 target_include_directories(PokerCore PUBLIC include)
 
+add_executable(open_holdem
+        src/main.cpp
+)
+
+target_link_libraries(open_holdem PRIVATE
+        PokerCore
+)
+
 add_executable(poker_tests
         tests/test_card.cpp
         tests/test_hand.cpp
