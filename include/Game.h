@@ -40,6 +40,7 @@ public:
     const std::vector<Player *>& getWinners() const { return winners; }
 
     void addPlayer(Player new_player) {
+        new_player.id = players.size();
         players.push_back(new_player);
     }
 

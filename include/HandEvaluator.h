@@ -5,9 +5,6 @@
 
 namespace holdem {
 
-using Hand5 = Cards5;
-using Hand7 = Cards7;
-
 enum class HandType {
     HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
     FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
@@ -61,16 +58,16 @@ public:
      * @param hand 玩家的出牌
      * @return 出牌对应的编码
      */
-    static HandValue getHandValue(const Hand5& hand);
+    static HandValue getHandValue(const Cards5& hand);
 
     /**
      * 从玩家7张手牌中选取最好的5张手牌
      * @param hand7 玩家的手牌 (公共牌+底牌)
      * @return 玩家的最佳出牌
      */
-    static Hand5 selectBest(const Hand7& hand7);
+    static Cards5 selectBest(const Cards7& hand7);
 
-    static HandValue evaluate(const Hand7& hand7);
+    static HandValue evaluate(const Cards7& hand7);
 };
 } // namespace holdem
 
@@ -81,7 +78,7 @@ namespace holdem::internal {
  * @param hand7 7张手牌
  * @return 所有可能的5张出牌组合
  */
-std::vector<Hand5> getCombinations(const Hand7& hand7);
+std::vector<Cards5> getCombinations(const Cards7& hand7);
 
 /**
  * @brief 记录频次统计中的某一点数及其频次的数据结构
@@ -112,6 +109,6 @@ using SortedCounts = std::vector<RankCount>;
  * @param hand5 5张牌
  * @return 频次统计(按频次、点数从高到低依次排列)
  */
-SortedCounts getSortedCounts(Hand5 hand5);
+SortedCounts getSortedCounts(Cards5 hand5);
 } // namespace holdem::internal
 #endif //OPENHOLDEM_HAND_EVALUATOR_H

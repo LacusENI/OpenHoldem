@@ -10,10 +10,10 @@ namespace holdem {
  * @brief 扑克牌的花色
  */
 enum class Suit : uint8_t {
-    CLUBS,    // 梅花
-    DIAMONDS, // 方块
-    HEARTS,   // 红心
-    SPADES,   // 黑桃
+    CLUB,    // 梅花
+    DIAMOND, // 方块
+    HEART,   // 红心
+    SPADE,   // 黑桃
 };
 
 /**
@@ -31,10 +31,14 @@ struct Card {
     Suit suit;
     Rank rank;
 
-    Card() : suit(), rank() {};
-    Card(Suit suit, Rank rank) : suit(suit), rank(rank) {};
+    Card() : suit(), rank() {}
+    explicit Card(const std::string& str);
+    Card(Suit suit, Rank rank) : suit(suit), rank(rank) {}
 
-    [[nodiscard]] std::string toString() const;
+    /* 用于输出到日志中的展示字符串 */
+    std::string toString() const;
+    /* 用于输出到用户界面的展示字符串 */
+    std::string toMessage() const;
 
     bool operator<(const Card& other) const {
         if (rank == other.rank) return suit < other.suit;

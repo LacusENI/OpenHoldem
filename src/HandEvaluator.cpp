@@ -4,13 +4,13 @@
 
 namespace holdem::internal {
 
-std::vector<Hand5> getCombinations(const Hand7& hand7) {
-    std::vector<Hand5> combinations;
+std::vector<Cards5> getCombinations(const Cards7& hand7) {
+    std::vector<Cards5> combinations;
 
     std::vector<bool> mask = {false, false, true, true, true, true, true};
 
     do {
-        Hand5 combo;
+        Cards5 combo;
         int combo_i = 0;
         for (int i = 0; i < mask.size(); i++) {
             if (mask[i]) { combo[combo_i++] = hand7[i]; }
@@ -21,7 +21,7 @@ std::vector<Hand5> getCombinations(const Hand7& hand7) {
     return combinations;
 }
 
-SortedCounts getSortedCounts(Hand5 hand5) {
+SortedCounts getSortedCounts(Cards5 hand5) {
     std::sort(hand5.begin(), hand5.end(), std::greater());
     SortedCounts counts;
     counts.emplace_back(hand5[0].rank, 0);
@@ -41,7 +41,7 @@ SortedCounts getSortedCounts(Hand5 hand5) {
  * @param hand5 5张牌
  * @return true 若5张牌是同花
  */
-bool isFlush(const Hand5& hand5) {
+bool isFlush(const Cards5& hand5) {
     Suit suit = hand5[0].suit;
     return std::all_of(hand5.begin(), hand5.end(),
         [suit](Card c) { return c.suit == suit; });
@@ -96,7 +96,7 @@ HandType evalPatternHand(const SortedCounts& counts) {
  * @param counts 牌的点数统计
  * @return 牌型
  */
-HandType evalUniqueHand(const Hand5& hand5, SortedCounts& counts) {
+HandType evalUniqueHand(const Cards5& hand5, SortedCounts& counts) {
     bool flushFlag = isFlush(hand5);
     bool straightFlag = isStraight(counts);
     if (flushFlag && straightFlag) {
@@ -111,7 +111,7 @@ HandType evalUniqueHand(const Hand5& hand5, SortedCounts& counts) {
 }
 
 /* 判断5张牌的牌型 */
-HandType getHandType(const Hand5& hand5, SortedCounts& counts) {
+HandType getHandType(const Cards5& hand5, SortedCounts& counts) {
     if (counts.size() != 5)
         return evalPatternHand(counts);
     return evalUniqueHand(hand5, counts);
@@ -119,7 +119,7 @@ HandType getHandType(const Hand5& hand5, SortedCounts& counts) {
 }
 
 namespace holdem {
-HandValue HandEvaluator::getHandValue(const Hand5 &hand) {
+HandValue HandEvaluator::getHandValue(const Cards5 &hand) {
     internal::SortedCounts counts = internal::getSortedCounts(hand);
     HandType handType = getHandType(hand, counts);
     int handValue = static_cast<int>(handType);
@@ -134,10 +134,10 @@ HandValue HandEvaluator::getHandValue(const Hand5 &hand) {
     return HandValue(handValue);
 }
 
-Hand5 HandEvaluator::selectBest(const Hand7 &hand7) {
+Cards5 HandEvaluator::selectBest(const Cards7 &hand7) {
     auto maxHandValue = HandValue(0);
-    Hand5 bestHand;
-    for (Hand5 hand5 : internal::getCombinations(hand7)) {
+    Cards5 bestHand;
+    for (Cards5 hand5 : internal::getCombinations(hand7)) {
         HandValue handValue = getHandValue(hand5);
         if (handValue > maxHandValue) {
             maxHandValue = handValue;
@@ -147,7 +147,7 @@ Hand5 HandEvaluator::selectBest(const Hand7 &hand7) {
     return bestHand;
 }
 
-HandValue HandEvaluator::evaluate(const Hand7& hand7) {
+HandValue HandEvaluator::evaluate(const Cards7& hand7) {
     return getHandValue(selectBest(hand7));
 }
 }
