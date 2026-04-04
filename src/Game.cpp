@@ -12,17 +12,24 @@ void Game::run() {
         game_state = GameState::INIT;
         winners.clear();
     }
-    // 洗牌，发底牌
+    // 打印庄家位信息
+    PlayerId button = getPlayerByPosition(getButtonPosition()).id;
+    std::cout << std::format("Button: @P{}\n", button);
+    // 洗牌，发底牌，盲注
     deck->shuffle();
     dealHoleCards();
+    postBlind();
+    nextStreet();
     // 依次经过 Flop/Turn/River 阶段
     while (game_state != GameState::SHOWDOWN) {
         render();
+        runBettingRound();
         nextStreet();
     }
     // 摊牌阶段
     showdown();
     render();
+    award();
 }
 
 void Game::dealHoleCards() {
@@ -33,28 +40,93 @@ void Game::dealHoleCards() {
         player.hole_cards[0] = deck->deal();
         player.hole_cards[1] = deck->deal();
     }
-    game_state = GameState::PREFLOP;
+}
+
+void Game::postBlind() {
+    Player& sb = getPlayerByPosition(getSmallBlindPosition());
+    Player& bb = getPlayerByPosition(getBigBlindPosition());
+    Stack small_blind = big_blind / 2;
+    commitChips(sb.position, small_blind);
+    commitChips(bb.position, big_blind);
+    std::cout << std::format("#[@P{}]: Small Blind (-${})\n", sb.id, small_blind);
+    std::cout << std::format("#[@P{}]: Big Blind (-${})\n", bb.id, big_blind);
+}
+
+void Game::takeAction(Position position) {
+    Player& player = getPlayerByPosition(position);
+    std::string action_msg;
+    Stack bet = 0;
+    if (current_bet == 0) {
+        action_msg = "Bet";
+        bet = big_blind;
+    } else if (player.current_bet < current_bet) {
+        action_msg = "Call";
+        bet = current_bet - player.current_bet;
+    } else {
+        action_msg = "Call";
+    }
+    commitChips(position, bet);
+    std::cout << std::format("#[@P{}]: {} (-${})\n",
+        player.id, action_msg, bet);
+}
+
+void Game::award() {
+    int winners_n = static_cast<int>(winners.size());
+    int share = pot / winners_n;
+    int remainder = pot % winners_n;
+
+    std::cout << "Winner:";
+    for (size_t i = 0; i < winners_n; ++i) {
+        int amount = share;
+        if (i < remainder) {  // 前 remainder 个玩家多得 1 个筹码
+            amount += 1;
+        }
+        Player& player = getPlayerByPosition(winners[i]);
+        player.chips += amount;
+
+        std::cout << std::format(" @P{}(+${})", player.id, amount);
+    }
+    std::cout << "\n";
+
+    // 打印最终结果
+    std::cout << "Result\n";
+    for (Player& player : players) {
+        std::cout << std::format("[@P{}] ${:>3}\n", player.id, player.chips);
+    }
 }
 
 void Game::nextStreet() {
     switch (game_state) {
+    case GameState::INIT:
+        game_state = GameState::PREFLOP;
+        rest_position = getUtgPosition();
+        break;
     case GameState::PREFLOP:
         community_cards[0] = deck->deal();
         community_cards[1] = deck->deal();
         community_cards[2] = deck->deal();
         game_state = GameState::FLOP;
+        rest_position = nextPosition(button_position);
         break;
     case GameState::FLOP:
         community_cards[3] = deck->deal();
         game_state = GameState::TURN;
+        rest_position = nextPosition(button_position);
         break;
     case GameState::TURN:
         community_cards[4] = deck->deal();
         game_state = GameState::SHOWDOWN;
+        rest_position = nextPosition(button_position);
         break;
     default:
         throw std::runtime_error("Invalid game state for nextStreet()");
     }
+    if (game_state != GameState::PREFLOP) {
+        for (Player& player : players) {
+            player.current_bet = 0;
+        }
+    }
+    current_bet = 0;
 }
 
 void Game::showdown() {
@@ -77,7 +149,39 @@ void Game::showdown() {
     }
 }
 
+void Game::runBettingRound() {
+    std::cout << "Betting Round\n";
+    Position current_position = rest_position;
+    do {
+        takeAction(current_position);
+        current_position = nextPosition(current_position);
+    } while (current_position != rest_position);
+}
+
 void Game::render() {
+    // 显示当前下注轮，底池
+    std::string street_msg;
+    switch (game_state) {
+    case GameState::SHOWDOWN:
+        street_msg = "SHOWDOWN";
+        break;
+    case GameState::RIVER:
+        street_msg = "RIVER";
+        break;
+    case GameState::TURN:
+        street_msg = "TURN";
+        break;
+    case GameState::FLOP:
+        street_msg = "FLOP";
+        break;
+    case GameState::PREFLOP:
+        street_msg = "PREFLOP";
+        break;
+    default:
+        throw std::runtime_error("Invalid Game State");
+    }
+    std::cout << std::format("---{}--- Pot: ${}\n", street_msg, pot);
+
     // 显示公共牌信息
     std::string cc1, cc2, cc3, cc4, cc5;
     switch (game_state) {
@@ -112,17 +216,8 @@ void Game::render() {
             hand_message = "";
         }
         std::cout << std::format(
-            "[@P{}] {} {}   {}\n", id, hole1, hole2, hand_message);
-    }
-
-    // 若处于摊牌阶段，显示获胜的玩家
-    if (game_state == GameState::SHOWDOWN) {
-        std::cout << "Winner:";
-        for (Position position : winners) {
-            PlayerId id = getPlayerByPosition(position).id;
-            std::cout << std::format(" @P{}", id);
-        }
-        std::cout << "\n";
+            "[@P{}] ${:<3} |  {} {}   {}\n",
+            id, player.chips,hole1, hole2, hand_message);
     }
 }
 

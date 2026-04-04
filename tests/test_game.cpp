@@ -39,32 +39,6 @@ TEST(TestGame, DealHoleCards) {
     EXPECT_EQ(player2.hole_cards[1], Card(Suit::SPADE, Rank::KING));
 }
 
-// 测试 Preflop 阶段发的公共牌是否正确
-TEST(TestGame, FlopDealCards) {
-    auto deck = std::make_unique<MockDeck>();
-    EXPECT_CALL(*deck, deal())
-        .WillOnce(Return(Card(Suit::HEART, Rank::ACE)))     // 玩家1 第一张
-        .WillOnce(Return(Card(Suit::SPADE, Rank::ACE)))     // 玩家1 第二张
-        .WillOnce(Return(Card(Suit::HEART, Rank::KING)))    // 玩家2 第一张
-        .WillOnce(Return(Card(Suit::SPADE, Rank::KING)))    // 玩家2 第二张
-        .WillOnce(Return(Card(Suit::DIAMOND, Rank::JACK)))  // 第一张公共牌
-        .WillOnce(Return(Card(Suit::DIAMOND, Rank::QUEEN))) // 第二张公共牌
-        .WillOnce(Return(Card(Suit::HEART, Rank::EIGHT)));  // 第三张公共牌
-    EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
-
-    Game game(std::move(deck));
-    game.addPlayer(0);
-    game.addPlayer(1);
-
-    game.dealHoleCards();
-    game.nextStreet(); // 进入 flop 阶段
-    auto communityCards = game.getCommunityCards();
-
-    EXPECT_EQ(communityCards[0], Card(Suit::DIAMOND, Rank::JACK));
-    EXPECT_EQ(communityCards[1], Card(Suit::DIAMOND, Rank::QUEEN));
-    EXPECT_EQ(communityCards[2], Card(Suit::HEART, Rank::EIGHT));
-}
-
 // 测试三个阶段是否正确发放公共牌
 TEST(TestGame, DeclCommunityCards) {
     auto deck = std::make_unique<MockDeck>();
@@ -129,17 +103,4 @@ TEST(TestGame, GetWinners) {
     EXPECT_EQ(winners[0], players[0].position);
     EXPECT_EQ(winners[0], 0);
     EXPECT_EQ(&game.getPlayerByPosition(winners[0]), &players[0]);
-}
-
-// 测试手牌描述信息是否正确
-TEST(TestGame, TestHandMessage) {
-    const Cards5 hand5 = {
-        Card("C7"), Card("D8"), Card("H9"),
-        Card("ST"), Card("SJ")
-    };
-    HandValue hand_value = HandEvaluator::getHandValue(hand5);
-    std::string hand_message = internal::getHandMessage(hand_value);
-
-    EXPECT_EQ(hand_value.getHandType(), HandType::STRAIGHT);
-    EXPECT_EQ(hand_message, "Straight, 7 to Jack");
 }

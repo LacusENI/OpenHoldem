@@ -16,6 +16,8 @@ int main() {
     game.addPlayer(1);
     game.addPlayer(2);
     game.addPlayer(3);
+    game.addPlayer(4);
+    game.addPlayer(5);
     game.run();
 
     return 0;
