@@ -26,12 +26,9 @@ TEST(TestGame, DealHoleCards) {
     game.addPlayer(0);
     game.addPlayer(1);
 
-    game.dealHoleCards();
-
-    auto players = game.getPlayers();
-    ASSERT_EQ(players.size(), 2);
-    Player& player1 = players[0];
-    Player& player2 = players[1];
+    game.nextStreet();
+    Player& player1 = game.getPlayer(0);
+    Player& player2 = game.getPlayer(1);
 
     EXPECT_EQ(player1.hole_cards[0], Card(Suit::HEART, Rank::ACE));
     EXPECT_EQ(player1.hole_cards[1], Card(Suit::SPADE, Rank::ACE));
@@ -58,7 +55,6 @@ TEST(TestGame, DeclCommunityCards) {
     game.addPlayer(0);
     game.addPlayer(1);
 
-    game.dealHoleCards();
     game.nextStreet(); // 进入 Preflop 阶段
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
@@ -90,7 +86,6 @@ TEST(TestGame, GetWinners) {
     Game game(std::move(deck));
     game.addPlayer(0);
     game.addPlayer(1);
-    game.dealHoleCards();
     game.nextStreet(); // 进入 Preflop 阶段
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
@@ -98,11 +93,39 @@ TEST(TestGame, GetWinners) {
     game.showdown(); // 摊牌
 
     auto& winners = game.getWinners();
-    auto& players = game.getPlayers();
     ASSERT_EQ(winners.size(), 1);
 
     // 玩家1: 一对A, 玩家2: 一对K
-    EXPECT_EQ(winners[0], players[0].position);
-    EXPECT_EQ(winners[0], 0);
-    EXPECT_EQ(&game.getPlayerByPosition(winners[0]), &players[0]);
+    EXPECT_EQ(winners[0], game.getPlayer(0).position);
+}
+
+TEST(TestGame, TestAward) {
+    auto deck = std::make_unique<MockDeck>();
+    EXPECT_CALL(*deck, deal())
+        .WillOnce(Return(Card(Suit::HEART, Rank::ACE)))     // 玩家1 第一张
+        .WillOnce(Return(Card(Suit::SPADE, Rank::ACE)))     // 玩家1 第二张
+        .WillOnce(Return(Card(Suit::HEART, Rank::KING)))    // 玩家2 第一张
+        .WillOnce(Return(Card(Suit::SPADE, Rank::KING)))    // 玩家2 第二张
+        .WillOnce(Return(Card(Suit::DIAMOND, Rank::JACK)))  // 第一张公共牌
+        .WillOnce(Return(Card(Suit::DIAMOND, Rank::QUEEN))) // 第二张公共牌
+        .WillOnce(Return(Card(Suit::HEART, Rank::EIGHT)))   // 第三张公共牌
+        .WillOnce(Return(Card(Suit::CLUB, Rank::THREE)))    // 第四张公共牌
+        .WillOnce(Return(Card(Suit::DIAMOND, Rank::TEN)));  // 第五张公共牌
+    EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
+
+    Game game(std::move(deck));
+    game.addPlayer(0);
+    game.addPlayer(1);
+    game.nextStreet(); // 进入 Preflop 阶段
+    game.nextStreet(); // 进入 flop 阶段
+    game.nextStreet(); // 进入 turn 阶段
+    game.nextStreet(); // 进入 river 阶段
+    game.showdown();
+    // 玩家1: 一对A, 玩家2: 一对K
+    Player& winner = game.getPlayer(game.getWinners()[0]);
+
+    Stack pot = game.getPot();
+    Stack chips_before_award = winner.chips;
+    game.award();
+    EXPECT_EQ(winner.chips, pot + chips_before_award);
 }

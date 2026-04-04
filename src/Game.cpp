@@ -13,12 +13,10 @@ void Game::run() {
         winners.clear();
     }
     // 打印庄家位信息
-    PlayerId button = getPlayerByPosition(getButtonPosition()).id;
-    std::cout << std::format("Button: @P{}\n", button);
-    // 洗牌，发底牌，盲注
-    deck->shuffle();
-    dealHoleCards();
-    postBlind();
+    PlayerId button = getPlayer(getButtonPosition()).id;
+    output(std::format("Button: @P{}\n", button));
+
+    // 进入 Preflop 阶段
     nextStreet();
     // 依次经过 Flop/Turn/River 阶段
     while (game_state != GameState::SHOWDOWN) {
@@ -32,42 +30,46 @@ void Game::run() {
     award();
 }
 
-void Game::dealHoleCards() {
-    if (game_state != GameState::INIT) {
-        throw std::runtime_error("Game state is not init");
-    }
+void Game::preflop() {
+    // 洗牌
+    deck->shuffle();
+    // 发底牌
     for (Player& player : players) {
         player.hole_cards[0] = deck->deal();
         player.hole_cards[1] = deck->deal();
     }
-}
-
-void Game::postBlind() {
-    Player& sb = getPlayerByPosition(getSmallBlindPosition());
-    Player& bb = getPlayerByPosition(getBigBlindPosition());
+    // 盲注
+    Player& sb = getPlayer(getSmallBlindPosition());
+    Player& bb = getPlayer(getBigBlindPosition());
     Stack small_blind = big_blind / 2;
     commitChips(sb.position, small_blind);
     commitChips(bb.position, big_blind);
-    std::cout << std::format("#[@P{}]: Small Blind (-${})\n", sb.id, small_blind);
-    std::cout << std::format("#[@P{}]: Big Blind (-${})\n", bb.id, big_blind);
+    output(std::format("#[@P{}]: Small Blind (-${})\n", sb.id, small_blind));
+    output(std::format("#[@P{}]: Big Blind (-${})\n", bb.id, big_blind));
 }
 
-void Game::takeAction(Position position) {
-    Player& player = getPlayerByPosition(position);
+void Game::takeAction() {
+    Player& player = getPlayer(current_position);
     std::string action_msg;
-    Stack bet = 0;
+    Stack amount = 0;
     if (current_bet == 0) {
         action_msg = "Bet";
-        bet = big_blind;
+        amount = big_blind;
     } else if (player.current_bet < current_bet) {
         action_msg = "Call";
-        bet = current_bet - player.current_bet;
+        amount = current_bet - player.current_bet;
     } else {
-        action_msg = "Call";
+        action_msg = "Check";
     }
-    commitChips(position, bet);
-    std::cout << std::format("#[@P{}]: {} (-${})\n",
-        player.id, action_msg, bet);
+    commitChips(current_position, amount);
+    output(std::format("#[@P{}]: {} (-${})\n",
+        player.id, action_msg, amount));
+}
+
+void Game::nextPlayer() {
+    current_position = nextPosition(current_position);
+    if (current_position == rest_position)
+        round_ended = true;
 }
 
 void Game::award() {
@@ -75,31 +77,36 @@ void Game::award() {
     int share = pot / winners_n;
     int remainder = pot % winners_n;
 
-    std::cout << "Winner:";
+    output("Winner:");
     for (size_t i = 0; i < winners_n; ++i) {
         int amount = share;
-        if (i < remainder) {  // 前 remainder 个玩家多得 1 个筹码
-            amount += 1;
-        }
-        Player& player = getPlayerByPosition(winners[i]);
-        player.chips += amount;
+        // 前 remainder 个玩家多得 1 个筹码
+        if (i < remainder) amount += 1;
 
-        std::cout << std::format(" @P{}(+${})", player.id, amount);
+        Player& player = getPlayer(winners[i]);
+        player.chips += amount;
+        output(std::format(" @P{}(+${})", player.id, amount));
     }
-    std::cout << "\n";
+    output("\n");
 
     // 打印最终结果
-    std::cout << "Result\n";
+    output("Result\n");
     for (Player& player : players) {
-        std::cout << std::format("[@P{}] ${:>3}\n", player.id, player.chips);
+        output(std::format("[@P{}] ${:>3}\n", player.id, player.chips));
     }
+
 }
 
 void Game::nextStreet() {
+    for (Player& player : players) {
+        player.current_bet = 0;
+    }
+
     switch (game_state) {
     case GameState::INIT:
         game_state = GameState::PREFLOP;
         rest_position = getUtgPosition();
+        preflop();
         break;
     case GameState::PREFLOP:
         community_cards[0] = deck->deal();
@@ -118,14 +125,10 @@ void Game::nextStreet() {
         game_state = GameState::SHOWDOWN;
         rest_position = nextPosition(button_position);
         break;
-    default:
-        throw std::runtime_error("Invalid game state for nextStreet()");
+    default: break;
     }
-    if (game_state != GameState::PREFLOP) {
-        for (Player& player : players) {
-            player.current_bet = 0;
-        }
-    }
+    current_position = rest_position;
+    round_ended = false;
     current_bet = 0;
 }
 
@@ -150,12 +153,10 @@ void Game::showdown() {
 }
 
 void Game::runBettingRound() {
-    std::cout << "Betting Round\n";
-    Position current_position = rest_position;
-    do {
-        takeAction(current_position);
-        current_position = nextPosition(current_position);
-    } while (current_position != rest_position);
+    while (!round_ended) {
+        takeAction();
+        nextPlayer();
+    }
 }
 
 void Game::render() {
@@ -180,7 +181,7 @@ void Game::render() {
     default:
         throw std::runtime_error("Invalid Game State");
     }
-    std::cout << std::format("---{}--- Pot: ${}\n", street_msg, pot);
+    output(std::format("---{}--- Pot: ${}\n", street_msg, pot));
 
     // 显示公共牌信息
     std::string cc1, cc2, cc3, cc4, cc5;
@@ -199,12 +200,11 @@ void Game::render() {
     default:
         throw std::runtime_error("Invalid Game State");
     }
-    std::cout << std::format(
-        "Community Cards: {} {} {} {} {}\n",
-        cc1, cc2, cc3, cc4, cc5);
+    output(std::format("Community Cards: {} {} {} {} {}\n",
+        cc1, cc2, cc3, cc4, cc5));
 
     // 显示每名玩家底牌信息
-    std::cout << "Hold Cards:\n";
+    output("Hold Cards:\n");
     for (Player& player : players) {
         PlayerId id = player.id;
         std::string hole1 = player.hole_cards[0].toMessage();
@@ -215,9 +215,9 @@ void Game::render() {
         } else {
             hand_message = "";
         }
-        std::cout << std::format(
+       output(std::format(
             "[@P{}] ${:<3} |  {} {}   {}\n",
-            id, player.chips,hole1, hole2, hand_message);
+            id, player.chips,hole1, hole2, hand_message));
     }
 }
 

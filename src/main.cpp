@@ -13,6 +13,7 @@ int main() {
     std::cout << " OpenHoldem\n";
 
     Game game(std::move(std::make_unique<Deck>()));
+    game.print_enabled = true;
     game.addPlayer(1);
     game.addPlayer(2);
     game.addPlayer(3);

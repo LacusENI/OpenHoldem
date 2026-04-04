@@ -2,6 +2,7 @@
 #define OPENHOLDEM_GAME_H
 #include <memory>
 #include "Deck.h"
+#include "iostream"
 #include "HandEvaluator.h"
 
 namespace holdem {
@@ -39,7 +40,9 @@ private:
     Stack big_blind = 10;         // 大盲注额
     Stack pot = 0;                // 底池金额
     Stack current_bet = 0;        // 当前下注额
-    Position rest_position = 0;   // 休止符玩家位置(若该玩家行动后下一位是休止符玩家，本轮下注结束)
+    Position rest_position{};     // 休止符玩家位置(若该玩家行动后下一位是休止符玩家，本轮下注结束)
+    Position current_position{};  // 当前行动玩家的位置
+    bool round_ended = false;     // 下注轮是否结束
 
     std::unique_ptr<IDeck> deck; // 牌组
     Cards5 community_cards;      // 公共牌
@@ -47,15 +50,19 @@ private:
 
     std::vector<Position> winners{}; // 赢家列表
 public:
+    bool print_enabled = false;
+
     explicit Game(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
 
     const Cards5& getCommunityCards() const { return community_cards; }
     GameState getGameState() const { return game_state; }
-    const std::vector<Player>& getPlayers() const { return players; }
     Position getButtonPosition() const { return button_position; }
     Stack getBigBlind() const { return big_blind; }
     Stack getPot() const { return pot; }
     Stack getCurrentBet() const { return current_bet; }
+    Position getRestPosition() const { return rest_position; }
+    Position getCurrentPosition() const { return current_position; }
+    bool isRoundEnded() const { return round_ended; }
     const std::vector<Position>& getWinners() const { return winners; }
 
     /**
@@ -73,21 +80,9 @@ public:
      * @param position 玩家座位(从0开始)
      * @return 玩家
      */
-    Player& getPlayerByPosition(Position position) {
+    Player& getPlayer(Position position) {
         return players[position];
     }
-    /**
-     * 通过 ID 搜索玩家
-     * @param id 玩家ID
-     * @return 目标玩家
-     */
-    Player& getPlayerById(PlayerId id) {
-        for (Player& player : players) {
-            if (player.id == id) return player;
-        }
-        throw std::runtime_error("Player not found");
-    }
-
     /**
      * 当前玩家的下一位(左手第一位)
      * @param position 当前玩家位置
@@ -96,7 +91,6 @@ public:
     Position nextPosition(Position position) const {
         return (position + 1) % static_cast<int>(players.size());
     }
-
     /* 小盲注位 */
     Position getSmallBlindPosition() const {
         return nextPosition(button_position);
@@ -116,7 +110,7 @@ public:
      * @param amount 投入筹码的数额
      */
     void commitChips(Position position, Stack amount) {
-        Player& player = getPlayerByPosition(position);
+        Player& player = getPlayer(position);
         player.chips -= amount;
         pot += amount;
         player.current_bet += amount;
@@ -126,19 +120,22 @@ public:
     }
 
     /**
+     * 控制台输出
+     * @param msg 输出信息
+     */
+    void output(const std::string& msg) const {
+        if (print_enabled) std::cout << msg;
+    }
+    /**
      * @brief 运行一局游戏
      * @details 调用此函数后，将进行一局游戏，直到结束
      */
     void run();
     /**
-     * @brief 为每位玩家发放底牌
-     * @note 每位玩家一次性发放两张底牌
+     * @brief 进行Preflop下注轮前的准备工作
+     * @details 包括洗牌，发底牌，盲注
      */
-    void dealHoleCards();
-    /**
-     * @brief 投入小盲注和大盲注
-     */
-    void postBlind();
+    void preflop();
     /**
      * @brief 进入下一个阶段，翻开此轮的公共牌
      * @note 每次发公共牌前不烧牌
@@ -158,10 +155,15 @@ public:
      */
     void runBettingRound();
     /**
-     * @brief 该玩家开始行动
+     * @brief 当前玩家采取行动
      * @note demo_v2 阶段只有"投入大盲注等额"一种行动
      */
-    void takeAction(Position position);
+    void takeAction();
+    /**
+     * @brief 移动至下一个要行动的玩家,
+     * 若下注轮已结束，则设置回合结束标志
+     */
+    void nextPlayer();
     /**
      * @brief 为赢家分配底池
      * @note 若有多名玩家获胜且底池无法均分,
