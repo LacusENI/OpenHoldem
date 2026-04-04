@@ -23,8 +23,8 @@ TEST(TestGame, DealHoleCards) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     Game game(std::move(deck));
-    game.addPlayer(Player());
-    game.addPlayer(Player());
+    game.addPlayer(0);
+    game.addPlayer(1);
 
     game.dealHoleCards();
 
@@ -53,8 +53,8 @@ TEST(TestGame, FlopDealCards) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     Game game(std::move(deck));
-    game.addPlayer(Player());
-    game.addPlayer(Player());
+    game.addPlayer(0);
+    game.addPlayer(1);
 
     game.dealHoleCards();
     game.nextStreet(); // 进入 flop 阶段
@@ -81,8 +81,8 @@ TEST(TestGame, DeclCommunityCards) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     Game game(std::move(deck));
-    game.addPlayer(Player());
-    game.addPlayer(Player());
+    game.addPlayer(0);
+    game.addPlayer(1);
 
     game.dealHoleCards();
     game.nextStreet(); // 进入 flop 阶段
@@ -113,8 +113,8 @@ TEST(TestGame, GetWinners) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     Game game(std::move(deck));
-    game.addPlayer(Player());
-    game.addPlayer(Player());
+    game.addPlayer(0);
+    game.addPlayer(1);
     game.dealHoleCards();
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
@@ -126,7 +126,9 @@ TEST(TestGame, GetWinners) {
     ASSERT_EQ(winners.size(), 1);
 
     // 玩家1: 一对A, 玩家2: 一对K
-    EXPECT_EQ(winners[0], &players[0]);
+    EXPECT_EQ(winners[0], players[0].position);
+    EXPECT_EQ(winners[0], 0);
+    EXPECT_EQ(&game.getPlayerByPosition(winners[0]), &players[0]);
 }
 
 // 测试手牌描述信息是否正确

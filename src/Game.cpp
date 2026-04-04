@@ -67,11 +67,11 @@ void Game::showdown() {
     HandValue winner_value;
     for (Player& player : players) {
         if (player.hand_value == winner_value) {
-            winners.push_back(&player);
+            winners.push_back(player.position);
         }
         else if (player.hand_value > winner_value) {
             winners.clear();
-            winners.push_back(&player);
+            winners.push_back(player.position);
             winner_value = player.hand_value;
         }
     }
@@ -118,8 +118,9 @@ void Game::render() {
     // 若处于摊牌阶段，显示获胜的玩家
     if (game_state == GameState::SHOWDOWN) {
         std::cout << "Winner:";
-        for (Player* player : winners) {
-            std::cout << std::format(" @P{}", player->id);
+        for (Position position : winners) {
+            PlayerId id = getPlayerByPosition(position).id;
+            std::cout << std::format(" @P{}", id);
         }
         std::cout << "\n";
     }
