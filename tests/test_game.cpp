@@ -59,6 +59,7 @@ TEST(TestGame, DeclCommunityCards) {
     game.addPlayer(1);
 
     game.dealHoleCards();
+    game.nextStreet(); // 进入 Preflop 阶段
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
     game.nextStreet(); // 进入 river 阶段
@@ -90,6 +91,7 @@ TEST(TestGame, GetWinners) {
     game.addPlayer(0);
     game.addPlayer(1);
     game.dealHoleCards();
+    game.nextStreet(); // 进入 Preflop 阶段
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
     game.nextStreet(); // 进入 river 阶段
