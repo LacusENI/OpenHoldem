@@ -42,7 +42,7 @@ public:
 
     /* 洗牌 */
     void shuffle() override {
-        std::shuffle(cards.begin(), cards.end(), rng);
+        std::ranges::shuffle(cards, rng);
         next_card_index = 0;
     }
 

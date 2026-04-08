@@ -13,13 +13,13 @@ std::string rankToString(Rank rank) {
     return ranks[static_cast<int>(rank)];
 }
 
-Card::Card(const std::string& str) {
+Card::Card(const char* str) {
     switch (str[0]) {
     case 'C': suit = Suit::CLUB; break;
     case 'D': suit = Suit::DIAMOND; break;
     case 'H': suit = Suit::HEART; break;
     case 'S': suit = Suit::SPADE; break;
-    default: throw std::invalid_argument("invalid card string: " + str);
+    default: throw std::invalid_argument("invalid card string: " + std::string(str));
     }
     switch (str[1]) {
     case 'T': rank = Rank::TEN; break;
@@ -31,7 +31,7 @@ Card::Card(const std::string& str) {
         if (str[1] >= '2' && str[1] <= '9') {
             rank = static_cast<Rank>(str[1] - '0');
         } else {
-            throw std::invalid_argument("invalid card string: " + str);
+            throw std::invalid_argument("invalid card string: " + std::string(str));
         }
     }
 }
