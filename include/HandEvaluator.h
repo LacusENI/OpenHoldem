@@ -25,9 +25,9 @@ enum class HandType {
  * - 两对9和5: 0x295000 (2表示两对)
  */
 struct HandValue {
-    uint32_t raw_value;
+    uint32_t raw_value = 0;
 
-    HandValue() : raw_value(0) {}
+    HandValue() = default;
     explicit HandValue(int raw_value) : raw_value(raw_value) {}
 
     /* 获取此手牌分值对应的手牌类型 */
@@ -64,20 +64,6 @@ struct HandValue {
 class HandEvaluator {
 public:
     /**
-     * @brief 计算玩家出牌对应的编码
-     * @param hand 玩家的出牌
-     * @return 出牌对应的编码
-     */
-    static HandValue getHandValue(const Cards5& hand);
-
-    /**
-     * @brief 从玩家7张手牌中选取最好的5张手牌
-     * @param hand7 玩家的手牌 (公共牌+底牌)
-     * @return 玩家的最佳出牌
-     */
-    static Cards5 selectBest(const Cards7& hand7);
-
-    /**
      * 计算该玩家的手牌大小
      * @param hand7 5张公共牌+2张底牌
      * @return 手牌分值
@@ -87,13 +73,6 @@ public:
 } // namespace holdem
 
 namespace holdem::internal {
-
-/**
- * 枚举所有可能的出牌组合(7选5)
- * @param hand7 7张手牌
- * @return 所有可能的5张出牌组合
- */
-std::vector<Cards5> getCombinations(const Cards7& hand7);
 
 /**
  * @brief 记录频次统计中的某一点数及其频次的数据结构
@@ -115,15 +94,38 @@ struct RankCount {
     }
 };
 
-using SortedCounts = std::vector<RankCount>;
+using HandCounts = std::vector<RankCount>;
 
 /**
  * 统计5张牌的频次，按频次从高到低排序，若频次相同，点数高者优先，如：
  * - 5, 5, 4, 4, 2 -> 5:2, 4:2, 2:1
  * - 6, 6, 6, 9, 9 -> 6:3, 9:2
+ * @note 如果是A2345顺子，则A视为点数最低牌
  * @param hand5 5张牌
  * @return 频次统计(按频次、点数从高到低依次排列)
  */
-SortedCounts getSortedCounts(Cards5 hand5);
+HandCounts evalHandCounts(Cards5 hand5);
+
+/**
+ * @brief 计算玩家出牌对应的编码
+ * @param hand 玩家的出牌
+ * @return 出牌对应的编码
+ */
+HandValue evalHandValue(const Cards5& hand);
+
+/**
+ * 判断5张出牌的牌型
+ * @param hand5 5张出牌
+ * @param counts 其点数统计
+ * @return 5张出牌的牌型
+ */
+HandType evalHandType(const Cards5& hand5, const HandCounts& counts);
+
+/**
+ * 枚举所有可能的出牌组合(7选5)
+ * @param hand7 7张手牌
+ * @return 所有可能的5张出牌组合
+ */
+std::vector<Cards5> enum5from7(const Cards7& hand7);
 } // namespace holdem::internal
 #endif //OPENHOLDEM_HAND_EVALUATOR_H
