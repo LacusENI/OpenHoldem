@@ -20,13 +20,13 @@ void Game::run() {
     nextStreet();
     // 依次经过 Flop/Turn/River 阶段
     while (game_state != GameState::SHOWDOWN) {
-        render();
+        displayBoard();
         runBettingRound();
         nextStreet();
     }
     // 摊牌阶段
     showdown();
-    render();
+    displayBoard();
     award();
 }
 
@@ -161,7 +161,7 @@ void Game::runBettingRound() {
     }
 }
 
-void Game::render() {
+void Game::displayBoard() {
     // 显示当前下注轮，底池
     std::string street_msg;
     switch (game_state) {

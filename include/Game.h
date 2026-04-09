@@ -144,7 +144,7 @@ public:
     /**
      * @brief 渲染控制台界面
      */
-    void render();
+    void displayBoard();
     /**
      * @brief 进入摊牌阶段
      * @details 评估每个玩家的牌型，并决出胜者

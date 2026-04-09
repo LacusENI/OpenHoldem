@@ -90,6 +90,11 @@ public:
      * @param amount 投入筹码的数额
      */
     void commitChips(Position position, Stack amount);
+
+    /**
+     * @brief 负责发放底牌或公共牌
+     */
+    void dealCards();
 };
 
 }
