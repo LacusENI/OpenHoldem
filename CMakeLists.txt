@@ -10,9 +10,11 @@ add_library(poker_core
         include/HandEvaluator.h
         include/Deck.h
         include/Game.h
+        include/GameModel.h
         src/Card.cpp
-        src/Game.cpp
         src/HandEvaluator.cpp
+        src/Game.cpp
+        src/GameModel.cpp
 )
 
 target_include_directories(poker_core PUBLIC include)
