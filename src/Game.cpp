@@ -115,6 +115,9 @@ void Game::nextStreet() {
         break;
     case GameState::TURN:
         community_cards[4] = deck->deal();
+        game_state = GameState::RIVER;
+        break;
+    case GameState::RIVER:
         game_state = GameState::SHOWDOWN;
         rest_position = nextPosition(button_position);
         break;
