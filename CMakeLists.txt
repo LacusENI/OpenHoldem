@@ -31,6 +31,7 @@ add_executable(poker_tests
         tests/test_card.cpp
         tests/test_hand.cpp
         tests/test_game.cpp
+        tests/test_model.cpp
 )
 
 target_link_libraries(poker_tests PRIVATE
