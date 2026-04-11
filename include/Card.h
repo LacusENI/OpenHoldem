@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <array>
+#include <format>
 
 namespace holdem {
 
@@ -54,6 +55,10 @@ struct Card {
         return rank > other.rank;
     }
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Card& card) {
+    return os << std::format("Card(\"{}\")", card.toString());
+}
 
 using Cards7 = std::array<Card, 7>;
 using Cards2 = std::array<Card, 2>;
