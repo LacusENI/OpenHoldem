@@ -1,5 +1,6 @@
 #ifndef OPENHOLDEM_GAME_H
 #define OPENHOLDEM_GAME_H
+#include <iostream>
 #include <memory>
 #include "GameModel.h"
 
@@ -34,11 +35,13 @@ public:
     }
 
     void output(const std::string& msg) const {
-        model.output(msg);
+        if (model.print_enabled) std::cout << msg;
     }
 
-    void displayAction() {
-
+    void displayAction(const Action& action) const {
+        if (model.print_enabled)
+            output(std::format("#[@P{}]: {} (-${})\n",
+                action.actor_position + 1, action.action_name, action.amount));
     }
 };
 

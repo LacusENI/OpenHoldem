@@ -1,6 +1,5 @@
 #ifndef OPENHOLDEM_GAME_STATE_H
 #define OPENHOLDEM_GAME_STATE_H
-#include <iostream>
 #include <memory>
 #include "Deck.h"
 #include "HandEvaluator.h"
@@ -13,6 +12,12 @@ using Stack = int;    // 筹码数量
 
 enum class GameState {
     IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
+};
+
+struct Action {
+    Position actor_position;
+    std::string action_name;
+    Stack amount;
 };
 
 /**
@@ -94,16 +99,13 @@ public:
      */
     void commitChips(Position position, Stack amount);
 
-    void setup() {} // TODO: 待实现
+    void setup() { // TODO: 待实现
+        deck->shuffle();
+    }
     /**
      * @brief 负责发放底牌或公共牌
      */
     void dealCards();
-    /**
-     * @brief 进行Preflop下注轮前的准备工作
-     * @details 包括洗牌，发底牌，盲注
-     */
-    void preflop();
     /**
      * @brief 进入下一个阶段，翻开此轮的公共牌
      * @note 每次发公共牌前不烧牌
@@ -122,7 +124,7 @@ public:
      * @brief 当前玩家采取行动
      * @note demo_v2 阶段只有"投入大盲注等额"一种行动
      */
-    void takeAction();
+    Action takeAction();
     /**
      * @brief 移动至下一个要行动的玩家,
      * 若下注轮已结束，则设置回合结束标志
@@ -134,13 +136,9 @@ public:
      * 则座位靠前的赢家比靠后的赢家多分得一个筹码
      */
     std::vector<Stack> award();
-    /**
-     * 控制台输出
-     * @param msg 输出信息
-     */
-    void output(const std::string& msg) const {
-        if (print_enabled) std::cout << msg;
-    }
+
+    Action bigBlind();
+    Action smallBlind();
 };
 }
 

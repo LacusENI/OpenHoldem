@@ -107,25 +107,20 @@ void GameModel::dealCards() {
     }
 }
 
-void GameModel::preflop() {
-    // 洗牌
-    deck->shuffle();
-    // 发底牌
-    for (Player& player : players) {
-        player.hole_cards[0] = deck->deal();
-        player.hole_cards[1] = deck->deal();
-    }
-    // 盲注
-    Player& sb = getPlayer(getSmallBlindPosition());
-    Player& bb = getPlayer(getBigBlindPosition());
-    Stack small_blind = big_blind / 2;
-    commitChips(sb.position, small_blind);
-    commitChips(bb.position, big_blind);
-    output(std::format("#[@P{}]: Small Blind (-${})\n", sb.id, small_blind));
-    output(std::format("#[@P{}]: Big Blind (-${})\n", bb.id, big_blind));
+Action GameModel::bigBlind() {
+    Position position = getBigBlindPosition();
+    commitChips(position, big_blind);
+    return {position, "Big Blind", big_blind};
 }
 
-void GameModel::takeAction() {
+Action GameModel::smallBlind() {
+    Position position = getSmallBlindPosition();
+    Stack small_blind = big_blind / 2;
+    commitChips(position, small_blind);
+    return {position, "Small Blind", small_blind};
+}
+
+Action GameModel::takeAction() {
     Player& player = getPlayer(current_position);
     std::string action_msg;
     Stack amount = 0;
@@ -139,8 +134,7 @@ void GameModel::takeAction() {
         action_msg = "Check";
     }
     commitChips(current_position, amount);
-    output(std::format("#[@P{}]: {} (-${})\n",
-        player.id, action_msg, amount));
+    return {current_position, action_msg, amount};
 }
 
 void GameModel::nextPlayer() {
@@ -175,31 +169,26 @@ void GameModel::nextStreet() {
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;
-        rest_position = getUtgPosition();
-        preflop();
+        current_position = getUtgPosition();
         break;
     case GameState::PREFLOP:
-        community_cards[0] = deck->deal();
-        community_cards[1] = deck->deal();
-        community_cards[2] = deck->deal();
         game_state = GameState::FLOP;
-        rest_position = nextPosition(button_position);
+        current_position = nextPosition(button_position);
         break;
     case GameState::FLOP:
-        community_cards[3] = deck->deal();
         game_state = GameState::TURN;
-        rest_position = nextPosition(button_position);
+        current_position = nextPosition(button_position);
         break;
     case GameState::TURN:
-        community_cards[4] = deck->deal();
         game_state = GameState::RIVER;
-        rest_position = nextPosition(button_position);
+        current_position = nextPosition(button_position);
         break;
     case GameState::RIVER:
         game_state = GameState::AWARD;
     default: break;
     }
-    current_position = rest_position;
+    dealCards();
+    rest_position = current_position;
     is_round_ended = false;
     round_bet = 0;
 }

@@ -10,10 +10,21 @@ void Game::run() {
 
     // 进入 Preflop 阶段
     nextStreet();
+
+    // 执行盲注
+    Action sb = model.smallBlind();
+    Action bb = model.bigBlind();
+    displayAction(sb);
+    displayAction(bb);
+
     // 依次经过 Flop/Turn/River 阶段
     while (model.game_state != GameState::AWARD) {
         displayBoard();
-        model.runBettingRound();
+        while (!model.is_round_ended) {
+            Action action = model.takeAction();
+            displayAction(action);
+            model.nextPlayer();
+        }
         nextStreet();
     }
     // 摊牌阶段
