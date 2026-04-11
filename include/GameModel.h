@@ -94,16 +94,11 @@ public:
      */
     void commitChips(Position position, Stack amount);
 
+    void setup() {} // TODO: 待实现
     /**
      * @brief 负责发放底牌或公共牌
      */
     void dealCards();
-
-    /**
-     * @brief 运行一局游戏
-     * @details 调用此函数后，将进行一局游戏，直到结束
-     */
-    void run();
     /**
      * @brief 进行Preflop下注轮前的准备工作
      * @details 包括洗牌，发底牌，盲注
@@ -114,10 +109,6 @@ public:
      * @note 每次发公共牌前不烧牌
      */
     void nextStreet();
-    /**
-     * @brief 渲染控制台界面
-     */
-    void displayBoard();
     /**
      * @brief 进入摊牌阶段
      * @details 评估每个玩家的牌型，并决出胜者
@@ -142,7 +133,7 @@ public:
      * @note 若有多名玩家获胜且底池无法均分,
      * 则座位靠前的赢家比靠后的赢家多分得一个筹码
      */
-    void award();
+    std::vector<Stack> award();
     /**
      * 控制台输出
      * @param msg 输出信息
@@ -151,7 +142,11 @@ public:
         if (print_enabled) std::cout << msg;
     }
 };
+}
 
+namespace holdem::internal {
+std::string rankToMessage(Rank rank);
+std::string getHandMessage(HandValue hand_value);
 }
 
 #endif //OPENHOLDEM_GAME_STATE_H

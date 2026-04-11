@@ -127,6 +127,6 @@ TEST(TestGame, TestAward) {
 
     Stack pot = game.model.pot;
     Stack chips_before_award = winner.chips;
-    game.award();
+    game.model.award();
     EXPECT_EQ(winner.chips, pot + chips_before_award);
 }

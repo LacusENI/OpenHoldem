@@ -13,9 +13,9 @@ public:
 
     explicit Game(std::unique_ptr<IDeck> deck) : model(std::move(deck)) {}
 
-    void run() {
-        model.run();
-    }
+    void run();
+
+    void displayBoard();
 
     void addPlayer(PlayerId id) {
         model.addPlayer(id);
@@ -33,8 +33,12 @@ public:
         model.showdown();
     }
 
-    void award() {
-        model.award();
+    void output(const std::string& msg) const {
+        model.output(msg);
+    }
+
+    void displayAction() {
+
     }
 };
 

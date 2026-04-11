@@ -1,7 +1,6 @@
 #include "Card.h"
 #include "GameModel.h"
 #include "HandEvaluator.h"
-#include <iostream>
 
 namespace holdem::internal {
 std::string rankToMessage(Rank rank) {
@@ -108,30 +107,6 @@ void GameModel::dealCards() {
     }
 }
 
-void GameModel::run() {
-    // 初始化
-    if (game_state != GameState::IDLE) {
-        game_state = GameState::IDLE;
-        winners.clear();
-    }
-    // 打印庄家位信息
-    PlayerId button = getPlayer(button_position).id;
-    output(std::format("Button: @P{}\n", button));
-
-    // 进入 Preflop 阶段
-    nextStreet();
-    // 依次经过 Flop/Turn/River 阶段
-    while (game_state != GameState::AWARD) {
-        displayBoard();
-        runBettingRound();
-        nextStreet();
-    }
-    // 摊牌阶段
-    showdown();
-    displayBoard();
-    award();
-}
-
 void GameModel::preflop() {
     // 洗牌
     deck->shuffle();
@@ -174,29 +149,22 @@ void GameModel::nextPlayer() {
         is_round_ended = true;
 }
 
-void GameModel::award() {
+std::vector<Stack> GameModel::award() {
     int winners_n = static_cast<int>(winners.size());
     int share = pot / winners_n;
     int remainder = pot % winners_n;
 
-    output("Winner:");
+    std::vector<Stack> amounts;
     for (size_t i = 0; i < winners_n; ++i) {
         int amount = share;
         // 前 remainder 个玩家多得 1 个筹码
         if (i < remainder) amount += 1;
 
+        amounts.push_back(amount);
         Player& player = getPlayer(winners[i]);
         player.chips += amount;
-        output(std::format(" @P{}(+${})", player.id, amount));
     }
-    output("\n");
-
-    // 打印最终结果
-    output("Result\n");
-    for (Player& player : players) {
-        output(std::format("[@P{}] ${:>3}\n", player.id, player.chips));
-    }
-
+    return amounts;
 }
 
 void GameModel::nextStreet() {
@@ -260,68 +228,6 @@ void GameModel::runBettingRound() {
     while (!is_round_ended) {
         takeAction();
         nextPlayer();
-    }
-}
-
-void GameModel::displayBoard() {
-    // 显示当前下注轮，底池
-    std::string street_msg;
-    switch (game_state) {
-    case GameState::AWARD:
-        street_msg = "SHOWDOWN";
-        break;
-    case GameState::RIVER:
-        street_msg = "RIVER";
-        break;
-    case GameState::TURN:
-        street_msg = "TURN";
-        break;
-    case GameState::FLOP:
-        street_msg = "FLOP";
-        break;
-    case GameState::PREFLOP:
-        street_msg = "PREFLOP";
-        break;
-    default:
-        throw std::runtime_error("Invalid Game State");
-    }
-    output(std::format("---{}--- Pot: ${}\n", street_msg, pot));
-
-    // 显示公共牌信息
-    std::string cc1, cc2, cc3, cc4, cc5;
-    switch (game_state) {
-    case GameState::AWARD:
-    case GameState::RIVER:
-        cc5 = community_cards[4].toMessage();
-    case GameState::TURN:
-        cc4 = community_cards[3].toMessage();
-    case GameState::FLOP:
-        cc3 = community_cards[2].toMessage();
-        cc2 = community_cards[1].toMessage();
-        cc1 = community_cards[0].toMessage();
-    case GameState::PREFLOP:
-        break;
-    default:
-        throw std::runtime_error("Invalid Game State");
-    }
-    output(std::format("Community Cards: {} {} {} {} {}\n",
-        cc1, cc2, cc3, cc4, cc5));
-
-    // 显示每名玩家底牌信息
-    output("Hold Cards:\n");
-    for (Player& player : players) {
-        PlayerId id = player.id;
-        std::string hole1 = player.hole_cards[0].toMessage();
-        std::string hole2 = player.hole_cards[1].toMessage();
-        std::string hand_message;
-        if (game_state == GameState::AWARD) {
-            hand_message = internal::getHandMessage(player.hand_value);
-        } else {
-            hand_message = "";
-        }
-       output(std::format(
-            "[@P{}] ${:<3} |  {} {}   {}\n",
-            id, player.chips,hole1, hole2, hand_message));
     }
 }
 
