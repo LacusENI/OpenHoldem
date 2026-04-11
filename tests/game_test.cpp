@@ -90,7 +90,7 @@ TEST(TestGame, GetWinners) {
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
     game.nextStreet(); // 进入 river 阶段
-    game.showdown(); // 摊牌
+    game.handleAward(); // 摊牌
 
     auto& winners = game.model.winners;
     ASSERT_EQ(winners.size(), 1);
@@ -121,12 +121,10 @@ TEST(TestGame, TestAward) {
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
     game.nextStreet(); // 进入 river 阶段
-    game.showdown();
+    game.handleAward();
+    Stack chips_before_award = game.getPlayer(0).chips;
     // 玩家1: 一对A, 玩家2: 一对K
     Player& winner = game.getPlayer(game.model.winners[0]);
-
     Stack pot = game.model.pot;
-    Stack chips_before_award = winner.chips;
-    game.model.award();
     EXPECT_EQ(winner.chips, pot + chips_before_award);
 }

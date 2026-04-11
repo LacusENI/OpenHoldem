@@ -113,15 +113,6 @@ public:
      */
     void nextStreet();
     /**
-     * @brief 进入摊牌阶段
-     * @details 评估每个玩家的牌型，并决出胜者
-     */
-    void showdown();
-    /**
-     * @brief 进行一次下注轮(玩家行动)
-     */
-    void runBettingRound();
-    /**
      * @brief 当前玩家采取行动
      * @note demo_v2 阶段只有"投入大盲注等额"一种行动
      * @return 此次玩家所采取的动作信息
@@ -132,13 +123,8 @@ public:
      * 若下注轮已结束，则设置回合结束标志
      */
     void nextPlayer();
-    /**
-     * @brief 为赢家分配底池
-     * @note 若有多名玩家获胜且底池无法均分,
-     * 则座位靠前的赢家比靠后的赢家多分得一个筹码
-     * @return 赢家获得的筹码
-     */
-    std::vector<Stack> award();
+
+    void distributePot(std::vector<Stack> amounts);
 
     /**
      * @brief 执行大盲注
@@ -151,11 +137,6 @@ public:
      */
     Action smallBlind();
 };
-}
-
-namespace holdem::internal {
-std::string rankToMessage(Rank rank);
-std::string getHandMessage(HandValue hand_value);
 }
 
 #endif //OPENHOLDEM_GAME_STATE_H

@@ -1,4 +1,69 @@
 #include "Game.h"
+#include "ShowdownHandler.h"
+
+namespace holdem::internal {
+std::string rankToMessage(Rank rank) {
+    switch (rank) {
+    case Rank::ACE: return "Ace";
+    case Rank::KING: return "King";
+    case Rank::QUEEN: return "Queen";
+    case Rank::JACK: return "Jack";
+    case Rank::TEN: return "Ten";
+    default:
+        return std::to_string(static_cast<int>(rank));
+    }
+}
+
+std::string getHandMessage(HandValue hand_value) {
+    HandType hand_type = hand_value.getHandType();
+    std::string x, y;
+    switch (hand_type) {
+    case HandType::ROYAL_FLUSH:
+        return "Royal Flush";
+    case HandType::STRAIGHT_FLUSH:
+        x = rankToMessage(hand_value.getRank(4));
+        y = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "Straight Flush, {} to {}", x, y);
+    case HandType::FOUR_OF_A_KIND:
+        x = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "Four of a Kind, {}s", x);
+    case HandType::FULL_HOUSE:
+        x = rankToMessage(hand_value.getRank(0));
+        y = rankToMessage(hand_value.getRank(1));
+        return std::format(
+            "Full House, {}s full of {}s", x, y);
+    case HandType::FLUSH:
+        x = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "Flush, {}-high", x);
+    case HandType::STRAIGHT:
+        x = rankToMessage(hand_value.getRank(4));
+        y = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "Straight, {} to {}", x, y);
+    case HandType::THREE_OF_A_KIND:
+        x = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "Three of a Kind, {}s", x);
+    case HandType::TWO_PAIR:
+        x = rankToMessage(hand_value.getRank(0));
+        y = rankToMessage(hand_value.getRank(1));
+        return std::format(
+            "Two pair, {}s and {}s", x, y);
+    case HandType::ONE_PAIR:
+        x = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "One Pair, {}s", x);
+    case HandType::HIGH_CARD:
+        x = rankToMessage(hand_value.getRank(0));
+        return std::format(
+            "High Card, {}-high", x);
+    }
+    return "";
+}
+} // namespace holdem::internal
 
 namespace holdem {
 void Game::run() {
@@ -28,9 +93,8 @@ void Game::run() {
         nextStreet();
     }
     // 摊牌阶段
-    model.showdown();
+    auto amounts = handleAward();
     displayBoard();
-    auto amounts = model.award();
 
     // 打印分配底池结果
     output("Winner:");
@@ -110,4 +174,14 @@ void Game::displayBoard() {
     }
 }
 
+std::vector<Stack> Game::handleAward() {
+    auto hand_values = ShowdownHandler::evalHandValues(
+        model.players, model.community_cards);
+    model.winners = ShowdownHandler::determineWinners(
+        hand_values);
+    auto amounts = ShowdownHandler::calculateDistribution(
+        model.pot, model.winners.size());
+    model.distributePot(amounts);
+    return amounts;
+}
 }

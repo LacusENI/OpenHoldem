@@ -7,14 +7,16 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(poker_core
         include/Card.h
-        include/HandEvaluator.h
-        include/Deck.h
-        include/Game.h
-        include/GameModel.h
         src/Card.cpp
+        include/Deck.h
+        include/HandEvaluator.h
         src/HandEvaluator.cpp
+        include/Game.h
         src/Game.cpp
+        include/GameModel.h
         src/GameModel.cpp
+        include/ShowdownHandler.h
+        src/ShowdownHandler.cpp
 )
 
 target_include_directories(poker_core PUBLIC include)
@@ -28,10 +30,11 @@ target_link_libraries(open_holdem PRIVATE
 )
 
 add_executable(poker_tests
-        tests/test_card.cpp
-        tests/test_hand.cpp
-        tests/test_game.cpp
-        tests/test_model.cpp
+        tests/card_test.cpp
+        tests/hand_evaluator_test.cpp
+        tests/game_test.cpp
+        tests/game_model_test.cpp
+        docs/showdown_handler_test.txt
 )
 
 target_link_libraries(poker_tests PRIVATE

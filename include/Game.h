@@ -30,10 +30,6 @@ public:
         return model.getPlayer(pos);
     }
 
-    void showdown() {
-        model.showdown();
-    }
-
     void output(const std::string& msg) const {
         if (model.print_enabled) std::cout << msg;
     }
@@ -43,6 +39,8 @@ public:
             output(std::format("#[@P{}]: {} (-${})\n",
                 action.actor_position + 1, action.action_name, action.amount));
     }
+
+    std::vector<Stack> handleAward();
 };
 
 } // namespace holdem
