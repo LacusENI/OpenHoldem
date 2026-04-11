@@ -99,9 +99,10 @@ public:
      */
     void commitChips(Position position, Stack amount);
 
-    void setup() { // TODO: 待实现
-        deck->shuffle();
-    }
+    /**
+     * @brief 游戏状态和数据初始化
+     */
+    void setup();
     /**
      * @brief 负责发放底牌或公共牌
      */
@@ -123,6 +124,7 @@ public:
     /**
      * @brief 当前玩家采取行动
      * @note demo_v2 阶段只有"投入大盲注等额"一种行动
+     * @return 此次玩家所采取的动作信息
      */
     Action takeAction();
     /**
@@ -134,10 +136,19 @@ public:
      * @brief 为赢家分配底池
      * @note 若有多名玩家获胜且底池无法均分,
      * 则座位靠前的赢家比靠后的赢家多分得一个筹码
+     * @return 赢家获得的筹码
      */
     std::vector<Stack> award();
 
+    /**
+     * @brief 执行大盲注
+     * @return 动作信息
+     */
     Action bigBlind();
+    /**
+     * @brief 执行小盲注
+     * @return 动作信息
+     */
     Action smallBlind();
 };
 }

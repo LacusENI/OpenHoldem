@@ -84,6 +84,20 @@ void GameModel::commitChips(Position position, Stack amount) {
     }
 }
 
+void GameModel::setup() {
+    game_state = GameState::IDLE;
+    pot = 0;
+    round_bet = 0;
+    is_round_ended = false;
+    winners.clear();
+    for (Player& player : players) {
+        player.current_bet = 0;
+        player.hand_value = HandValue();
+    }
+    deck->shuffle();
+}
+
+
 void GameModel::dealCards() {
     switch (game_state) {
     case GameState::PREFLOP:
@@ -201,7 +215,7 @@ void GameModel::showdown() {
     }
     // 决出手牌最大的获胜者
     HandValue winner_value;
-    for (Player& player : players) {
+    for (const Player& player : players) {
         if (player.hand_value == winner_value) {
             winners.push_back(player.position);
         }
