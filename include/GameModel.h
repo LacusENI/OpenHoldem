@@ -1,5 +1,6 @@
 #ifndef OPENHOLDEM_GAME_STATE_H
 #define OPENHOLDEM_GAME_STATE_H
+#include <iostream>
 #include <memory>
 #include "Deck.h"
 #include "HandEvaluator.h"
@@ -35,6 +36,7 @@ class GameModel {
 public:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
+    bool print_enabled = false;
     Position button_position = 0; // 庄家位置
     Stack big_blind = 10;         // 大盲注额
     Stack pot = 0;                // 底池金额
@@ -54,7 +56,7 @@ public:
     /**
      * @brief 添加新玩家到玩家列表
      */
-    void addPlayer();
+    void addPlayer(PlayerId id);
     /**
      * 获取到该座位上的玩家信息
      * @param position 玩家座位(从0开始)
@@ -96,6 +98,58 @@ public:
      * @brief 负责发放底牌或公共牌
      */
     void dealCards();
+
+    /**
+     * @brief 运行一局游戏
+     * @details 调用此函数后，将进行一局游戏，直到结束
+     */
+    void run();
+    /**
+     * @brief 进行Preflop下注轮前的准备工作
+     * @details 包括洗牌，发底牌，盲注
+     */
+    void preflop();
+    /**
+     * @brief 进入下一个阶段，翻开此轮的公共牌
+     * @note 每次发公共牌前不烧牌
+     */
+    void nextStreet();
+    /**
+     * @brief 渲染控制台界面
+     */
+    void displayBoard();
+    /**
+     * @brief 进入摊牌阶段
+     * @details 评估每个玩家的牌型，并决出胜者
+     */
+    void showdown();
+    /**
+     * @brief 进行一次下注轮(玩家行动)
+     */
+    void runBettingRound();
+    /**
+     * @brief 当前玩家采取行动
+     * @note demo_v2 阶段只有"投入大盲注等额"一种行动
+     */
+    void takeAction();
+    /**
+     * @brief 移动至下一个要行动的玩家,
+     * 若下注轮已结束，则设置回合结束标志
+     */
+    void nextPlayer();
+    /**
+     * @brief 为赢家分配底池
+     * @note 若有多名玩家获胜且底池无法均分,
+     * 则座位靠前的赢家比靠后的赢家多分得一个筹码
+     */
+    void award();
+    /**
+     * 控制台输出
+     * @param msg 输出信息
+     */
+    void output(const std::string& msg) const {
+        if (print_enabled) std::cout << msg;
+    }
 };
 
 }

@@ -35,8 +35,8 @@ TEST(TestGameModel, TestDealCards) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     GameModel model(std::move(deck));
-    model.addPlayer();
-    model.addPlayer();
+    model.addPlayer(1);
+    model.addPlayer(2);
 
     // Pre-flop 阶段
     model.game_state = GameState::PREFLOP;
@@ -72,7 +72,7 @@ TEST(TestGameModel, TestDealCards) {
 TEST(TestGameModel, TestCommitChips) {
     auto deck = std::make_unique<MockEmptyDeck>();
     GameModel model(std::move(deck));
-    model.addPlayer();
+    model.addPlayer(1);
     Player& player = model.getPlayer(0);
 
     // 测试 Bet 动作

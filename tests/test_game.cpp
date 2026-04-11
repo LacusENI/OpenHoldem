@@ -59,7 +59,7 @@ TEST(TestGame, DeclCommunityCards) {
     game.nextStreet(); // 进入 flop 阶段
     game.nextStreet(); // 进入 turn 阶段
     game.nextStreet(); // 进入 river 阶段
-    auto communityCards = game.getCommunityCards();
+    Cards5& communityCards = game.model.community_cards;
 
     EXPECT_EQ(communityCards[0], Card("DJ"));
     EXPECT_EQ(communityCards[1], Card("DQ"));
@@ -92,7 +92,7 @@ TEST(TestGame, GetWinners) {
     game.nextStreet(); // 进入 river 阶段
     game.showdown(); // 摊牌
 
-    auto& winners = game.getWinners();
+    auto& winners = game.model.winners;
     ASSERT_EQ(winners.size(), 1);
 
     // 玩家1: 一对A, 玩家2: 一对K
@@ -123,9 +123,9 @@ TEST(TestGame, TestAward) {
     game.nextStreet(); // 进入 river 阶段
     game.showdown();
     // 玩家1: 一对A, 玩家2: 一对K
-    Player& winner = game.getPlayer(game.getWinners()[0]);
+    Player& winner = game.getPlayer(game.model.winners[0]);
 
-    Stack pot = game.getPot();
+    Stack pot = game.model.pot;
     Stack chips_before_award = winner.chips;
     game.award();
     EXPECT_EQ(winner.chips, pot + chips_before_award);
