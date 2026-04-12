@@ -3,6 +3,7 @@
 #include <iostream>
 #include <memory>
 #include "GameModel.h"
+#include "GameView.h"
 
 namespace holdem {
 /**
@@ -11,12 +12,13 @@ namespace holdem {
 class Game {
 public:
     GameModel model;
+    std::unique_ptr<IGameView> view;
 
-    explicit Game(std::unique_ptr<IDeck> deck) : model(std::move(deck)) {}
+    explicit Game(
+        std::unique_ptr<IDeck> deck,
+        std::unique_ptr<IGameView> view) : model(std::move(deck)), view(std::move(view)) {}
 
     void run();
-
-    void displayBoard();
 
     void addPlayer(PlayerId id) {
         model.addPlayer(id);
@@ -30,17 +32,7 @@ public:
         return model.getPlayer(pos);
     }
 
-    void output(const std::string& msg) const {
-        if (model.print_enabled) std::cout << msg;
-    }
-
-    void displayAction(const Action& action) const {
-        if (model.print_enabled)
-            output(std::format("#[@P{}]: {} (-${})\n",
-                action.actor_position + 1, action.action_name, action.amount));
-    }
-
-    std::vector<Stack> handleAward();
+    void handleAward();
 };
 
 } // namespace holdem

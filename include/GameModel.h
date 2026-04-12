@@ -124,7 +124,7 @@ public:
      */
     void nextPlayer();
 
-    void distributePot(std::vector<Stack> amounts);
+    void distributePot(const std::vector<Stack>& amounts);
 
     /**
      * @brief 执行大盲注

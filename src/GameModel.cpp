@@ -93,7 +93,7 @@ void GameModel::nextPlayer() {
         is_round_ended = true;
 }
 
-void GameModel::distributePot(std::vector<Stack> amounts) {
+void GameModel::distributePot(const std::vector<Stack>& amounts) {
     for (int i = 0; i < amounts.size(); i++) {
         Player& player = getPlayer(winners[i]);
         Stack amount = amounts[i];

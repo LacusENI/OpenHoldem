@@ -17,6 +17,8 @@ add_library(poker_core
         src/GameModel.cpp
         include/ShowdownHandler.h
         src/ShowdownHandler.cpp
+        include/GameView.h
+        src/GameView.cpp
 )
 
 target_include_directories(poker_core PUBLIC include)
