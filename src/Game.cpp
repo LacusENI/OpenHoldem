@@ -22,8 +22,8 @@ void Game::run() {
     while (model.game_state != GameState::AWARD) {
         view->onRoundStarted(model);
         while (!model.is_round_ended) {
-            view->onPlayerTurn(model.current_position);
-            Action action = model.takeAction();
+            Action action = view->onPlayerTurn(model.current_position);
+            action = model.takeAction(action);
             view->onPlayerActed(action);
             model.nextActor();
         }

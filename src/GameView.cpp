@@ -85,7 +85,7 @@ Action GameView::onPlayerTurn(const Position& position) {
     std::cout << "[@P" << position + 1 << "]Continue Or Fold [C/f]: ";
     std::string input;
     std::cin >> input;
-    if (input == "f" && input == "F") {
+    if (input == "f" || input == "F") {
         return Action(position, "Fold", 0);
     }
     return Action(position, "", 0);

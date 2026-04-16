@@ -77,27 +77,35 @@ Action GameModel::smallBlind() {
     return {position, "Small Blind", small_blind};
 }
 
-Action GameModel::takeAction() {
+Action GameModel::takeAction(const Action& action) {
     Player& player = getPlayer(current_position);
-    std::string action_msg;
+    if (action.description == "Fold") {
+        player.is_folded = true;
+        return {current_position, "Fold", 0};
+    }
+    std::string description;
     Stack amount = 0;
     if (round_bet == 0) {
-        action_msg = "Bet";
+        description = "Bet";
         amount = big_blind;
     } else if (player.current_bet < round_bet) {
-        action_msg = "Call";
+        description = "Call";
         amount = round_bet - player.current_bet;
     } else {
-        action_msg = "Check";
+        description = "Check";
     }
     commitChips(current_position, amount);
-    return {current_position, action_msg, amount};
+    return {current_position, description, amount};
 }
 
 void GameModel::nextActor() {
-    current_position = nextPositionToAct(current_position);
-    if (current_position == rest_position)
-        is_round_ended = true;
+    Position next_position = nextPositionToAct(current_position);
+    is_round_ended = (next_position == rest_position);
+    if (getPlayer(current_position).is_folded
+        && current_position == rest_position) {
+        rest_position = next_position;
+    }
+    current_position = next_position;
 }
 
 void GameModel::distributePot(const std::vector<Stack>& amounts) {
@@ -121,15 +129,15 @@ void GameModel::nextStreet() {
         break;
     case GameState::PREFLOP:
         game_state = GameState::FLOP;
-        current_position = nextPosition(button_position);
+        current_position = nextPositionToAct(button_position);
         break;
     case GameState::FLOP:
         game_state = GameState::TURN;
-        current_position = nextPosition(button_position);
+        current_position = nextPositionToAct(button_position);
         break;
     case GameState::TURN:
         game_state = GameState::RIVER;
-        current_position = nextPosition(button_position);
+        current_position = nextPositionToAct(button_position);
         break;
     case GameState::RIVER:
         game_state = GameState::AWARD;

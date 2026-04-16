@@ -125,7 +125,7 @@ public:
      * @note demo_v2 阶段只有"投入大盲注等额"一种行动
      * @return 此次玩家所采取的动作信息
      */
-    Action takeAction();
+    Action takeAction(const Action& action);
     /**
      * @brief 移动至下一个要行动的玩家,
      * 若下注轮已结束，则设置回合结束标志
