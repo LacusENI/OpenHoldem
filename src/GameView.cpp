@@ -78,7 +78,17 @@ void GameView::onRoundStarted(const GameModel& game_model) {
 
 void GameView::onPlayerActed(const Action& action) {
     output(std::format("#[@P{}]: {} (-${})\n",
-            action.actor_position + 1, action.action_name, action.amount));
+            action.actor_position + 1, action.description, action.amount));
+}
+
+Action GameView::onPlayerTurn(const Position& position) {
+    std::cout << "[@P" << position + 1 << "]Continue Or Fold [C/f]: ";
+    std::string input;
+    std::cin >> input;
+    if (input == "f" && input == "F") {
+        return Action(position, "Fold", 0);
+    }
+    return Action(position, "", 0);
 }
 
 void GameView::onRoundEnded() {}

@@ -16,7 +16,7 @@ enum class GameState {
 
 struct Action {
     Position actor_position;
-    std::string action_name;
+    std::string description;
     Stack amount;
 };
 
