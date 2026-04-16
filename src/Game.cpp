@@ -24,7 +24,7 @@ void Game::run() {
         while (!model.is_round_ended) {
             Action action = model.takeAction();
             view->onPlayerActed(action);
-            model.nextPlayer();
+            model.nextActor();
         }
         nextStreet();
     }

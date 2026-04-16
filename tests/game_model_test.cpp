@@ -111,3 +111,20 @@ TEST(TestGameModel, TestCommitChips) {
     EXPECT_EQ(model.pot, 60);
     EXPECT_EQ(model.round_bet, 20);
 }
+
+TEST(TestGameModel, TestNextPositionToAct) {
+    auto deck = std::make_unique<MockEmptyDeck>();
+    GameModel model(std::move(deck));
+    model.addPlayer(1);
+    model.addPlayer(2); // Fold
+    model.addPlayer(3);
+    model.addPlayer(4); // Fold
+    model.addPlayer(5); // Fold
+    model.players[1].is_folded = true;
+    model.players[3].is_folded = true;
+    model.players[4].is_folded = true;
+
+    // P1 -> P3 -> P1
+    EXPECT_EQ(model.nextPositionToAct(0), 2);
+    EXPECT_EQ(model.nextPositionToAct(2), 0);
+}

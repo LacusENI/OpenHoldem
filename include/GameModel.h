@@ -28,8 +28,9 @@ struct Player {
     Position position; // 玩家所在位置
     Cards2 hole_cards; // 玩家的底牌
 
-    Stack chips = 0;       // 玩家拥有的筹码
-    Stack current_bet = 0; // 玩家当前下注额
+    Stack chips = 0;        // 玩家拥有的筹码
+    Stack current_bet = 0;  // 玩家当前下注额
+    bool is_folded = false; // 玩家是否已弃牌
 
     HandValue hand_value; // 手牌分值
 };
@@ -78,6 +79,13 @@ public:
     Position nextPosition(Position position) const {
         return (position + 1) % static_cast<int>(players.size());
     }
+
+    /**
+     * 获取当前玩家的下一个可行动的玩家位置
+     * @param position 当前玩家位置
+     * @return 下一个行动玩家位置
+     */
+    Position nextPositionToAct(Position position) const;
     /* 小盲注位 */
     Position getSmallBlindPosition() const {
         return nextPosition(button_position);
@@ -122,7 +130,7 @@ public:
      * @brief 移动至下一个要行动的玩家,
      * 若下注轮已结束，则设置回合结束标志
      */
-    void nextPlayer();
+    void nextActor();
 
     void distributePot(const std::vector<Stack>& amounts);
 

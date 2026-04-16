@@ -10,6 +10,14 @@ void GameModel::addPlayer(PlayerId id) {
     players.push_back(new_player);
 }
 
+Position GameModel::nextPositionToAct(Position position) const {
+    Position next_pos = nextPosition(position);
+    while (players[next_pos].is_folded) {
+        next_pos = nextPosition(next_pos);
+    }
+    return next_pos;
+}
+
 void GameModel::commitChips(Position position, Stack amount) {
     Player& player = getPlayer(position);
     player.chips -= amount;
@@ -32,7 +40,6 @@ void GameModel::setup() {
     }
     deck->shuffle();
 }
-
 
 void GameModel::dealCards() {
     switch (game_state) {
@@ -87,8 +94,8 @@ Action GameModel::takeAction() {
     return {current_position, action_msg, amount};
 }
 
-void GameModel::nextPlayer() {
-    current_position = nextPosition(current_position);
+void GameModel::nextActor() {
+    current_position = nextPositionToAct(current_position);
     if (current_position == rest_position)
         is_round_ended = true;
 }
@@ -99,6 +106,7 @@ void GameModel::distributePot(const std::vector<Stack>& amounts) {
         Stack amount = amounts[i];
         player.chips += amount;
     }
+    pot = 0;
 }
 
 void GameModel::nextStreet() {
