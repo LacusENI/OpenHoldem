@@ -8,12 +8,12 @@ namespace holdem {
 
 class ShowdownHandler {
 public:
-    static std::vector<HandValue> evalHandValues(
+    static std::vector<std::pair<Position, HandValue>> evalHandValues(
         const std::vector<Player>& players,
         const Cards5& community_cards);
 
     static std::vector<Position> determineWinners(
-        const std::vector<HandValue>& hand_values);
+        const std::vector<std::pair<Position, HandValue>>& hand_values);
 
     static std::vector<Stack> calculateDistribution(
         int pot, int winners_n);

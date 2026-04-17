@@ -1,29 +1,30 @@
 #include "ShowdownHandler.h"
 
 namespace holdem {
-std::vector<HandValue> ShowdownHandler::evalHandValues(
-        const std::vector<Player>& players,
-        const Cards5& community_cards) {
-    std::vector<HandValue> hand_values;
+std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(
+    const std::vector<Player>& players,
+    const Cards5& community_cards) {
+    std::vector<std::pair<Position, HandValue>> result;
     for (const Player& player : players) {
-        Cards7 hand7 = concatCards(player.hole_cards, community_cards);
-        HandValue hand_value = HandEvaluator::evaluate(hand7);
-        hand_values.push_back(hand_value);
+        if (!player.is_folded) {
+            Cards7 hand7 = concatCards(player.hole_cards, community_cards);
+            HandValue hand_value = HandEvaluator::evaluate(hand7);
+            result.emplace_back(player.position, hand_value);
+        }
     }
-    return hand_values;
+    return result;
 }
 
 std::vector<Position> ShowdownHandler::determineWinners(
-    const std::vector<HandValue>& hand_values) {
+    const std::vector<std::pair<Position, HandValue>>& hand_values) {
     HandValue winner_value;
     std::vector<Position> winners;
-    for (Position pos = 0; pos < hand_values.size(); ++pos) {
-        if (hand_values[pos] == winner_value) {
-            winners.push_back(pos);
-        } else if (hand_values[pos] > winner_value) {
-            winner_value = hand_values[pos];
-            winners.clear();
-            winners.push_back(pos);
+    for (auto [position, hand_value] : hand_values) {
+        if (hand_value > winner_value) {
+            winner_value = hand_value;
+            winners = {position};
+        } else if (hand_value == winner_value) {
+            winners.push_back(position);
         }
     }
     return winners;

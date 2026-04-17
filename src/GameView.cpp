@@ -12,7 +12,14 @@ void GameView::output(const std::string& text) {
     std::cout << text;
 }
 
-void GameView::displayBoard(const GameModel& game_model, const std::vector<std::string>& hand_msgs) {
+void GameView::displayBoard(
+        const GameModel& game_model,
+        const std::vector<std::pair<Position, std::string>>& active_player_hand_msgs
+    ) {
+    std::vector<std::string> hand_msgs(game_model.players.size(), "");
+    for (auto [position, msg] : active_player_hand_msgs) {
+        hand_msgs[position] = msg;
+    }
     // 显示当前下注轮，底池
     std::string street_msg;
     switch (game_model.game_state) {
@@ -63,7 +70,7 @@ void GameView::displayBoard(const GameModel& game_model, const std::vector<std::
         PlayerId id = player.id;
         std::string hole1 = player.hole_cards[0].toMessage();
         std::string hole2 = player.hole_cards[1].toMessage();
-        std::string hand_message = i < hand_msgs.size() ? hand_msgs[i] : "";
+        std::string hand_message = hand_msgs[i];
         output(std::format(
              "[@P{}] ${:<3} |  {} {}   {}\n",
              id, player.chips, hole1, hole2, hand_message));
@@ -93,10 +100,11 @@ Action GameView::onPlayerTurn(const Position& position) {
 
 void GameView::onRoundEnded() {}
 
-void GameView::onShowdownCompleted(const GameModel& game_model, const std::vector<HandValue>& results) {
-    std::vector<std::string> hand_msgs;
-    for (const HandValue& hv : results) {
-        hand_msgs.push_back(internal::getHandMessage(hv));
+void GameView::onShowdownCompleted(const GameModel& game_model, const std::vector<std::pair<Position, HandValue>>& results) {
+    std::vector<std::pair<Position, std::string>> hand_msgs;
+    for (auto [position, hand_value] : results) {
+        std::string hand_msg = internal::getHandMessage(hand_value);
+        hand_msgs.emplace_back(position, hand_msg);
     }
     displayBoard(game_model, hand_msgs);
 }
