@@ -100,7 +100,10 @@ Action GameModel::takeAction(const Action& action) {
 
 void GameModel::nextActor() {
     Position next_position = nextPositionToAct(current_position);
-    is_round_ended = (next_position == rest_position);
+    is_round_ended =
+        next_position == rest_position ||
+            nextPositionToAct(next_position) == next_position;
+    is_only_one_active = nextPositionToAct(next_position) == next_position;
     if (getPlayer(current_position).is_folded
         && current_position == rest_position) {
         rest_position = next_position;
@@ -145,7 +148,8 @@ void GameModel::nextStreet() {
     }
     dealCards();
     rest_position = current_position;
-    is_round_ended = false;
+    if (!is_only_one_active)
+        is_round_ended = false;
     round_bet = 0;
 }
 }

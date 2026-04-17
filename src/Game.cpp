@@ -1,7 +1,6 @@
 #include "Game.h"
 #include "ShowdownHandler.h"
 
-
 namespace holdem {
 void Game::run() {
     // 初始化
