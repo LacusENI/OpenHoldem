@@ -1,82 +1,16 @@
 #ifndef OPENHOLDEM_HAND_EVALUATOR_H
 #define OPENHOLDEM_HAND_EVALUATOR_H
 #include <array>
-#include "Card.h"
+
+#include "models/Hand.h"
 
 namespace holdem {
-
-enum class HandType {
-    HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
-    FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
-};
-
-/**
- * @brief 表示手牌强度的分值类型
- * @details 采用 32 位整数编码, 整数越大，牌越大, 格式为：0xTPSKKK,
- * - T: HandType (4 bits)       牌型等级(0-9)
- * - P: Primary Rank (4 bits)   主牌点数(如葫芦的三条的点数)
- * - S: Secondary Rank (4 bits) 次高牌点数(如葫芦的对子的点数）
- * - K：Kickers (4 bits each)   踢脚牌点数(按从大到小排序)
- * - 按照比较顺序排列，不足的位置设置为零
- * - 例如: 葫芦: PS000，两条: PKKK0，两对：PSK00
- * @details 举例:
- * - 三条7，两对2的葫芦: 0x672000 (6表示葫芦)
- * - A, Q, 9, 7, 2的高牌: 0x0EC972 (0表示高牌, E表示Ace, C表示Queen)
- * - 两对9和5: 0x295000 (2表示两对)
- */
-struct HandValue {
-    uint32_t raw_value;
-
-    HandValue() : raw_value(0) {}
-    explicit HandValue(int raw_value) : raw_value(raw_value) {}
-
-    /* 获取此手牌分值对应的手牌类型 */
-    [[nodiscard]] HandType getHandType() const {
-        return static_cast<HandType>(raw_value >> 20);
-    }
-
-    /**
-     * @brief 获取此手牌分值对应的主牌/次高牌/踢脚牌的点数,
-     * 按参与比较的优先级排序
-     * @param index 第X张计分牌的点数 (0为主牌，1为次高牌，2-4为踢脚牌)
-     * @return 点数
-     */
-    [[nodiscard]] Rank getRank(const int index) const {
-        return static_cast<Rank>((raw_value >> (16 - 4 * index)) & 0xF);
-    }
-
-    bool operator==(const HandValue &other) const {
-        return raw_value == other.raw_value;
-    }
-
-    bool operator>(const HandValue &other) const {
-        return raw_value > other.raw_value;
-    }
-
-    bool operator<(const HandValue &other) const {
-        return raw_value < other.raw_value;
-    }
-};
 
 /**
  * @brief 扑克牌型评估器
  */
 class HandEvaluator {
 public:
-    /**
-     * @brief 计算玩家出牌对应的编码
-     * @param hand 玩家的出牌
-     * @return 出牌对应的编码
-     */
-    static HandValue getHandValue(const Cards5& hand);
-
-    /**
-     * @brief 从玩家7张手牌中选取最好的5张手牌
-     * @param hand7 玩家的手牌 (公共牌+底牌)
-     * @return 玩家的最佳出牌
-     */
-    static Cards5 selectBest(const Cards7& hand7);
-
     /**
      * 计算该玩家的手牌大小
      * @param hand7 5张公共牌+2张底牌
@@ -87,13 +21,6 @@ public:
 } // namespace holdem
 
 namespace holdem::internal {
-
-/**
- * 枚举所有可能的出牌组合(7选5)
- * @param hand7 7张手牌
- * @return 所有可能的5张出牌组合
- */
-std::vector<Cards5> getCombinations(const Cards7& hand7);
 
 /**
  * @brief 记录频次统计中的某一点数及其频次的数据结构
@@ -115,15 +42,38 @@ struct RankCount {
     }
 };
 
-using SortedCounts = std::vector<RankCount>;
+using HandCounts = std::vector<RankCount>;
 
 /**
  * 统计5张牌的频次，按频次从高到低排序，若频次相同，点数高者优先，如：
  * - 5, 5, 4, 4, 2 -> 5:2, 4:2, 2:1
  * - 6, 6, 6, 9, 9 -> 6:3, 9:2
+ * @note 如果是A2345顺子，则A视为点数最低牌
  * @param hand5 5张牌
  * @return 频次统计(按频次、点数从高到低依次排列)
  */
-SortedCounts getSortedCounts(Cards5 hand5);
+HandCounts evalHandCounts(Cards5 hand5);
+
+/**
+ * @brief 计算玩家出牌对应的编码
+ * @param hand 玩家的出牌
+ * @return 出牌对应的编码
+ */
+HandValue evalHandValue(const Cards5& hand);
+
+/**
+ * 判断5张出牌的牌型
+ * @param hand5 5张出牌
+ * @param counts 其点数统计
+ * @return 5张出牌的牌型
+ */
+HandType evalHandType(const Cards5& hand5, const HandCounts& counts);
+
+/**
+ * 枚举所有可能的出牌组合(7选5)
+ * @param hand7 7张手牌
+ * @return 所有可能的5张出牌组合
+ */
+std::vector<Cards5> enum5from7(const Cards7& hand7);
 } // namespace holdem::internal
 #endif //OPENHOLDEM_HAND_EVALUATOR_H

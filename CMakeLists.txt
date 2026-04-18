@@ -6,19 +6,33 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(GTest CONFIG REQUIRED)
 
 add_library(poker_core
-        include/Card.h
-        include/HandEvaluator.h
-        include/Deck.h
+
+        include/models/Card.h
+        include/models/Deck.h
+        include/models/Player.h
+        include/models/GameTypes.h
+
         include/Game.h
-        src/Card.cpp
-        src/Game.cpp
-        src/HandEvaluator.cpp
+        include/GameModel.h
+        include/GameView.h
+        include/HandEvaluator.h
+        include/ShowdownHandler.h
+
+        src/core/models/Card.cpp
+        src/core/models/Deck.cpp
+
+        src/core/HandEvaluator.cpp
+        src/core/Game.cpp
+        src/core/GameModel.cpp
+        src/core/ShowdownHandler.cpp
+        src/core/GameView.cpp
 )
 
 target_include_directories(poker_core PUBLIC include)
 
 add_executable(open_holdem
         src/main.cpp
+        include/models/Hand.h
 )
 
 target_link_libraries(open_holdem PRIVATE
@@ -26,9 +40,13 @@ target_link_libraries(open_holdem PRIVATE
 )
 
 add_executable(poker_tests
-        tests/test_card.cpp
-        tests/test_hand.cpp
-        tests/test_game.cpp
+        tests/MockDeck.h
+        tests/MockGameView.h
+
+        tests/card_test.cpp
+        tests/hand_evaluator_test.cpp
+        tests/game_test.cpp
+        tests/game_model_test.cpp
 )
 
 target_link_libraries(poker_tests PRIVATE

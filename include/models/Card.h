@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <array>
+#include <format>
 
 namespace holdem {
 
@@ -32,7 +33,7 @@ struct Card {
     Rank rank;
 
     Card() : suit(), rank() {}
-    explicit Card(const std::string& str);
+    explicit Card(const char* str);
     Card(Suit suit, Rank rank) : suit(suit), rank(rank) {}
 
     /* 用于输出到日志中的展示字符串 */
@@ -54,6 +55,8 @@ struct Card {
         return rank > other.rank;
     }
 };
+
+std::ostream& operator<<(std::ostream& os, const Card& card);
 
 using Cards7 = std::array<Card, 7>;
 using Cards2 = std::array<Card, 2>;
