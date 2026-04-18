@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "Card.h"
+#include "models/Card.h"
 #include "Game.h"
 
 using namespace holdem;

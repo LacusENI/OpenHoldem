@@ -56,9 +56,7 @@ struct Card {
     }
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Card& card) {
-    return os << std::format("Card(\"{}\")", card.toString());
-}
+std::ostream& operator<<(std::ostream& os, const Card& card);
 
 using Cards7 = std::array<Card, 7>;
 using Cards2 = std::array<Card, 2>;

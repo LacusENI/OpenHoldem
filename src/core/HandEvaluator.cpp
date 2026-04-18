@@ -115,7 +115,7 @@ HandType evalUniqueHandType(const Cards5& hand5, const HandCounts& counts) {
  * @return 牌型
  */
 HandType evalPatternHandType(const HandCounts& counts) {
-    std::vector table = {
+    const std::vector table = {
         HandType::ONE_PAIR,
         HandType::TWO_PAIR,
         HandType::THREE_OF_A_KIND,

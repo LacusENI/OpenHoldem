@@ -31,7 +31,8 @@ std::vector<Position> ShowdownHandler::determineWinners(
     return winners;
 }
 
-std::vector<Stack> ShowdownHandler::calculateDistribution(int pot, int winners_n) {
+std::vector<Stack> ShowdownHandler::calculateDistribution(
+    const int pot, const int winners_n) {
     const int share = pot / winners_n;
     const int remainder = pot % winners_n;
 

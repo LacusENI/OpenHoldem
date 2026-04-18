@@ -1,9 +1,12 @@
-#include "Card.h"
+#include "models/Card.h"
 
 #include <stdexcept>
 #include <vector>
 
 namespace holdem {
+std::ostream& operator<<(std::ostream& os, const Card& card){
+    return os << std::format("Card(\"{}\")", card.toString());
+}
 
 std::string rankToString(Rank rank) {
     static std::vector<std::string> ranks = {
@@ -52,8 +55,8 @@ std::string Card::toString() const {
 
 Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
     Cards7 cards7;
-    std::copy(cards2.begin(), cards2.end(), cards7.begin());
-    std::copy(cards5.begin(), cards5.end(), cards7.begin() + 2);
+    std::ranges::copy(cards2, cards7.begin());
+    std::ranges::copy(cards5, cards7.begin() + 2);
     return cards7;
 }
 

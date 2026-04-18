@@ -1,7 +1,8 @@
 #ifndef OPENHOLDEM_HAND_EVALUATOR_H
 #define OPENHOLDEM_HAND_EVALUATOR_H
 #include <array>
-#include "Hand.h"
+
+#include "models/Hand.h"
 
 namespace holdem {
 

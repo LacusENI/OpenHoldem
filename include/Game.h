@@ -1,6 +1,7 @@
 #ifndef OPENHOLDEM_GAME_H
 #define OPENHOLDEM_GAME_H
 #include <memory>
+
 #include "GameModel.h"
 #include "GameView.h"
 

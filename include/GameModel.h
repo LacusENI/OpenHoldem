@@ -1,38 +1,14 @@
 #ifndef OPENHOLDEM_GAME_STATE_H
 #define OPENHOLDEM_GAME_STATE_H
 #include <memory>
-#include "Deck.h"
-#include "Hand.h"
+
+#include "models/Deck.h"
+#include "models/Player.h"
 
 namespace holdem {
 
-using PlayerId = int; // 玩家ID
-using Position = int; // 玩家座位
-using Stack = int;    // 筹码数量
-
 enum class GameState {
     IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
-};
-
-struct Action {
-    Position actor_position;
-    std::string description;
-    Stack amount;
-};
-
-/**
- * @brief 玩家实体类
- */
-struct Player {
-    PlayerId id;       // 玩家ID
-    Position position; // 玩家所在位置
-    Cards2 hole_cards; // 玩家的底牌
-
-    Stack chips = 0;        // 玩家拥有的筹码
-    Stack current_bet = 0;  // 玩家当前下注额
-    bool is_folded = false; // 玩家是否已弃牌
-
-    HandValue hand_value; // 手牌分值
 };
 
 /**

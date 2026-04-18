@@ -1,4 +1,4 @@
-#include "Card.h"
+#include "models/Card.h"
 #include "GameModel.h"
 #include "HandEvaluator.h"
 
