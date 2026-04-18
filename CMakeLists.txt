@@ -11,6 +11,7 @@ add_library(poker_core
         include/models/Deck.h
         include/models/Player.h
         include/models/GameTypes.h
+        include/models/Hand.h
 
         include/Game.h
         include/GameModel.h
@@ -32,7 +33,6 @@ target_include_directories(poker_core PUBLIC include)
 
 add_executable(open_holdem
         src/main.cpp
-        include/models/Hand.h
 )
 
 target_link_libraries(open_holdem PRIVATE
