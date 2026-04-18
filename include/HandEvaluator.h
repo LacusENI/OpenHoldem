@@ -1,6 +1,7 @@
 #ifndef OPENHOLDEM_HAND_EVALUATOR_H
 #define OPENHOLDEM_HAND_EVALUATOR_H
 #include <array>
+#include <vector>
 
 #include "models/Hand.h"
 
