@@ -1,21 +1,9 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "GameModel.h"
+#include "MockDeck.h"
 
 using namespace holdem;
-
-class MockDeck : public IDeck {
-public:
-    MOCK_METHOD(void, shuffle, (), (override));
-    MOCK_METHOD(Card, deal, (), (override));
-};
-
-class MockEmptyDeck : public IDeck {
-public:
-    void shuffle() override {}
-
-    Card deal() override { return Card(); }
-};
 
 using testing::Return;
 

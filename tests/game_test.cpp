@@ -1,25 +1,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include "Game.h"
+#include "MockDeck.h"
+#include "MockGameView.h"
 
 using namespace holdem;
-
-class MockDeck : public IDeck {
-public:
-    MOCK_METHOD(void, shuffle, (), (override));
-    MOCK_METHOD(Card, deal, (), (override));
-};
-
-class MockIGameView : public IGameView {
-public:
-    MOCK_METHOD(void, onGameStarted, (), (override));
-    MOCK_METHOD(void, onRoundStarted, (const GameModel& game_model), (override));
-    MOCK_METHOD(void, onPlayerActed, (const Action& action), (override));
-    MOCK_METHOD(void, onRoundEnded, (), (override));
-    MOCK_METHOD(void, onShowdownCompleted, (const GameModel& game_model, const std::vector<HandValue>& results), (override));
-    MOCK_METHOD(void, onWinnerDeclared, (const std::vector<Position>& winners, const std::vector<Stack>& amounts), (override));
-    MOCK_METHOD(void, onGameOver, (const GameModel& game_model), (override));
-};
 
 using testing::Return;
 using testing::NiceMock;
@@ -33,7 +18,7 @@ TEST(TestGame, DealHoleCards) {
         .WillOnce(Return(Card("HK")))  // 玩家2 第一张
         .WillOnce(Return(Card("SK"))); // 玩家2 第二张
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
-    auto mock_view = std::make_unique<NiceMock<MockIGameView>>();
+    auto mock_view = std::make_unique<NiceMock<MockGameView>>();
 
     Game game(std::move(deck), std::move(mock_view));
     game.addPlayer(0);
@@ -63,7 +48,7 @@ TEST(TestGame, DeclCommunityCards) {
         .WillOnce(Return(Card("C3")))  // 第四张公共牌
         .WillOnce(Return(Card("DT"))); // 第五张公共牌
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
-    auto mock_view = std::make_unique<NiceMock<MockIGameView>>();
+    auto mock_view = std::make_unique<NiceMock<MockGameView>>();
 
     Game game(std::move(deck), std::move(mock_view));
     game.addPlayer(0);
@@ -96,7 +81,7 @@ TEST(TestGame, GetWinners) {
         .WillOnce(Return(Card("C3")))  // 第四张公共牌
         .WillOnce(Return(Card("DT"))); // 第五张公共牌
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
-    auto mock_view = std::make_unique<NiceMock<MockIGameView>>();
+    auto mock_view = std::make_unique<NiceMock<MockGameView>>();
 
     Game game(std::move(deck), std::move(mock_view));
     game.addPlayer(0);
@@ -128,7 +113,7 @@ TEST(TestGame, TestAward) {
         .WillOnce(Return(Card("C3")))  // 第四张公共牌
         .WillOnce(Return(Card("DT"))); // 第五张公共牌
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
-    auto mock_view = std::make_unique<NiceMock<MockIGameView>>();
+    auto mock_view = std::make_unique<NiceMock<MockGameView>>();
 
     Game game(std::move(deck), std::move(mock_view));
     game.addPlayer(0);

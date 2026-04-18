@@ -23,7 +23,7 @@ public:
 /**
  * @brief 扑克牌组
  */
-class Deck : public IDeck {
+class Deck final : public IDeck {
 private:
     std::vector<Card> cards;
     std::mt19937 rng;

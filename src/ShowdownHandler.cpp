@@ -1,4 +1,5 @@
 #include "ShowdownHandler.h"
+#include "HandEvaluator.h"
 
 namespace holdem {
 std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(

@@ -25,6 +25,7 @@ target_include_directories(poker_core PUBLIC include)
 
 add_executable(open_holdem
         src/main.cpp
+        include/Hand.h
 )
 
 target_link_libraries(open_holdem PRIVATE
@@ -36,7 +37,8 @@ add_executable(poker_tests
         tests/hand_evaluator_test.cpp
         tests/game_test.cpp
         tests/game_model_test.cpp
-        docs/showdown_handler_test.txt
+        tests/MockDeck.h
+        tests/MockGameView.h
 )
 
 target_link_libraries(poker_tests PRIVATE

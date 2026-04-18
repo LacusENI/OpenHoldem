@@ -2,7 +2,7 @@
 #define OPENHOLDEM_GAME_STATE_H
 #include <memory>
 #include "Deck.h"
-#include "HandEvaluator.h"
+#include "Hand.h"
 
 namespace holdem {
 

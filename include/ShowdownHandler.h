@@ -2,7 +2,6 @@
 #define OPENHOLDEM_SHOWDOWN_HANDLER_H
 #include <vector>
 #include "GameModel.h"
-#include "HandEvaluator.h"
 
 namespace holdem {
 
