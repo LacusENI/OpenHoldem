@@ -9,30 +9,31 @@ add_library(poker_core
 
         include/models/Card.h
         include/models/Deck.h
-        include/models/Player.h
         include/models/GameTypes.h
         include/models/Hand.h
+        include/models/Player.h
 
         include/Game.h
         include/GameModel.h
-        include/GameView.h
         include/HandEvaluator.h
+        include/IGameView.h
         include/ShowdownHandler.h
 
         src/core/models/Card.cpp
         src/core/models/Deck.cpp
 
-        src/core/HandEvaluator.cpp
         src/core/Game.cpp
         src/core/GameModel.cpp
+        src/core/HandEvaluator.cpp
         src/core/ShowdownHandler.cpp
-        src/core/GameView.cpp
 )
 
 target_include_directories(poker_core PUBLIC include)
 
 add_executable(open_holdem
         src/main.cpp
+        src/ConsoleView.h
+        src/ConsoleView.cpp
 )
 
 target_link_libraries(open_holdem PRIVATE

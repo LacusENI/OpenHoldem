@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "GameView.h"
+#include "ConsoleView.h"
 
 namespace holdem::internal {
 std::string rankToMessage(Rank rank);
@@ -8,11 +8,11 @@ std::string getHandMessage(HandValue hand_value);
 } // namespace holdem::internal
 
 namespace holdem {
-void GameView::output(const std::string& text) {
+void ConsoleView::output(const std::string& text) {
     std::cout << text;
 }
 
-void GameView::displayBoard(
+void ConsoleView::displayBoard(
         const GameModel& game_model,
         const std::vector<std::pair<Position, std::string>>& active_player_hand_msgs
     ) {
@@ -77,18 +77,18 @@ void GameView::displayBoard(
     }
 }
 
-void GameView::onGameStarted() {}
+void ConsoleView::onGameStarted() {}
 
-void GameView::onRoundStarted(const GameModel& game_model) {
+void ConsoleView::onRoundStarted(const GameModel& game_model) {
     displayBoard(game_model, {});
 }
 
-void GameView::onPlayerActed(const Action& action) {
+void ConsoleView::onPlayerActed(const Action& action) {
     output(std::format("#[@P{}]: {} (-${})\n",
             action.actor_position + 1, action.description, action.amount));
 }
 
-Action GameView::onPlayerTurn(const Position& position) {
+Action ConsoleView::onPlayerTurn(const Position& position) {
     std::cout << "[@P" << position + 1 << "]Continue Or Fold [C/f]: ";
     std::string input;
     std::cin >> input;
@@ -98,9 +98,9 @@ Action GameView::onPlayerTurn(const Position& position) {
     return Action(position, "", 0);
 }
 
-void GameView::onRoundEnded() {}
+void ConsoleView::onRoundEnded() {}
 
-void GameView::onShowdownCompleted(const GameModel& game_model, const std::vector<std::pair<Position, HandValue>>& results) {
+void ConsoleView::onShowdownCompleted(const GameModel& game_model, const std::vector<std::pair<Position, HandValue>>& results) {
     std::vector<std::pair<Position, std::string>> hand_msgs;
     for (auto [position, hand_value] : results) {
         std::string hand_msg = internal::getHandMessage(hand_value);
@@ -109,7 +109,7 @@ void GameView::onShowdownCompleted(const GameModel& game_model, const std::vecto
     displayBoard(game_model, hand_msgs);
 }
 
-void GameView::onWinnerDeclared(const std::vector<Position>& winners, const std::vector<Stack>& amounts) {
+void ConsoleView::onWinnerDeclared(const std::vector<Position>& winners, const std::vector<Stack>& amounts) {
     output("Winner:");
     for (int i = 0; i < winners.size(); ++i) {
         Position position = winners[i];
@@ -119,7 +119,7 @@ void GameView::onWinnerDeclared(const std::vector<Position>& winners, const std:
     output("\n");
 }
 
-void GameView::onGameOver(const GameModel& game_model) {
+void ConsoleView::onGameOver(const GameModel& game_model) {
     output("Result\n");
     for (const Player& player : game_model.players) {
         output(std::format("[@P{}] ${:>3}\n", player.position + 1, player.chips));

@@ -3,7 +3,7 @@
 #include <memory>
 
 #include "GameModel.h"
-#include "GameView.h"
+#include "IGameView.h"
 
 namespace holdem {
 /**

@@ -2,6 +2,7 @@
 
 #include "models/Card.h"
 #include "Game.h"
+#include "ConsoleView.h"
 
 using namespace holdem;
 
@@ -12,7 +13,7 @@ int main() {
     std::cout << Card("S8").toMessage();
     std::cout << " OpenHoldem\n";
 
-    Game game(std::move(std::make_unique<Deck>()), std::make_unique<GameView>());
+    Game game(std::move(std::make_unique<Deck>()), std::make_unique<ConsoleView>());
     game.model.print_enabled = true;
     game.model.addPlayer(1);
     game.addPlayer(2);
