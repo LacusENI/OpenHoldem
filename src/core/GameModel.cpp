@@ -67,35 +67,35 @@ void GameModel::dealCards() {
 Action GameModel::bigBlind() {
     Position position = getBigBlindPosition();
     commitChips(position, big_blind);
-    return {position, "Big Blind", big_blind};
+    return {position, ActionType::BIG_BLIND, big_blind};
 }
 
 Action GameModel::smallBlind() {
     Position position = getSmallBlindPosition();
     Stack small_blind = big_blind / 2;
     commitChips(position, small_blind);
-    return {position, "Small Blind", small_blind};
+    return {position, ActionType::SMALL_BLIND, small_blind};
 }
 
 Action GameModel::takeAction(const Action& action) {
     Player& player = getPlayer(current_position);
-    if (action.description == "Fold") {
+    if (action.type == ActionType::FOLD) {
         player.is_folded = true;
-        return {current_position, "Fold", 0};
+        return {current_position, ActionType::FOLD, 0};
     }
-    std::string description;
+    ActionType action_type;
     Stack amount = 0;
     if (round_bet == 0) {
-        description = "Bet";
+        action_type = ActionType::BET;
         amount = big_blind;
     } else if (player.current_bet < round_bet) {
-        description = "Call";
+        action_type = ActionType::CALL;
         amount = round_bet - player.current_bet;
     } else {
-        description = "Check";
+        action_type = ActionType::CHECK;
     }
     commitChips(current_position, amount);
-    return {current_position, description, amount};
+    return {current_position, action_type, amount};
 }
 
 void GameModel::nextActor() {

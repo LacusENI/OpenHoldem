@@ -5,6 +5,7 @@
 namespace holdem::internal {
 std::string rankToMessage(Rank rank);
 std::string getHandMessage(HandValue hand_value);
+std::string actionTypeToMessage(ActionType action_type);
 } // namespace holdem::internal
 
 namespace holdem {
@@ -86,7 +87,7 @@ void ConsoleView::onRoundStarted(const OnRoundStartedData& data) const {
 void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
     const Action& action = data.action;
     output(std::format("#[@P{}]: {} (-${})\n",
-            action.actor_position + 1, action.description, action.amount));
+            action.actor_position + 1, internal::actionTypeToMessage(action.type), action.amount));
 }
 
 PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
@@ -94,11 +95,11 @@ PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
     std::cout << "[@P" << position + 1 << "]Continue Or Fold [C/f]: ";
     std::string input;
     std::cin >> input;
-    std::string description = "";
+    ActionType action_type = ActionType::VOID;
     if (input == "f" || input == "F") {
-        description = "Fold";
+        action_type = ActionType::FOLD;
     }
-    return {Action(position, description, 0)};
+    return {Action(position, action_type, 0)};
 }
 
 void ConsoleView::onRoundEnded(const OnRoundEndedData& data) const {}
@@ -191,5 +192,28 @@ std::string getHandMessage(HandValue hand_value) {
             "High Card, {}-high", x);
     }
     return "";
+}
+
+std::string actionTypeToMessage(ActionType action_type) {
+    switch (action_type) {
+    case ActionType::CALL:
+        return "Call";
+    case ActionType::CHECK:
+        return "Check";
+    case ActionType::RAISE:
+        return "Raise";
+    case ActionType::BET:
+        return "Bet";
+    case ActionType::FOLD:
+        return "Fold";
+    case ActionType::ALL_IN:
+        return "All-in";
+    case ActionType::SMALL_BLIND:
+        return "Small Blind";
+    case ActionType::BIG_BLIND:
+        return "Big Blind";
+    default:
+        return "";
+    }
 }
 }
