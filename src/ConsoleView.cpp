@@ -77,51 +77,55 @@ void ConsoleView::displayBoard(
     }
 }
 
-void ConsoleView::onGameStarted() {}
+void ConsoleView::onGameStarted(const OnGameStartedData&data) const {}
 
-void ConsoleView::onRoundStarted(const GameModel& game_model) {
-    displayBoard(game_model, {});
+void ConsoleView::onRoundStarted(const OnRoundStartedData& data) const {
+    displayBoard(data.game_model, {});
 }
 
-void ConsoleView::onPlayerActed(const Action& action) {
+void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
+    const Action& action = data.action;
     output(std::format("#[@P{}]: {} (-${})\n",
             action.actor_position + 1, action.description, action.amount));
 }
 
-Action ConsoleView::onPlayerTurn(const Position& position) {
+PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
+    Position position = data.position;
     std::cout << "[@P" << position + 1 << "]Continue Or Fold [C/f]: ";
     std::string input;
     std::cin >> input;
+    std::string description = "";
     if (input == "f" || input == "F") {
-        return Action(position, "Fold", 0);
+        description = "Fold";
     }
-    return Action(position, "", 0);
+    return {Action(position, description, 0)};
 }
 
-void ConsoleView::onRoundEnded() {}
+void ConsoleView::onRoundEnded(const OnRoundEndedData& data) const {}
 
-void ConsoleView::onShowdownCompleted(const GameModel& game_model, const std::vector<std::pair<Position, HandValue>>& results) {
+void ConsoleView::onShowdownCompleted(const OnShowdownCompletedData& data) const {
+    auto& results = data.results;
     std::vector<std::pair<Position, std::string>> hand_msgs;
     for (auto [position, hand_value] : results) {
         std::string hand_msg = internal::getHandMessage(hand_value);
         hand_msgs.emplace_back(position, hand_msg);
     }
-    displayBoard(game_model, hand_msgs);
+    displayBoard(data.game_model, hand_msgs);
 }
 
-void ConsoleView::onWinnerDeclared(const std::vector<Position>& winners, const std::vector<Stack>& amounts) {
+void ConsoleView::onWinnerDeclared(const OnWinnerDeclaredData& data) const {
     output("Winner:");
-    for (int i = 0; i < winners.size(); ++i) {
-        Position position = winners[i];
-        Stack amount = amounts[i];
+    for (int i = 0; i < data.winners.size(); ++i) {
+        Position position = data.winners[i];
+        Stack amount = data.amounts[i];
         output(std::format(" @P{}(+${})", position + 1, amount));
     }
     output("\n");
 }
 
-void ConsoleView::onGameOver(const GameModel& game_model) {
+void ConsoleView::onGameOver(const OnGameOverData& data) const {
     output("Result\n");
-    for (const Player& player : game_model.players) {
+    for (const Player& player : data.game_model.players) {
         output(std::format("[@P{}] ${:>3}\n", player.position + 1, player.chips));
     }
 }

@@ -11,16 +11,16 @@ private:
         const std::vector<std::pair<Position, std::string>>& active_player_hand_msgs
         );
 public:
-    void onGameStarted() override;
-    void onRoundStarted(const GameModel& game_model) override;
-    void onPlayerActed(const Action& action) override;
-    Action onPlayerTurn(const Position& position) override;
-    void onRoundEnded() override;
+    void onGameStarted(const OnGameStartedData&data) const override;
+    void onRoundStarted(const OnRoundStartedData& data) const override;
+    void onPlayerActed(const OnPlayerActedData& data) const override;
+    PlayerInputData onPlayerTurn(const OnPlayerTurnData& data) const override;
+    void onRoundEnded(const OnRoundEndedData& data) const override;
     void onShowdownCompleted(
-        const GameModel& game_model, const std::vector<std::pair<Position, HandValue>>& results) override;
+        const OnShowdownCompletedData& data) const override;
     void onWinnerDeclared(
-        const std::vector<Position>& winners, const std::vector<Stack>& amounts) override;
-    void onGameOver(const GameModel& game_model) override;
+        const OnWinnerDeclaredData& data) const override;
+    void onGameOver(const OnGameOverData& data) const override;
 };
 }
 #endif //OPENHOLDEM_CONSOLE_VIEW_H
