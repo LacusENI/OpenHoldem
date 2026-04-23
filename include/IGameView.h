@@ -1,10 +1,13 @@
-#ifndef OPENHOLDEM_I_GAME_VIEW_H
-#define OPENHOLDEM_I_GAME_VIEW_H
+#pragma once
+
 #include <vector>
 
-#include "GameModel.h"
+#include "models/GameTypes.h"
+#include "models/Hand.h"
 
 namespace holdem {
+
+class GameModel;
 
 struct OnGameStartedData {
     Position btn_position;
@@ -67,7 +70,4 @@ public:
     virtual void onGameOver(const OnGameOverData& data) const = 0;
 };
 
-
 }
-
-#endif //OPENHOLDEM_I_GAME_VIEW_H

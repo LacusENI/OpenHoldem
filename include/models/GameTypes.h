@@ -1,5 +1,4 @@
-#ifndef OPENHOLDEM_GAME_TYPES_H
-#define OPENHOLDEM_GAME_TYPES_H
+#pragma once
 
 namespace holdem {
 using PlayerId = int; // 玩家ID
@@ -21,5 +20,3 @@ struct Action {
     Stack amount;
 };
 }
-
-#endif //OPENHOLDEM_GAME_TYPES_H

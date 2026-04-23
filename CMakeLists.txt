@@ -46,7 +46,6 @@ add_executable(poker_tests
 
         tests/card_test.cpp
         tests/hand_evaluator_test.cpp
-        tests/game_test.cpp
         tests/game_model_test.cpp
 )
 

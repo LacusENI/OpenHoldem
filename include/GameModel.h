@@ -1,11 +1,15 @@
-#ifndef OPENHOLDEM_GAME_STATE_H
-#define OPENHOLDEM_GAME_STATE_H
-#include <memory>
+#pragma once
 
-#include "models/Deck.h"
+#include <memory>
+#include <vector>
+
+#include "models/Card.h"
+#include "models/GameTypes.h"
 #include "models/Player.h"
 
 namespace holdem {
+
+class IDeck;
 
 enum class GameState {
     IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
@@ -18,7 +22,6 @@ class GameModel {
 public:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
-    bool print_enabled = false;
     Position button_position = 0;    // 庄家位置
     Stack big_blind = 10;            // 大盲注额
     Stack pot = 0;                   // 底池金额
@@ -34,7 +37,8 @@ public:
 
     std::vector<Position> winners{}; // 赢家列表
 
-    explicit GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
+    explicit GameModel(std::unique_ptr<IDeck> deck);
+    ~GameModel();
 
     /**
      * @brief 添加新玩家到玩家列表
@@ -123,5 +127,3 @@ public:
     Action smallBlind();
 };
 }
-
-#endif //OPENHOLDEM_GAME_STATE_H

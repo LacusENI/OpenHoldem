@@ -1,5 +1,5 @@
-#ifndef OPENHOLDEM_HAND_H
-#define OPENHOLDEM_HAND_H
+#pragma once
+
 #include "Card.h"
 
 enum class HandType {
@@ -56,5 +56,3 @@ struct HandValue {
     }
 };
 }
-
-#endif //OPENHOLDEM_HAND_H

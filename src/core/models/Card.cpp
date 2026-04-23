@@ -1,7 +1,9 @@
-#include "models/Card.h"
-
+#include <string>
 #include <stdexcept>
 #include <vector>
+#include <format>
+
+#include "models/Card.h"
 
 namespace holdem {
 std::ostream& operator<<(std::ostream& os, const Card& card){

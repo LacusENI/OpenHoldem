@@ -1,8 +1,11 @@
-#include "models/Card.h"
 #include "GameModel.h"
-#include "HandEvaluator.h"
+#include "models/Deck.h"
 
 namespace holdem {
+GameModel::GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
+
+GameModel::~GameModel() = default;
+
 void GameModel::addPlayer(PlayerId id) {
     Player new_player;
     new_player.id = id;
@@ -36,7 +39,6 @@ void GameModel::setup() {
     winners.clear();
     for (Player& player : players) {
         player.current_bet = 0;
-        player.hand_value = HandValue();
     }
     deck->shuffle();
 }

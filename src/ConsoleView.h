@@ -1,5 +1,5 @@
-#ifndef OPENHOLDEM_CONSOLE_VIEW_H
-#define OPENHOLDEM_CONSOLE_VIEW_H
+#pragma once
+
 #include "IGameView.h"
 
 namespace holdem {
@@ -23,4 +23,3 @@ public:
     void onGameOver(const OnGameOverData& data) const override;
 };
 }
-#endif //OPENHOLDEM_CONSOLE_VIEW_H

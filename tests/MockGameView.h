@@ -2,6 +2,7 @@
 #define OPENHOLDEM_MOCK_GAME_VIEW_H
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
 #include "IGameView.h"
 
 using namespace holdem;

@@ -1,9 +1,8 @@
-#ifndef OPENHOLDEM_CARD_H
-#define OPENHOLDEM_CARD_H
+#pragma once
+
 #include <cstdint>
 #include <string>
 #include <array>
-#include <format>
 
 namespace holdem {
 
@@ -66,5 +65,3 @@ using Cards5 = std::array<Card, 5>;
 Cards7 concatCards(const Cards2& cards2, const Cards5& cards5);
 
 } // namespace holdem
-
-#endif //OPENHOLDEM_CARD_H

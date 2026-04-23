@@ -1,8 +1,7 @@
-#ifndef OPENHOLDEM_DECK_H
-#define OPENHOLDEM_DECK_H
+#pragma once
+
 #include <random>
 #include <vector>
-#include <chrono>
 
 #include "Card.h"
 
@@ -36,7 +35,3 @@ public:
     Card deal() override;
 };
 }
-
-
-
-#endif //OPENHOLDEM_DECK_H

@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "models/Card.h"
+#include "models/Deck.h"
+#include "GameModel.h"
 #include "Game.h"
 #include "ConsoleView.h"
 
@@ -13,13 +15,14 @@ int main() {
     std::cout << Card("S8").toMessage();
     std::cout << " OpenHoldem\n";
 
-    Game game(std::move(std::make_unique<Deck>()), std::make_unique<ConsoleView>());
-    game.model.print_enabled = true;
-    game.model.addPlayer(1);
-    game.addPlayer(2);
-    game.addPlayer(3);
-    game.addPlayer(4);
-    game.addPlayer(5);
+    auto deck = std::make_unique<Deck>();
+    auto game_model = std::make_unique<GameModel>(std::move(deck));
+    Game game(std::move(game_model), std::make_unique<ConsoleView>());
+    game.model->addPlayer(1);
+    game.model->addPlayer(2);
+    game.model->addPlayer(3);
+    game.model->addPlayer(4);
+    game.model->addPlayer(5);
     game.run();
 
     return 0;

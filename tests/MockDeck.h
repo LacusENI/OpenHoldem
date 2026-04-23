@@ -2,7 +2,8 @@
 #define OPENHOLDEM_MOCK_DECK_H
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
-#include "../include/models/Deck.h"
+
+#include "models/Deck.h"
 
 class MockDeck : public holdem::IDeck {
 public:

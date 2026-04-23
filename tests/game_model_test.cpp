@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
+
 #include "GameModel.h"
 #include "MockDeck.h"
 

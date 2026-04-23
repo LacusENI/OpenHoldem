@@ -1,6 +1,8 @@
 #include <iostream>
+#include <format>
 
 #include "ConsoleView.h"
+#include "GameModel.h"
 
 namespace holdem::internal {
 std::string rankToMessage(Rank rank);

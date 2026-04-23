@@ -1,5 +1,5 @@
-#ifndef OPENHOLDEM_SHOWDOWN_HANDLER_H
-#define OPENHOLDEM_SHOWDOWN_HANDLER_H
+#pragma once
+
 #include <vector>
 
 #include "models/GameTypes.h"
@@ -22,4 +22,3 @@ public:
 };
 
 }
-#endif //OPENHOLDEM_SHOWDOWN_HANDLER_H

@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
-#include "../include/models/Card.h"
+
+#include "models/Card.h"
 
 using namespace holdem;
 

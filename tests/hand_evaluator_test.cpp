@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+
 #include "HandEvaluator.h"
 
 using namespace holdem;
