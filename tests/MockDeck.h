@@ -3,7 +3,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "models/Deck.h"
+#include "entity/Deck.h"
 
 class MockDeck : public holdem::IDeck {
 public:

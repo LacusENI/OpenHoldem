@@ -7,11 +7,11 @@ find_package(GTest CONFIG REQUIRED)
 
 add_library(poker_core
 
-        include/models/Card.h
-        include/models/Deck.h
-        include/models/GameTypes.h
-        include/models/Hand.h
-        include/models/Player.h
+        include/entity/Card.h
+        include/entity/Deck.h
+        include/entity/GameTypes.h
+        include/entity/Hand.h
+        include/entity/Player.h
 
         include/Game.h
         include/GameModel.h
@@ -19,8 +19,8 @@ add_library(poker_core
         include/IGameView.h
         include/ShowdownHandler.h
 
-        src/core/models/Card.cpp
-        src/core/models/Deck.cpp
+        src/core/entity/Card.cpp
+        src/core/entity/Deck.cpp
 
         src/core/Game.cpp
         src/core/GameModel.cpp

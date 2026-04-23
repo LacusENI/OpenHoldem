@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "models/Card.h"
-#include "models/Hand.h"
+#include "entity/Card.h"
+#include "entity/Hand.h"
 
 namespace holdem {
 

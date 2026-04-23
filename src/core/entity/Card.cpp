@@ -3,7 +3,7 @@
 #include <vector>
 #include <format>
 
-#include "models/Card.h"
+#include "entity/Card.h"
 
 namespace holdem {
 std::ostream& operator<<(std::ostream& os, const Card& card){

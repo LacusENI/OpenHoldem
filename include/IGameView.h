@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "models/GameTypes.h"
-#include "models/Hand.h"
+#include "entity/GameTypes.h"
+#include "entity/Hand.h"
 
 namespace holdem {
 

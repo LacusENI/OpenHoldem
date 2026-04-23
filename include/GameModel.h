@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "models/Card.h"
-#include "models/GameTypes.h"
-#include "models/Player.h"
+#include "entity/Card.h"
+#include "entity/GameTypes.h"
+#include "entity/Player.h"
 
 namespace holdem {
 
