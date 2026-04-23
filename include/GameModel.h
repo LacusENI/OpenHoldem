@@ -35,8 +35,6 @@ public:
     Cards5 community_cards;      // 公共牌
     std::vector<Player> players; // 玩家列表
 
-    std::vector<Position> winners{}; // 赢家列表
-
     explicit GameModel(std::unique_ptr<IDeck> deck);
     ~GameModel();
 
@@ -113,7 +111,7 @@ public:
      */
     void nextActor();
 
-    void distributePot(const std::vector<Stack>& amounts);
+    void distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners);
 
     /**
      * @brief 执行大盲注

@@ -36,7 +36,6 @@ void GameModel::setup() {
     pot = 0;
     round_bet = 0;
     is_round_ended = false;
-    winners.clear();
     for (Player& player : players) {
         player.current_bet = 0;
     }
@@ -113,7 +112,7 @@ void GameModel::nextActor() {
     current_position = next_position;
 }
 
-void GameModel::distributePot(const std::vector<Stack>& amounts) {
+void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
         Player& player = getPlayer(winners[i]);
         Stack amount = amounts[i];

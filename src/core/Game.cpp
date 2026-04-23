@@ -45,12 +45,12 @@ void Game::run() {
 void Game::handleAward() {
     auto hand_values = ShowdownHandler::evalHandValues(
         model->players, model->community_cards);
-    model->winners = ShowdownHandler::determineWinners(
+    auto winners = ShowdownHandler::determineWinners(
         hand_values);
     auto amounts = ShowdownHandler::calculateDistribution(
-        model->pot, model->winners.size());
+        model->pot, winners.size());
     view->onShowdownCompleted({*model, hand_values});
-    view->onWinnerDeclared({model->winners, amounts});
-    model->distributePot(amounts);
+    view->onWinnerDeclared({winners, amounts});
+    model->distributePot(amounts, winners);
 }
 }
