@@ -8,8 +8,8 @@ constexpr int cards_size = 52;
 namespace holdem {
 Deck::Deck() {
     cards.reserve(cards_size);
-    for (int s = 0; s < 4; ++s) {
-        for (int r = 2; r <= 14; ++r) {
+    for (int s = MIN_SUIT; s <= MAX_SUIT; ++s) {
+        for (int r = MIN_RANK; r <= MAX_RANK; ++r) {
             cards.emplace_back(static_cast<Suit>(s), static_cast<Rank>(r));
         }
     }
