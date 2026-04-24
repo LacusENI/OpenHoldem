@@ -20,17 +20,12 @@ std::vector<Cards5> enum5from7(const Cards7& hand7) {
 
 HandValue evalHandValue(const Cards5& hand) {
     HandCounts counts = evalHandCounts(hand);
-    HandType handType = evalHandType(hand, counts);
-    int handValue = static_cast<int>(handType);
-    int i = 0;
-    for (; i < counts.size(); i++) {
-        auto [rank, _] = counts[i];
-        handValue = (handValue << 4) + static_cast<int>(rank);
+    HandType hand_type = evalHandType(hand, counts);
+    std::vector<Rank> ranks;
+    for (auto [rank, _] : counts) {
+        ranks.push_back(rank);
     }
-    for (; i < 5; i++) {
-        handValue = handValue << 4;
-    }
-    return HandValue(handValue);
+    return HandValue::build(hand_type, ranks);
 }
 
 HandCounts evalHandCounts(Cards5 hand5) {

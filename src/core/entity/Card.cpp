@@ -6,16 +6,24 @@
 #include "entity/Card.h"
 
 namespace holdem {
-std::ostream& operator<<(std::ostream& os, const Card& card){
-    return os << std::format("Card(\"{}\")", card.toString());
+namespace utils {
+std::string castSuitToString(Suit suit) {
+    static std::vector<std::string> suits = {
+        "C", "D", "H", "S"
+    };
+    return suits[static_cast<int>(suit)];
 }
-
-std::string rankToString(Rank rank) {
+std::string castRankToString(Rank rank) {
     static std::vector<std::string> ranks = {
         "", "", "2", "3", "4", "5", "6", "7",
         "8", "9", "T", "J", "Q", "K", "A"
     };
     return ranks[static_cast<int>(rank)];
+}
+}
+
+std::ostream& operator<<(std::ostream& os, const Card& card){
+    return os << std::format("Card(\"{}\")", card.toString());
 }
 
 Card::Card(const char* str) {
@@ -45,14 +53,11 @@ std::string Card::toMessage() const {
     static std::vector<std::string> suits = {
         "\u2663", "\u2666", "\u2665", "\u2660"
     }; // Club, Diamond, Heart, Spade
-    return suits[static_cast<int>(suit)] + rankToString(rank);
+    return suits[static_cast<int>(suit)] + utils::castRankToString(rank);
 }
 
 std::string Card::toString() const {
-    static std::vector<std::string> suits = {
-        "C", "D", "H", "S"
-    }; // Club, Diamond, Heart, Spade
-    return suits[static_cast<int>(suit)] + rankToString(rank);
+    return utils::castSuitToString(suit) + utils::castRankToString(rank);
 }
 
 Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {

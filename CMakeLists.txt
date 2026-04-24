@@ -10,7 +10,7 @@ add_library(poker_core
         include/entity/Card.h
         include/entity/Deck.h
         include/entity/GameTypes.h
-        include/entity/Hand.h
+        include/entity/HandValue.h
         include/entity/Player.h
 
         include/Game.h
@@ -21,6 +21,7 @@ add_library(poker_core
 
         src/core/entity/Card.cpp
         src/core/entity/Deck.cpp
+        src/core/entity/HandValue.cpp
 
         src/core/Game.cpp
         src/core/GameModel.cpp

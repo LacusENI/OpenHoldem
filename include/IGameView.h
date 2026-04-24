@@ -3,7 +3,7 @@
 #include <vector>
 
 #include "entity/GameTypes.h"
-#include "entity/Hand.h"
+#include "entity/HandValue.h"
 
 namespace holdem {
 

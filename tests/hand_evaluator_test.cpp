@@ -107,11 +107,9 @@ TEST(HandEvaluatorTest, GetHandValue) {
     }; // 高牌 8, 9, 10, Q, 3 -> Q, 10, 9, 8, 3
     HandValue highCardValue = evalHandValue(highCard);
     EXPECT_EQ(highCardValue.getHandType(), HandType::HIGH_CARD);
-    EXPECT_EQ(highCardValue.getRank(0), Rank::QUEEN);
-    EXPECT_EQ(highCardValue.getRank(1), Rank::TEN);
-    EXPECT_EQ(highCardValue.getRank(2), Rank::NINE);
-    EXPECT_EQ(highCardValue.getRank(3), Rank::EIGHT);
-    EXPECT_EQ(highCardValue.getRank(4), Rank::THREE);
+    HandValue expectedHighCardValue = HandValue::build(
+        HandType::HIGH_CARD, {Rank::QUEEN, Rank::TEN, Rank::NINE, Rank::EIGHT, Rank::THREE});
+    EXPECT_EQ(highCardValue, expectedHighCardValue);
 
     Cards5 straight = {
         Card("C2"), Card("HA"), Card("H4"), Card("D3"), Card("S5")
