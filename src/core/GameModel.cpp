@@ -1,10 +1,15 @@
 #include "GameModel.h"
 #include "PlayerSet.h"
+#include "BettingRound.h"
 #include "Deck.h"
 
 namespace holdem {
-GameModel::GameModel(std::unique_ptr<IDeck> deck, std::shared_ptr<PlayerSet> players)
-    : deck(std::move(deck)), players(std::move(players)) {}
+GameModel::GameModel(
+    std::unique_ptr<IDeck> deck,
+    std::shared_ptr<PlayerSet> players,
+    std::unique_ptr<BettingRound> betting_round
+    )
+    : deck(std::move(deck)), players(std::move(players)), betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
 
@@ -17,23 +22,13 @@ Position GameModel::getBigBlindPosition() const  {
 }
 
 void GameModel::commitChips(Position position, Stack amount) {
-    Player& player = players->at(position);
-    player.chips -= amount;
+    betting_round->commitChips(position, amount);
     pot += amount;
-    player.current_bet += amount;
-    if (player.current_bet > round_bet) {
-        round_bet = player.current_bet;
-    }
 }
 
 void GameModel::setup() {
     game_state = GameState::IDLE;
     pot = 0;
-    round_bet = 0;
-    is_round_ended = false;
-    for (Player& player : *players) {
-        player.current_bet = 0;
-    }
     deck->shuffle();
 }
 
@@ -74,37 +69,11 @@ Action GameModel::smallBlind() {
 }
 
 Action GameModel::takeAction(const Action& action) {
-    Player& player = players->at(current_position);
-    if (action.type == ActionType::FOLD) {
-        player.is_folded = true;
-        return {current_position, ActionType::FOLD, 0};
-    }
-    ActionType action_type;
-    Stack amount = 0;
-    if (round_bet == 0) {
-        action_type = ActionType::BET;
-        amount = big_blind;
-    } else if (player.current_bet < round_bet) {
-        action_type = ActionType::CALL;
-        amount = round_bet - player.current_bet;
-    } else {
-        action_type = ActionType::CHECK;
-    }
-    commitChips(current_position, amount);
-    return {current_position, action_type, amount};
+    return betting_round->takeAction(action, big_blind);
 }
 
 void GameModel::nextActor() {
-    Position next_position = players->nextPositionToAct(current_position);
-    is_round_ended =
-        next_position == rest_position ||
-            players->nextPositionToAct(next_position) == next_position;
-    is_only_one_active = players->nextPositionToAct(next_position) == next_position;
-    if (players->at(current_position).is_folded
-        && current_position == rest_position) {
-        rest_position = next_position;
-    }
-    current_position = next_position;
+    betting_round->nextActor();
 }
 
 void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
@@ -117,10 +86,7 @@ void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vect
 }
 
 void GameModel::nextStreet() {
-    for (Player& player : *players) {
-        player.current_bet = 0;
-    }
-
+    Position current_position = 0;
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;
@@ -143,9 +109,6 @@ void GameModel::nextStreet() {
     default: break;
     }
     dealCards();
-    rest_position = current_position;
-    if (!is_only_one_active)
-        is_round_ended = false;
-    round_bet = 0;
+    betting_round->initialize(current_position);
 }
 }

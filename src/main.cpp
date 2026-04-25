@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include "BettingRound.h"
 #include "Card.h"
 #include "Deck.h"
 #include "GameModel.h"
@@ -19,7 +20,8 @@ int main() {
 
     auto deck = std::make_unique<Deck>();
     auto player_set = std::make_shared<PlayerSet>();
-    auto game_model = std::make_unique<GameModel>(std::move(deck), player_set);
+    auto betting_round = std::make_unique<BettingRound>(player_set);
+    auto game_model = std::make_unique<GameModel>(std::move(deck), player_set, std::move(betting_round));
     Game game(std::move(game_model), std::make_unique<ui::ConsoleView>());
     player_set->addNewPlayer();
     player_set->addNewPlayer();

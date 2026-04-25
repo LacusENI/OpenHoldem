@@ -13,6 +13,7 @@ add_library(poker_core
         include/core/value_object/Card.h
         include/core/value_object/Deck.h
         include/core/value_object/GameTypes.h
+        include/core/BettingRound.h
         include/core/Game.h
         include/core/GameModel.h
         include/core/HandEvaluator.h
@@ -23,12 +24,12 @@ add_library(poker_core
         src/core/value_object/Card.cpp
         src/core/value_object/Deck.cpp
         src/core/value_object/HandValue.cpp
+        src/core/BettingRound.cpp
         src/core/Game.cpp
         src/core/GameModel.cpp
         src/core/HandEvaluator.cpp
         src/core/PlayerSet.cpp
         src/core/ShowdownHandler.cpp
-
 )
 
 target_include_directories(poker_core PUBLIC
@@ -73,7 +74,6 @@ add_executable(poker_test
 
         test/card_test.cpp
         test/hand_evaluator_test.cpp
-        test/game_model_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE

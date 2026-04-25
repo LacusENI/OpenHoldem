@@ -10,6 +10,7 @@ namespace holdem {
 
 class IDeck;
 class PlayerSet;
+class BettingRound;
 
 /**
  * @brief 一局游戏的数据模型
@@ -18,20 +19,16 @@ class GameModel {
 public:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
-    Position btn_position = 0;       // 庄家位置
-    Stack big_blind = 10;            // 大盲注额
-    Stack pot = 0;                   // 底池金额
-    Stack round_bet = 0;             // 此轮目前的最大下注额
-    Position rest_position{};        // 休止符玩家位置(若该玩家行动后下一位是休止符玩家，本轮下注结束)
-    Position current_position{};     // 当前行动玩家的位置
-    bool is_round_ended = false;     // 下注轮是否已结束
-    bool is_only_one_active = false; // 是否只有一名未弃牌玩家
+    Position btn_position = 0; // 庄家位置
+    Stack big_blind = 10;      // 大盲注额
+    Stack pot = 0;             // 底池金额
 
-    std::unique_ptr<IDeck> deck; // 牌组
-    Cards5 community_cards;      // 公共牌
+    Cards5 community_cards;
+    std::unique_ptr<IDeck> deck;
     std::shared_ptr<PlayerSet> players;
+    std::shared_ptr<BettingRound> betting_round;
 
-    explicit GameModel(std::unique_ptr<IDeck> deck, std::shared_ptr<PlayerSet> players);
+    explicit GameModel(std::unique_ptr<IDeck> deck, std::shared_ptr<PlayerSet> players, std::unique_ptr<BettingRound>);
     ~GameModel();
 
     /* 小盲注位 */

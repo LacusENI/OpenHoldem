@@ -12,11 +12,10 @@ struct Player {
     Cards2 hole_cards; // 玩家的底牌
 
     Stack chips = 0;        // 玩家拥有的筹码
-    Stack current_bet = 0;  // 玩家当前下注额
     bool is_folded = false; // 玩家是否已弃牌
 
     Player() = default;
-    Player(Position position) : position(position) {}
+    explicit Player(Position position) : position(position) {}
 };
 
 }
