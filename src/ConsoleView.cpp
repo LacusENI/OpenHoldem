@@ -3,14 +3,9 @@
 
 #include "ConsoleView.h"
 #include "GameModel.h"
+#include "Formatter.h"
 
-namespace holdem::internal {
-std::string rankToMessage(Rank rank);
-std::string getHandMessage(HandValue hand_value);
-std::string actionTypeToMessage(ActionType action_type);
-} // namespace holdem::internal
-
-namespace holdem {
+namespace holdem::ui {
 void ConsoleView::output(const std::string& text) {
     std::cout << text;
 }
@@ -51,13 +46,13 @@ void ConsoleView::displayBoard(
     switch (game_model.game_state) {
     case GameState::AWARD:
     case GameState::RIVER:
-        cc5 = game_model.community_cards[4].toMessage();
+        cc5 = ui::formatter::format(game_model.community_cards[4]);
     case GameState::TURN:
-        cc4 = game_model.community_cards[3].toMessage();
+        cc4 = ui::formatter::format(game_model.community_cards[3]);
     case GameState::FLOP:
-        cc3 = game_model.community_cards[2].toMessage();
-        cc2 = game_model.community_cards[1].toMessage();
-        cc1 = game_model.community_cards[0].toMessage();
+        cc3 = ui::formatter::format(game_model.community_cards[2]);
+        cc2 = ui::formatter::format(game_model.community_cards[1]);
+        cc1 = ui::formatter::format(game_model.community_cards[0]);
     case GameState::PREFLOP:
         break;
     default:
@@ -71,8 +66,8 @@ void ConsoleView::displayBoard(
     for (size_t i = 0; i < game_model.players.size(); ++i) {
         const Player& player = game_model.players[i];
         PlayerId id = player.id;
-        std::string hole1 = player.hole_cards[0].toMessage();
-        std::string hole2 = player.hole_cards[1].toMessage();
+        std::string hole1 = ui::formatter::format(player.hole_cards[0]);
+        std::string hole2 = ui::formatter::format(player.hole_cards[1]);
         std::string hand_message = hand_msgs[i];
         output(std::format(
              "[@P{}] ${:<3} |  {} {}   {}\n",
@@ -89,7 +84,7 @@ void ConsoleView::onRoundStarted(const OnRoundStartedData& data) const {
 void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
     const Action& action = data.action;
     output(std::format("#[@P{}]: {} (-${})\n",
-            action.actor_position + 1, internal::actionTypeToMessage(action.type), action.amount));
+            action.actor_position + 1, ui::formatter::format(action.type), action.amount));
 }
 
 PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
@@ -110,7 +105,7 @@ void ConsoleView::onShowdownCompleted(const OnShowdownCompletedData& data) const
     auto& results = data.results;
     std::vector<std::pair<Position, std::string>> hand_msgs;
     for (auto [position, hand_value] : results) {
-        std::string hand_msg = internal::getHandMessage(hand_value);
+        std::string hand_msg = ui::formatter::format(hand_value);
         hand_msgs.emplace_back(position, hand_msg);
     }
     displayBoard(data.game_model, hand_msgs);
@@ -130,92 +125,6 @@ void ConsoleView::onGameOver(const OnGameOverData& data) const {
     output("Result\n");
     for (const Player& player : data.game_model.players) {
         output(std::format("[@P{}] ${:>3}\n", player.position + 1, player.chips));
-    }
-}
-}
-
-namespace holdem::internal {
-std::string rankToMessage(Rank rank) {
-    switch (rank) {
-    case Rank::ACE: return "Ace";
-    case Rank::KING: return "King";
-    case Rank::QUEEN: return "Queen";
-    case Rank::JACK: return "Jack";
-    case Rank::TEN: return "Ten";
-    default:
-        return std::to_string(static_cast<int>(rank));
-    }
-}
-std::string getHandMessage(HandValue hand_value) {
-    HandType hand_type = hand_value.getHandType();
-    std::string x, y;
-    switch (hand_type) {
-    case HandType::ROYAL_FLUSH:
-        return "Royal Flush";
-    case HandType::STRAIGHT_FLUSH:
-        x = rankToMessage(hand_value.getRank(4));
-        y = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "Straight Flush, {} to {}", x, y);
-    case HandType::FOUR_OF_A_KIND:
-        x = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "Four of a Kind, {}s", x);
-    case HandType::FULL_HOUSE:
-        x = rankToMessage(hand_value.getRank(0));
-        y = rankToMessage(hand_value.getRank(1));
-        return std::format(
-            "Full House, {}s full of {}s", x, y);
-    case HandType::FLUSH:
-        x = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "Flush, {}-high", x);
-    case HandType::STRAIGHT:
-        x = rankToMessage(hand_value.getRank(4));
-        y = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "Straight, {} to {}", x, y);
-    case HandType::THREE_OF_A_KIND:
-        x = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "Three of a Kind, {}s", x);
-    case HandType::TWO_PAIR:
-        x = rankToMessage(hand_value.getRank(0));
-        y = rankToMessage(hand_value.getRank(1));
-        return std::format(
-            "Two pair, {}s and {}s", x, y);
-    case HandType::ONE_PAIR:
-        x = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "One Pair, {}s", x);
-    case HandType::HIGH_CARD:
-        x = rankToMessage(hand_value.getRank(0));
-        return std::format(
-            "High Card, {}-high", x);
-    }
-    return "";
-}
-
-std::string actionTypeToMessage(ActionType action_type) {
-    switch (action_type) {
-    case ActionType::CALL:
-        return "Call";
-    case ActionType::CHECK:
-        return "Check";
-    case ActionType::RAISE:
-        return "Raise";
-    case ActionType::BET:
-        return "Bet";
-    case ActionType::FOLD:
-        return "Fold";
-    case ActionType::ALL_IN:
-        return "All-in";
-    case ActionType::SMALL_BLIND:
-        return "Small Blind";
-    case ActionType::BIG_BLIND:
-        return "Big Blind";
-    default:
-        return "";
     }
 }
 }

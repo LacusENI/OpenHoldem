@@ -51,13 +51,6 @@ Card::Card(const char* str) {
     }
 }
 
-std::string Card::toMessage() const {
-    static std::vector<std::string> suits = {
-        "_", "\u2663", "\u2666", "\u2665", "\u2660"
-    }; // None, Club, Diamond, Heart, Spade
-    return suits[static_cast<int>(suit)] + utils::castRankToString(rank);
-}
-
 std::string Card::toString() const {
     return utils::castSuitToString(suit) + utils::castRankToString(rank);
 }

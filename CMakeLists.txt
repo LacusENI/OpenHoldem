@@ -35,6 +35,8 @@ add_executable(open_holdem
         src/main.cpp
         src/ConsoleView.h
         src/ConsoleView.cpp
+        src/Formatter.cpp
+        src/Formatter.h
 )
 
 target_link_libraries(open_holdem PRIVATE

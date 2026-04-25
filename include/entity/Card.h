@@ -28,7 +28,7 @@ enum class Rank : uint8_t {
 constexpr int MIN_SUIT = static_cast<int>(Suit::CLUB);
 constexpr int MAX_SUIT = static_cast<int>(Suit::SPADE);
 constexpr int MIN_RANK = static_cast<int>(Rank::TWO);
-constexpr int MAX_RANK = static_cast<int>(Rank::THREE);
+constexpr int MAX_RANK = static_cast<int>(Rank::ACE);
 
 /**
  * @brief 扑克牌的实体类
@@ -43,8 +43,6 @@ struct Card {
 
     /* 用于输出到日志中的展示字符串 */
     std::string toString() const;
-    /* 用于输出到用户界面的展示字符串 */
-    std::string toMessage() const;
 
     bool operator<(const Card& other) const {
         if (rank == other.rank) return suit < other.suit;
@@ -71,7 +69,7 @@ using Cards5 = std::array<Card, 5>;
 Cards7 concatCards(const Cards2& cards2, const Cards5& cards5);
 
 namespace utils {
-std::string static castSuitToString(Suit suit);
-std::string static castRankToString(Rank rank);
+std::string castSuitToString(Suit suit);
+std::string castRankToString(Rank rank);
 }
 } // namespace holdem

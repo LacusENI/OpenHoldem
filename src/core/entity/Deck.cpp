@@ -3,11 +3,11 @@
 
 #include "entity/Deck.h"
 
-constexpr int cards_size = 52;
+constexpr int CARDS_SIZE = 52;
 
 namespace holdem {
 Deck::Deck() {
-    cards.reserve(cards_size);
+    cards.reserve(CARDS_SIZE);
     for (int s = MIN_SUIT; s <= MAX_SUIT; ++s) {
         for (int r = MIN_RANK; r <= MAX_RANK; ++r) {
             cards.emplace_back(static_cast<Suit>(s), static_cast<Rank>(r));
@@ -23,7 +23,7 @@ void Deck::shuffle() {
 }
 
 Card Deck::deal() {
-    if (next_card_index >= cards.size()) {
+    if (next_card_index >= CARDS_SIZE) {
         throw std::runtime_error("Deck::deal: index out of range");
     }
     return cards[next_card_index++];

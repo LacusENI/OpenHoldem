@@ -2,7 +2,7 @@
 
 #include "IGameView.h"
 
-namespace holdem {
+namespace holdem::ui {
 class ConsoleView final : public IGameView {
 private:
     static void output(const std::string& text);
