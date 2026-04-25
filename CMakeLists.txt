@@ -17,6 +17,7 @@ add_library(poker_core
         include/core/GameModel.h
         include/core/HandEvaluator.h
         include/core/IGameView.h
+        include/core/PlayerSet.h
         include/core/ShowdownHandler.h
 
         src/core/value_object/Card.cpp
@@ -25,7 +26,9 @@ add_library(poker_core
         src/core/Game.cpp
         src/core/GameModel.cpp
         src/core/HandEvaluator.cpp
+        src/core/PlayerSet.cpp
         src/core/ShowdownHandler.cpp
+
 )
 
 target_include_directories(poker_core PUBLIC
