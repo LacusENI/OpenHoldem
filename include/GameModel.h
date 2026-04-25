@@ -11,10 +11,6 @@ namespace holdem {
 
 class IDeck;
 
-enum class GameState {
-    IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
-};
-
 /**
  * @brief 一局游戏的数据模型
  */

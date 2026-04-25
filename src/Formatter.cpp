@@ -128,4 +128,21 @@ std::string format(const ActionType& action_type) {
         return "???";
     }
 }
+
+std::string format(const GameState& state) {
+    switch (state) {
+    case GameState::AWARD:
+        return "SHOWDOWN";
+    case GameState::RIVER:
+        return "RIVER";
+    case GameState::TURN:
+        return "TURN";
+    case GameState::FLOP:
+        return "FLOP";
+    case GameState::PREFLOP:
+        return "PREFLOP";
+    default:
+        return "???";
+    }
+}
 }

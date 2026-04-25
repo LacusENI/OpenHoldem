@@ -10,6 +10,7 @@ enum class HandType;
 class HandValue;
 enum class ActionType;
 class Action;
+enum class GameState;
 }
 
 namespace holdem::ui::formatter {
@@ -24,4 +25,6 @@ std::string format(const HandType& hand_type);
 std::string format(const HandValue& hand_value);
 
 std::string format(const ActionType& action_type);
+
+std::string format(const GameState& state);
 }

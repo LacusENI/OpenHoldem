@@ -19,26 +19,7 @@ void ConsoleView::displayBoard(
         hand_msgs[position] = msg;
     }
     // 显示当前下注轮，底池
-    std::string street_msg;
-    switch (game_model.game_state) {
-    case GameState::AWARD:
-        street_msg = "SHOWDOWN";
-        break;
-    case GameState::RIVER:
-        street_msg = "RIVER";
-        break;
-    case GameState::TURN:
-        street_msg = "TURN";
-        break;
-    case GameState::FLOP:
-        street_msg = "FLOP";
-        break;
-    case GameState::PREFLOP:
-        street_msg = "PREFLOP";
-        break;
-    default:
-        throw std::runtime_error("Invalid Game State");
-    }
+    std::string street_msg = formatter::format(game_model.game_state);
     output(std::format("---{}--- Pot: ${}\n", street_msg, game_model.pot));
 
     // 显示公共牌信息
@@ -46,13 +27,13 @@ void ConsoleView::displayBoard(
     switch (game_model.game_state) {
     case GameState::AWARD:
     case GameState::RIVER:
-        cc5 = ui::formatter::format(game_model.community_cards[4]);
+        cc5 = formatter::format(game_model.community_cards[4]);
     case GameState::TURN:
-        cc4 = ui::formatter::format(game_model.community_cards[3]);
+        cc4 = formatter::format(game_model.community_cards[3]);
     case GameState::FLOP:
-        cc3 = ui::formatter::format(game_model.community_cards[2]);
-        cc2 = ui::formatter::format(game_model.community_cards[1]);
-        cc1 = ui::formatter::format(game_model.community_cards[0]);
+        cc3 = formatter::format(game_model.community_cards[2]);
+        cc2 = formatter::format(game_model.community_cards[1]);
+        cc1 = formatter::format(game_model.community_cards[0]);
     case GameState::PREFLOP:
         break;
     default:
@@ -66,8 +47,8 @@ void ConsoleView::displayBoard(
     for (size_t i = 0; i < game_model.players.size(); ++i) {
         const Player& player = game_model.players[i];
         PlayerId id = player.id;
-        std::string hole1 = ui::formatter::format(player.hole_cards[0]);
-        std::string hole2 = ui::formatter::format(player.hole_cards[1]);
+        std::string hole1 = formatter::format(player.hole_cards[0]);
+        std::string hole2 = formatter::format(player.hole_cards[1]);
         std::string hand_message = hand_msgs[i];
         output(std::format(
              "[@P{}] ${:<3} |  {} {}   {}\n",
@@ -84,7 +65,7 @@ void ConsoleView::onRoundStarted(const OnRoundStartedData& data) const {
 void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
     const Action& action = data.action;
     output(std::format("#[@P{}]: {} (-${})\n",
-            action.actor_position + 1, ui::formatter::format(action.type), action.amount));
+            action.actor_position + 1, formatter::format(action.type), action.amount));
 }
 
 PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
@@ -105,7 +86,7 @@ void ConsoleView::onShowdownCompleted(const OnShowdownCompletedData& data) const
     auto& results = data.results;
     std::vector<std::pair<Position, std::string>> hand_msgs;
     for (auto [position, hand_value] : results) {
-        std::string hand_msg = ui::formatter::format(hand_value);
+        std::string hand_msg = formatter::format(hand_value);
         hand_msgs.emplace_back(position, hand_msg);
     }
     displayBoard(data.game_model, hand_msgs);
