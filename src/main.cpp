@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "entity/Card.h"
-#include "entity/Deck.h"
+#include "Card.h"
+#include "Deck.h"
 #include "GameModel.h"
 #include "Game.h"
 #include "ConsoleView.h"

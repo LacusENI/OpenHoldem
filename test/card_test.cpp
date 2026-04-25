@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "entity/Card.h"
+#include "Card.h"
 
 using namespace holdem;
 

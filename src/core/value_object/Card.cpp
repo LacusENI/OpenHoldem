@@ -3,7 +3,7 @@
 #include <vector>
 #include <format>
 
-#include "entity/Card.h"
+#include "Card.h"
 
 namespace holdem {
 namespace utils {

@@ -2,7 +2,7 @@
 #include <string>
 #include <cstdint>
 
-#include "entity/GameTypes.h"
+#include "GameTypes.h"
 
 namespace holdem {
 enum class Rank : uint8_t;

@@ -1,5 +1,5 @@
-#ifndef OPENHOLDEM_MOCK_GAME_VIEW_H
-#define OPENHOLDEM_MOCK_GAME_VIEW_H
+#pragma once
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
@@ -18,5 +18,3 @@ public:
     MOCK_METHOD(void, onWinnerDeclared, (const OnWinnerDeclaredData&), (const, override));
     MOCK_METHOD(void, onGameOver, (const OnGameOverData&), (const, override));
 };
-
-#endif //OPENHOLDEM_MOCK_GAME_VIEW_H

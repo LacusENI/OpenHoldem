@@ -32,5 +32,5 @@ build/open_holdem
 ```
 运行测试:
 ```bash
-build/poker_tests
+build/poker_test
 ```

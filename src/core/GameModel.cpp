@@ -1,5 +1,5 @@
 #include "GameModel.h"
-#include "../../include/entity/Deck.h"
+#include "Deck.h"
 
 namespace holdem {
 GameModel::GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}

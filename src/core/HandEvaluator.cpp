@@ -1,5 +1,6 @@
 #include <vector>
 #include <algorithm>
+
 #include "HandEvaluator.h"
 
 namespace holdem::internal {

@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <chrono>
 
-#include "entity/Deck.h"
+#include "Deck.h"
 
 constexpr int CARDS_SIZE = 52;
 

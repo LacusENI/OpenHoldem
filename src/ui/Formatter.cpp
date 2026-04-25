@@ -1,9 +1,9 @@
 #include <format>
 
 #include "Formatter.h"
-#include "entity/Card.h"
-#include "entity/HandValue.h"
-#include "entity/GameTypes.h"
+#include "Card.h"
+#include "HandValue.h"
+#include "GameTypes.h"
 
 namespace holdem::ui::formatter {
 std::string format(Rank rank) {

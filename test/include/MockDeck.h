@@ -1,9 +1,9 @@
-#ifndef OPENHOLDEM_MOCK_DECK_H
-#define OPENHOLDEM_MOCK_DECK_H
+#pragma once
+
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include "entity/Deck.h"
+#include "Deck.h"
 
 class MockDeck : public holdem::IDeck {
 public:
@@ -17,5 +17,3 @@ public:
 
     holdem::Card deal() override { return holdem::Card(); }
 };
-
-#endif //OPENHOLDEM_MOCK_DECK_H
