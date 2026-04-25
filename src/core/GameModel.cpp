@@ -6,22 +6,8 @@ GameModel::GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
 
 GameModel::~GameModel() = default;
 
-void GameModel::addPlayer() {
-    Player new_player;
-    new_player.position = static_cast<int>(players.size());
-    players.push_back(new_player);
-}
-
-Position GameModel::nextPositionToAct(Position position) const {
-    Position next_pos = nextPosition(position);
-    while (players[next_pos].is_folded) {
-        next_pos = nextPosition(next_pos);
-    }
-    return next_pos;
-}
-
 void GameModel::commitChips(Position position, Stack amount) {
-    Player& player = getPlayer(position);
+    Player& player = players.at(position);
     player.chips -= amount;
     pot += amount;
     player.current_bet += amount;
@@ -78,7 +64,7 @@ Action GameModel::smallBlind() {
 }
 
 Action GameModel::takeAction(const Action& action) {
-    Player& player = getPlayer(current_position);
+    Player& player = players.at(current_position);
     if (action.type == ActionType::FOLD) {
         player.is_folded = true;
         return {current_position, ActionType::FOLD, 0};
@@ -99,12 +85,12 @@ Action GameModel::takeAction(const Action& action) {
 }
 
 void GameModel::nextActor() {
-    Position next_position = nextPositionToAct(current_position);
+    Position next_position = players.nextPositionToAct(current_position);
     is_round_ended =
         next_position == rest_position ||
-            nextPositionToAct(next_position) == next_position;
-    is_only_one_active = nextPositionToAct(next_position) == next_position;
-    if (getPlayer(current_position).is_folded
+            players.nextPositionToAct(next_position) == next_position;
+    is_only_one_active = players.nextPositionToAct(next_position) == next_position;
+    if (players.at(current_position).is_folded
         && current_position == rest_position) {
         rest_position = next_position;
     }
@@ -113,7 +99,7 @@ void GameModel::nextActor() {
 
 void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
-        Player& player = getPlayer(winners[i]);
+        Player& player = players.at(winners[i]);
         Stack amount = amounts[i];
         player.chips += amount;
     }
@@ -128,19 +114,19 @@ void GameModel::nextStreet() {
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;
-        current_position = getUtgPosition();
+        current_position = players.nextPosition(getBigBlindPosition());
         break;
     case GameState::PREFLOP:
         game_state = GameState::FLOP;
-        current_position = nextPositionToAct(button_position);
+        current_position = players.nextPositionToAct(btn_position);
         break;
     case GameState::FLOP:
         game_state = GameState::TURN;
-        current_position = nextPositionToAct(button_position);
+        current_position = players.nextPositionToAct(btn_position);
         break;
     case GameState::TURN:
         game_state = GameState::RIVER;
-        current_position = nextPositionToAct(button_position);
+        current_position = players.nextPositionToAct(btn_position);
         break;
     case GameState::RIVER:
         game_state = GameState::AWARD;
