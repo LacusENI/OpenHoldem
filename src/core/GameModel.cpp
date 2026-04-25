@@ -1,11 +1,13 @@
-#include "models/Card.h"
 #include "GameModel.h"
-#include "HandEvaluator.h"
+#include "../../include/entity/Deck.h"
 
 namespace holdem {
-void GameModel::addPlayer(PlayerId id) {
+GameModel::GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
+
+GameModel::~GameModel() = default;
+
+void GameModel::addPlayer() {
     Player new_player;
-    new_player.id = id;
     new_player.position = static_cast<int>(players.size());
     players.push_back(new_player);
 }
@@ -33,10 +35,8 @@ void GameModel::setup() {
     pot = 0;
     round_bet = 0;
     is_round_ended = false;
-    winners.clear();
     for (Player& player : players) {
         player.current_bet = 0;
-        player.hand_value = HandValue();
     }
     deck->shuffle();
 }
@@ -67,35 +67,35 @@ void GameModel::dealCards() {
 Action GameModel::bigBlind() {
     Position position = getBigBlindPosition();
     commitChips(position, big_blind);
-    return {position, "Big Blind", big_blind};
+    return {position, ActionType::BIG_BLIND, big_blind};
 }
 
 Action GameModel::smallBlind() {
     Position position = getSmallBlindPosition();
     Stack small_blind = big_blind / 2;
     commitChips(position, small_blind);
-    return {position, "Small Blind", small_blind};
+    return {position, ActionType::SMALL_BLIND, small_blind};
 }
 
 Action GameModel::takeAction(const Action& action) {
     Player& player = getPlayer(current_position);
-    if (action.description == "Fold") {
+    if (action.type == ActionType::FOLD) {
         player.is_folded = true;
-        return {current_position, "Fold", 0};
+        return {current_position, ActionType::FOLD, 0};
     }
-    std::string description;
+    ActionType action_type;
     Stack amount = 0;
     if (round_bet == 0) {
-        description = "Bet";
+        action_type = ActionType::BET;
         amount = big_blind;
     } else if (player.current_bet < round_bet) {
-        description = "Call";
+        action_type = ActionType::CALL;
         amount = round_bet - player.current_bet;
     } else {
-        description = "Check";
+        action_type = ActionType::CHECK;
     }
     commitChips(current_position, amount);
-    return {current_position, description, amount};
+    return {current_position, action_type, amount};
 }
 
 void GameModel::nextActor() {
@@ -111,7 +111,7 @@ void GameModel::nextActor() {
     current_position = next_position;
 }
 
-void GameModel::distributePot(const std::vector<Stack>& amounts) {
+void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
         Player& player = getPlayer(winners[i]);
         Stack amount = amounts[i];

@@ -1,15 +1,15 @@
-#ifndef OPENHOLDEM_GAME_STATE_H
-#define OPENHOLDEM_GAME_STATE_H
-#include <memory>
+#pragma once
 
-#include "models/Deck.h"
-#include "models/Player.h"
+#include <memory>
+#include <vector>
+
+#include "entity/Card.h"
+#include "entity/GameTypes.h"
+#include "entity/Player.h"
 
 namespace holdem {
 
-enum class GameState {
-    IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
-};
+class IDeck;
 
 /**
  * @brief 一局游戏的数据模型
@@ -18,7 +18,6 @@ class GameModel {
 public:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
-    bool print_enabled = false;
     Position button_position = 0;    // 庄家位置
     Stack big_blind = 10;            // 大盲注额
     Stack pot = 0;                   // 底池金额
@@ -32,14 +31,13 @@ public:
     Cards5 community_cards;      // 公共牌
     std::vector<Player> players; // 玩家列表
 
-    std::vector<Position> winners{}; // 赢家列表
-
-    explicit GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
+    explicit GameModel(std::unique_ptr<IDeck> deck);
+    ~GameModel();
 
     /**
      * @brief 添加新玩家到玩家列表
      */
-    void addPlayer(PlayerId id);
+    void addPlayer();
     /**
      * 获取到该座位上的玩家信息
      * @param position 玩家座位(从0开始)
@@ -109,7 +107,7 @@ public:
      */
     void nextActor();
 
-    void distributePot(const std::vector<Stack>& amounts);
+    void distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners);
 
     /**
      * @brief 执行大盲注
@@ -123,5 +121,3 @@ public:
     Action smallBlind();
 };
 }
-
-#endif //OPENHOLDEM_GAME_STATE_H

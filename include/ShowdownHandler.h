@@ -1,10 +1,10 @@
-#ifndef OPENHOLDEM_SHOWDOWN_HANDLER_H
-#define OPENHOLDEM_SHOWDOWN_HANDLER_H
+#pragma once
+
 #include <vector>
 
-#include "models/GameTypes.h"
-#include "models/Hand.h"
-#include "models/Player.h"
+#include "entity/GameTypes.h"
+#include "entity/HandValue.h"
+#include "entity/Player.h"
 
 namespace holdem {
 
@@ -22,4 +22,3 @@ public:
 };
 
 }
-#endif //OPENHOLDEM_SHOWDOWN_HANDLER_H

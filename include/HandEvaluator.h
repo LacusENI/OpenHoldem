@@ -1,9 +1,9 @@
-#ifndef OPENHOLDEM_HAND_EVALUATOR_H
-#define OPENHOLDEM_HAND_EVALUATOR_H
-#include <array>
+#pragma once
+
 #include <vector>
 
-#include "models/Hand.h"
+#include "entity/Card.h"
+#include "entity/HandValue.h"
 
 namespace holdem {
 
@@ -77,4 +77,3 @@ HandType evalHandType(const Cards5& hand5, const HandCounts& counts);
  */
 std::vector<Cards5> enum5from7(const Cards7& hand7);
 } // namespace holdem::internal
-#endif //OPENHOLDEM_HAND_EVALUATOR_H

@@ -1,24 +1,29 @@
 #include <iostream>
 
-#include "models/Card.h"
+#include "entity/Card.h"
+#include "entity/Deck.h"
+#include "GameModel.h"
 #include "Game.h"
+#include "ConsoleView.h"
+#include "Formatter.h"
 
 using namespace holdem;
 
 int main() {
-    std::cout << Card("CA").toMessage();
-    std::cout << Card("DJ").toMessage();
-    std::cout << Card("HT").toMessage();
-    std::cout << Card("S8").toMessage();
+    std::cout << ui::formatter::format(Card("CA"));
+    std::cout << ui::formatter::format(Card("DJ"));
+    std::cout << ui::formatter::format(Card("HT"));
+    std::cout << ui::formatter::format(Card("S8"));
     std::cout << " OpenHoldem\n";
 
-    Game game(std::move(std::make_unique<Deck>()), std::make_unique<GameView>());
-    game.model.print_enabled = true;
-    game.model.addPlayer(1);
-    game.addPlayer(2);
-    game.addPlayer(3);
-    game.addPlayer(4);
-    game.addPlayer(5);
+    auto deck = std::make_unique<Deck>();
+    auto game_model = std::make_unique<GameModel>(std::move(deck));
+    Game game(std::move(game_model), std::make_unique<ui::ConsoleView>());
+    game.model->addPlayer();
+    game.model->addPlayer();
+    game.model->addPlayer();
+    game.model->addPlayer();
+    game.model->addPlayer();
     game.run();
 
     return 0;
