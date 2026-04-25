@@ -37,7 +37,7 @@ public:
     /**
      * @brief 添加新玩家到玩家列表
      */
-    void addPlayer(PlayerId id);
+    void addPlayer();
     /**
      * 获取到该座位上的玩家信息
      * @param position 玩家座位(从0开始)

@@ -24,8 +24,8 @@ TEST(TestGameModel, TestDealCards) {
     EXPECT_CALL(*deck, shuffle()).Times(testing::AnyNumber());
 
     GameModel model(std::move(deck));
-    model.addPlayer(1);
-    model.addPlayer(2);
+    model.addPlayer();
+    model.addPlayer();
 
     // Pre-flop 阶段
     model.game_state = GameState::PREFLOP;
@@ -61,7 +61,7 @@ TEST(TestGameModel, TestDealCards) {
 TEST(TestGameModel, TestCommitChips) {
     auto deck = std::make_unique<MockEmptyDeck>();
     GameModel model(std::move(deck));
-    model.addPlayer(1);
+    model.addPlayer();
     Player& player = model.getPlayer(0);
 
     // 测试 Bet 动作
@@ -104,11 +104,11 @@ TEST(TestGameModel, TestCommitChips) {
 TEST(TestGameModel, TestNextPositionToAct) {
     auto deck = std::make_unique<MockEmptyDeck>();
     GameModel model(std::move(deck));
-    model.addPlayer(1);
-    model.addPlayer(2); // Fold
-    model.addPlayer(3);
-    model.addPlayer(4); // Fold
-    model.addPlayer(5); // Fold
+    model.addPlayer();
+    model.addPlayer(); // Fold
+    model.addPlayer();
+    model.addPlayer(); // Fold
+    model.addPlayer(); // Fold
     model.players[1].is_folded = true;
     model.players[3].is_folded = true;
     model.players[4].is_folded = true;

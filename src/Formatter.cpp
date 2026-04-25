@@ -145,4 +145,8 @@ std::string format(const GameState& state) {
         return "???";
     }
 }
+
+std::string format(const Position& position) {
+    return std::format("[@P{}]", position + 1);
+}
 }

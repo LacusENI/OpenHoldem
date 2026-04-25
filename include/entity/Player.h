@@ -8,7 +8,6 @@ namespace holdem {
  * @brief 玩家实体类
  */
 struct Player {
-    PlayerId id;       // 玩家ID
     Position position; // 玩家所在位置
     Cards2 hole_cards; // 玩家的底牌
 

@@ -6,9 +6,8 @@ GameModel::GameModel(std::unique_ptr<IDeck> deck) : deck(std::move(deck)) {}
 
 GameModel::~GameModel() = default;
 
-void GameModel::addPlayer(PlayerId id) {
+void GameModel::addPlayer() {
     Player new_player;
-    new_player.id = id;
     new_player.position = static_cast<int>(players.size());
     players.push_back(new_player);
 }

@@ -46,13 +46,13 @@ void ConsoleView::displayBoard(
     output("Hold Cards:\n");
     for (size_t i = 0; i < game_model.players.size(); ++i) {
         const Player& player = game_model.players[i];
-        PlayerId id = player.id;
+        std::string position = formatter::format(player.position);
         std::string hole1 = formatter::format(player.hole_cards[0]);
         std::string hole2 = formatter::format(player.hole_cards[1]);
         std::string hand_message = hand_msgs[i];
         output(std::format(
-             "[@P{}] ${:<3} |  {} {}   {}\n",
-             id, player.chips, hole1, hole2, hand_message));
+             "{} ${:<3} |  {} {}   {}\n",
+             position, player.chips, hole1, hole2, hand_message));
     }
 }
 
@@ -64,8 +64,8 @@ void ConsoleView::onRoundStarted(const OnRoundStartedData& data) const {
 
 void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
     const Action& action = data.action;
-    output(std::format("#[@P{}]: {} (-${})\n",
-            action.actor_position + 1, formatter::format(action.type), action.amount));
+    output(std::format("#{}: {} (-${})\n",
+            formatter::format(action.actor_position), formatter::format(action.type), action.amount));
 }
 
 PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
@@ -95,9 +95,9 @@ void ConsoleView::onShowdownCompleted(const OnShowdownCompletedData& data) const
 void ConsoleView::onWinnerDeclared(const OnWinnerDeclaredData& data) const {
     output("Winner:");
     for (int i = 0; i < data.winners.size(); ++i) {
-        Position position = data.winners[i];
+        std::string position = formatter::format(data.winners[i]);
         Stack amount = data.amounts[i];
-        output(std::format(" @P{}(+${})", position + 1, amount));
+        output(std::format("{}(+${})", position, amount));
     }
     output("\n");
 }
@@ -105,7 +105,8 @@ void ConsoleView::onWinnerDeclared(const OnWinnerDeclaredData& data) const {
 void ConsoleView::onGameOver(const OnGameOverData& data) const {
     output("Result\n");
     for (const Player& player : data.game_model.players) {
-        output(std::format("[@P{}] ${:>3}\n", player.position + 1, player.chips));
+        std::string position = formatter::format(player.position);
+        output(std::format("{} ${:>3}\n", position, player.chips));
     }
 }
 }
