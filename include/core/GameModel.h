@@ -5,12 +5,11 @@
 
 #include "Card.h"
 #include "GameTypes.h"
-#include "Player.h"
-#include "PlayerSet.h"
 
 namespace holdem {
 
 class IDeck;
+class PlayerSet;
 
 /**
  * @brief 一局游戏的数据模型
@@ -30,19 +29,15 @@ public:
 
     std::unique_ptr<IDeck> deck; // 牌组
     Cards5 community_cards;      // 公共牌
-    PlayerSet players;
+    std::shared_ptr<PlayerSet> players;
 
-    explicit GameModel(std::unique_ptr<IDeck> deck);
+    explicit GameModel(std::unique_ptr<IDeck> deck, std::shared_ptr<PlayerSet> players);
     ~GameModel();
 
     /* 小盲注位 */
-    Position getSmallBlindPosition() const {
-        return players.nextPosition(btn_position);
-    }
+    Position getSmallBlindPosition() const;
     /* 大盲注位 */
-    Position getBigBlindPosition() const {
-        return players.nextPosition(getSmallBlindPosition());
-    }
+    Position getBigBlindPosition() const;
 
     /**
      * @brief 将玩家的筹码投入底池中，并更新玩家下注额和本轮下注额

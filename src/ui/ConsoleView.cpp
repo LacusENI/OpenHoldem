@@ -4,6 +4,7 @@
 #include "ConsoleView.h"
 #include "GameModel.h"
 #include "Formatter.h"
+#include "PlayerSet.h"
 
 namespace holdem::ui {
 void ConsoleView::output(const std::string& text) {
@@ -14,7 +15,7 @@ void ConsoleView::displayBoard(
         const GameModel& game_model,
         const std::vector<std::pair<Position, std::string>>& active_player_hand_msgs
     ) {
-    std::vector<std::string> hand_msgs(game_model.players.size(), "");
+    std::vector<std::string> hand_msgs(game_model.players->size(), "");
     for (auto [position, msg] : active_player_hand_msgs) {
         hand_msgs[position] = msg;
     }
@@ -44,8 +45,8 @@ void ConsoleView::displayBoard(
 
     // 显示每名玩家底牌信息
     output("Hold Cards:\n");
-    for (size_t i = 0; i < game_model.players.size(); ++i) {
-        const Player& player = game_model.players[i];
+    for (size_t i = 0; i < game_model.players->size(); ++i) {
+        const Player& player = game_model.players->at(i);
         std::string position = formatter::format(player.position);
         std::string hole1 = formatter::format(player.hole_cards[0]);
         std::string hole2 = formatter::format(player.hole_cards[1]);
@@ -104,7 +105,7 @@ void ConsoleView::onWinnerDeclared(const OnWinnerDeclaredData& data) const {
 
 void ConsoleView::onGameOver(const OnGameOverData& data) const {
     output("Result\n");
-    for (const Player& player : data.game_model.players) {
+    for (const Player& player : *data.game_model.players) {
         std::string position = formatter::format(player.position);
         output(std::format("{} ${:>3}\n", position, player.chips));
     }

@@ -6,6 +6,7 @@
 #include "Game.h"
 #include "ConsoleView.h"
 #include "Formatter.h"
+#include "PlayerSet.h"
 
 using namespace holdem;
 
@@ -17,13 +18,14 @@ int main() {
     std::cout << " OpenHoldem\n";
 
     auto deck = std::make_unique<Deck>();
-    auto game_model = std::make_unique<GameModel>(std::move(deck));
+    auto player_set = std::make_shared<PlayerSet>();
+    auto game_model = std::make_unique<GameModel>(std::move(deck), player_set);
     Game game(std::move(game_model), std::make_unique<ui::ConsoleView>());
-    game.model->addPlayer();
-    game.model->addPlayer();
-    game.model->addPlayer();
-    game.model->addPlayer();
-    game.model->addPlayer();
+    player_set->addNewPlayer();
+    player_set->addNewPlayer();
+    player_set->addNewPlayer();
+    player_set->addNewPlayer();
+    player_set->addNewPlayer();
     game.run();
 
     return 0;

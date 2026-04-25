@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "IGameView.h"
 #include "GameModel.h"
+#include "PlayerSet.h"
 #include "ShowdownHandler.h"
 
 namespace holdem {
@@ -44,7 +45,7 @@ void Game::run() {
 
 void Game::handleAward() {
     auto hand_values = ShowdownHandler::evalHandValues(
-        model->players, model->community_cards);
+        model->players->getPlayers(), model->community_cards);
     auto winners = ShowdownHandler::determineWinners(
         hand_values);
     auto amounts = ShowdownHandler::calculateDistribution(

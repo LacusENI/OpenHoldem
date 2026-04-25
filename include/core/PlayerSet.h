@@ -9,6 +9,8 @@ private:
     std::vector<Player> players;
 public:
     PlayerSet() = default;
+    size_t size() const { return players.size(); }
+    const std::vector<Player> & getPlayers() const { return players; }
     void addNewPlayer();
     Player& operator[] (Position position) { return players[position]; }
     const Player& operator[] (Position position) const { return players[position]; }
