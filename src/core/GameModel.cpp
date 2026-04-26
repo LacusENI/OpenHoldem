@@ -2,13 +2,16 @@
 #include "PlayerSet.h"
 #include "BettingRound.h"
 #include "Deck.h"
+#include "PotManager.h"
 
 namespace holdem {
 GameModel::GameModel(
     std::unique_ptr<IDeck> deck,
     std::shared_ptr<PlayerSet> players,
+    std::shared_ptr<PotManager> pot_manager,
     std::unique_ptr<BettingRound> betting_round
     ) : deck(std::move(deck)), players(std::move(players)),
+        pot_manager(std::move(pot_manager)),
         betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
@@ -23,12 +26,12 @@ Position GameModel::getBigBlindPosition() const  {
 
 void GameModel::commitChips(Position position, Stack amount) {
     betting_round->commitChips(position, amount);
-    pot += amount;
+    pot_manager->addChipsToPot(amount);
 }
 
 void GameModel::setup() {
     game_state = GameState::IDLE;
-    pot = 0;
+    pot_manager->clearPot();
     deck->shuffle();
 }
 
@@ -84,7 +87,7 @@ void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vect
         Stack amount = amounts[i];
         player.chips += amount;
     }
-    pot = 0;
+    pot_manager->clearPot();
 }
 
 void GameModel::nextStreet() {

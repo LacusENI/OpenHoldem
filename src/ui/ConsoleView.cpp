@@ -5,6 +5,7 @@
 #include "GameModel.h"
 #include "Formatter.h"
 #include "PlayerSet.h"
+#include "PotManager.h"
 
 namespace holdem::ui {
 void ConsoleView::output(const std::string& text) {
@@ -21,7 +22,7 @@ void ConsoleView::displayBoard(
     }
     // 显示当前下注轮，底池
     std::string street_msg = formatter::format(game_model.game_state);
-    output(std::format("---{}--- Pot: ${}\n", street_msg, game_model.pot));
+    output(std::format("---{}--- Pot: ${}\n", street_msg, game_model.pot_manager->get()));
 
     // 显示公共牌信息
     std::string cc1, cc2, cc3, cc4, cc5;

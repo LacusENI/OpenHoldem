@@ -11,6 +11,7 @@ namespace holdem {
 class IDeck;
 class PlayerSet;
 class BettingRound;
+class PotManager;
 
 /**
  * @brief 一局游戏的数据模型
@@ -21,14 +22,18 @@ public:
 
     Position btn_position = 0; // 庄家位置
     Stack big_blind = 10;      // 大盲注额
-    Stack pot = 0;             // 底池金额
 
     Cards5 community_cards;
     std::unique_ptr<IDeck> deck;
     std::shared_ptr<PlayerSet> players;
+    std::shared_ptr<PotManager> pot_manager;
     std::shared_ptr<BettingRound> betting_round;
 
-    explicit GameModel(std::unique_ptr<IDeck> deck, std::shared_ptr<PlayerSet> players, std::unique_ptr<BettingRound>);
+    GameModel(
+        std::unique_ptr<IDeck> deck,
+        std::shared_ptr<PlayerSet> players,
+        std::shared_ptr<PotManager> pot_manager,
+        std::unique_ptr<BettingRound>);
     ~GameModel();
 
     /* 小盲注位 */

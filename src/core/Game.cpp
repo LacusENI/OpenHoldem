@@ -4,6 +4,7 @@
 #include "IGameView.h"
 #include "GameModel.h"
 #include "PlayerSet.h"
+#include "PotManager.h"
 #include "ShowdownHandler.h"
 
 namespace holdem {
@@ -51,7 +52,7 @@ void Game::handleAward() {
     auto winners = ShowdownHandler::determineWinners(
         hand_values);
     auto amounts = ShowdownHandler::calculateDistribution(
-        model->pot, winners.size());
+        model->pot_manager->get(), winners.size());
     view->onShowdownCompleted({*model, hand_values});
     view->onWinnerDeclared({winners, amounts});
     model->distributePot(amounts, winners);

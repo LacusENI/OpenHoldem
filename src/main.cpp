@@ -8,6 +8,7 @@
 #include "ConsoleView.h"
 #include "Formatter.h"
 #include "PlayerSet.h"
+#include "PotManager.h"
 
 using namespace holdem;
 
@@ -20,8 +21,10 @@ int main() {
 
     auto deck = std::make_unique<Deck>();
     auto player_set = std::make_shared<PlayerSet>();
+    auto pot_manager = std::make_shared<PotManager>();
     auto betting_round = std::make_unique<BettingRound>(player_set);
-    auto game_model = std::make_unique<GameModel>(std::move(deck), player_set, std::move(betting_round));
+    auto game_model = std::make_unique<GameModel>(
+        std::move(deck), player_set, pot_manager, std::move(betting_round));
     Game game(std::move(game_model), std::make_unique<ui::ConsoleView>());
     player_set->addNewPlayer();
     player_set->addNewPlayer();
