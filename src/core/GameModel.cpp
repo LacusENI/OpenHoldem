@@ -16,18 +16,16 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
-Position GameModel::getSmallBlindPosition() const  {
-    return players->nextPosition(btn_position);
-}
 
-Position GameModel::getBigBlindPosition() const  {
-    return players->nextPosition(getSmallBlindPosition());
+Position GameModel::getCurrentPosition() const {
+    return betting_round->getCurrentPosition();
 }
 
 void GameModel::setup() {
     game_state = GameState::IDLE;
-    pot_manager->clearPot();
     deck->shuffle();
+    pot_manager->clearPot();
+    betting_round->setup();
 }
 
 void GameModel::dealCards() {
@@ -54,13 +52,13 @@ void GameModel::dealCards() {
 }
 
 Action GameModel::bigBlind() {
-    Position position = getBigBlindPosition();
+    Position position = players->getBbPosition(btn_position);
     betting_round->commitChips(position, big_blind);
     return {position, ActionType::BIG_BLIND, big_blind};
 }
 
 Action GameModel::smallBlind() {
-    Position position = getSmallBlindPosition();
+    Position position = players->getSbPosition(btn_position);
     Stack small_blind = big_blind / 2;
     betting_round->commitChips(position, small_blind);
     return {position, ActionType::SMALL_BLIND, small_blind};
@@ -71,11 +69,7 @@ bool GameModel::isRoundEnded() const {
 }
 
 Action GameModel::takeAction(const Action& action) {
-    return betting_round->handleAction(action, big_blind);
-}
-
-void GameModel::nextActor() {
-    betting_round->nextTurn();
+    return betting_round->handleAction(action);
 }
 
 void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
@@ -92,7 +86,7 @@ void GameModel::nextStreet() {
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;
-        current_position = players->nextPosition(getBigBlindPosition());
+        current_position = players->getUtgPosition(btn_position);
         break;
     case GameState::PREFLOP:
         game_state = GameState::FLOP;

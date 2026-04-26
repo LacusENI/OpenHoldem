@@ -36,10 +36,7 @@ public:
         std::unique_ptr<BettingRound>);
     ~GameModel();
 
-    /* 小盲注位 */
-    Position getSmallBlindPosition() const;
-    /* 大盲注位 */
-    Position getBigBlindPosition() const;
+    Position getCurrentPosition() const;
     /**
      * @brief 游戏状态和数据初始化
      */
@@ -59,11 +56,6 @@ public:
      * @return 此次玩家所采取的动作信息
      */
     Action takeAction(const Action& action);
-    /**
-     * @brief 移动至下一个要行动的玩家,
-     * 若下注轮已结束，则设置回合结束标志
-     */
-    void nextActor();
 
     void distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners);
 

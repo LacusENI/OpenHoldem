@@ -18,4 +18,15 @@ Position PlayerSet::nextPositionToAct(Position position) const {
     return players[next_pos].is_folded ? -1 : next_pos;
 }
 
+Position PlayerSet::getSbPosition(Position btn_position) const {
+    return nextPosition(btn_position);
+}
+
+Position PlayerSet::getBbPosition(Position btn_position) const {
+    return nextPosition(nextPosition(btn_position));
+}
+
+Position PlayerSet::getUtgPosition(Position btn_position) const {
+    return nextPosition(getBbPosition(btn_position));
+}
 } // namespace holdem

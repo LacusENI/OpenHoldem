@@ -22,5 +22,8 @@ public:
     auto cend() const { return players.cend(); }
     Position nextPosition(Position position) const;
     Position nextPositionToAct(Position position) const;
+    Position getSbPosition(Position btn_position) const;
+    Position getBbPosition(Position btn_position) const;
+    Position getUtgPosition(Position btn_position) const;
 };
 } // namespace holdem

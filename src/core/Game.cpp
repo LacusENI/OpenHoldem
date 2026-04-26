@@ -32,10 +32,9 @@ void Game::run() {
     while (model->game_state != GameState::AWARD) {
         view->onRoundStarted({*model});
         while (!model->isRoundEnded()) {
-            Action action = view->onPlayerTurn({model->betting_round->getCurrentPosition()}).action;
+            Action action = view->onPlayerTurn({model->getCurrentPosition()}).action;
             action = model->takeAction(action);
             view->onPlayerActed({action});
-            model->nextActor();
         }
         model->nextStreet();
     }
