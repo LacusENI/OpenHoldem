@@ -9,7 +9,7 @@ bool BettingRound::isRoundEnded() const {
     return is_round_ended || players->nextPositionToAct(current_position) == current_position;
 }
 
-void BettingRound::initialize(Position start_position) {
+void BettingRound::prepare(Position start_position) {
     player_bets.resize(players->size(), 0);
     current_position = start_position;
     rest_position = start_position;
@@ -20,7 +20,7 @@ void BettingRound::initialize(Position start_position) {
     round_bet = 0;
 }
 
-void BettingRound::nextActor() {
+void BettingRound::nextTurn() {
     Position next_position = players->nextPositionToAct(current_position);
     is_round_ended =
         next_position == rest_position ||
@@ -43,7 +43,7 @@ void BettingRound::commitChips(Position position, Stack amount) {
     player_bets[position] = player_bet;
 }
 
-Action BettingRound::takeAction(Action action, Stack big_blind) {
+Action BettingRound::handleAction(Action action, Stack big_blind) const {
     Player& player = players->at(current_position);
     if (action.type == ActionType::FOLD) {
         player.is_folded = true;
@@ -61,7 +61,6 @@ Action BettingRound::takeAction(Action action, Stack big_blind) {
     } else {
         action_type = ActionType::CHECK;
     }
-    commitChips(current_position, amount);
     return {current_position, action_type, amount};
 }
 

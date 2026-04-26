@@ -8,8 +8,8 @@ GameModel::GameModel(
     std::unique_ptr<IDeck> deck,
     std::shared_ptr<PlayerSet> players,
     std::unique_ptr<BettingRound> betting_round
-    )
-    : deck(std::move(deck)), players(std::move(players)), betting_round(std::move(betting_round)) {}
+    ) : deck(std::move(deck)), players(std::move(players)),
+        betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
 
@@ -69,11 +69,13 @@ Action GameModel::smallBlind() {
 }
 
 Action GameModel::takeAction(const Action& action) {
-    return betting_round->takeAction(action, big_blind);
+    auto [position, action_type, amount] = betting_round->handleAction(action, big_blind);
+    commitChips(position, amount);
+    return {position, action_type, amount};
 }
 
 void GameModel::nextActor() {
-    betting_round->nextActor();
+    betting_round->nextTurn();
 }
 
 void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
@@ -109,6 +111,6 @@ void GameModel::nextStreet() {
     default: break;
     }
     dealCards();
-    betting_round->initialize(current_position);
+    betting_round->prepare(current_position);
 }
 }
