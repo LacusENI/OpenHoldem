@@ -1,9 +1,16 @@
 #include "BettingRound.h"
+#include "PotManager.h"
 #include "PlayerSet.h"
 
 namespace holdem {
 
-BettingRound::BettingRound(std::shared_ptr<PlayerSet> players) : players(std::move(players)) {}
+BettingRound::BettingRound(
+    std::shared_ptr<PlayerSet> players,
+    std::shared_ptr<PotManager> pot_manager
+    )
+    : players(std::move(players)), pot_manager(std::move(pot_manager)) {}
+
+BettingRound::~BettingRound() = default;
 
 bool BettingRound::isRoundEnded() const {
     return is_round_ended || players->nextPositionToAct(current_position) == current_position;

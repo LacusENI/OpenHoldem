@@ -7,6 +7,7 @@
 
 namespace holdem {
 class PlayerSet;
+class PotManager;
 
 enum class RoundState {
     IDLE, IN_PROGRESS, COMPLETED, ONLY_ONE_ACTIVE, ONLY_ONE_LIVE
@@ -16,6 +17,7 @@ class BettingRound {
 private:
     RoundState round_state = RoundState::IDLE;
     std::shared_ptr<PlayerSet> players;
+    std::shared_ptr<PotManager> pot_manager;
 
     std::vector<Stack> player_bets;  // 玩家的本轮下注额
     Stack round_bet = 0;             // 此轮目前的最大下注额
@@ -30,7 +32,9 @@ private:
     int active_players_count{};      // 剩余活跃(未弃牌)玩家数量
     int players_can_act_count{};     // 剩余可以行动的玩家数量
 public:
-    explicit BettingRound(std::shared_ptr<PlayerSet> players);
+    BettingRound(
+        std::shared_ptr<PlayerSet> players, std::shared_ptr<PotManager> pot_manager);
+    ~BettingRound();
     Position getCurrentPosition() const { return current_position; }
     bool isRoundEnded() const;
     void prepare(Position start_position);
