@@ -48,9 +48,10 @@ void BettingRound::commitChips(Position position, Stack amount) {
         round_bet = player_bet;
     }
     player_bets[position] = player_bet;
+    pot_manager->addChipsToPot(amount);
 }
 
-Action BettingRound::handleAction(Action action, Stack big_blind) const {
+Action BettingRound::handleAction(Action action, Stack big_blind) {
     Player& player = players->at(current_position);
     if (action.type == ActionType::FOLD) {
         player.is_folded = true;
@@ -68,6 +69,7 @@ Action BettingRound::handleAction(Action action, Stack big_blind) const {
     } else {
         action_type = ActionType::CHECK;
     }
+    commitChips(action.actor_position, amount);
     return {current_position, action_type, amount};
 }
 

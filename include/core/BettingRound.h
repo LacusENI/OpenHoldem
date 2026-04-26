@@ -38,7 +38,7 @@ public:
     Position getCurrentPosition() const { return current_position; }
     bool isRoundEnded() const;
     void prepare(Position start_position);
-    Action handleAction(Action action, Stack big_blind) const;
+    Action handleAction(Action action, Stack big_blind);
     void nextTurn();
     void commitChips(Position position, Stack amount);
 };

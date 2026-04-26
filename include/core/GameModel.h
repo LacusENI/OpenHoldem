@@ -40,15 +40,6 @@ public:
     Position getSmallBlindPosition() const;
     /* 大盲注位 */
     Position getBigBlindPosition() const;
-
-    /**
-     * @brief 将玩家的筹码投入底池中，并更新玩家下注额和本轮下注额
-     * @note demo_v3 阶段暂不检查玩家是否有足够的筹码
-     * @param position 玩家位置
-     * @param amount 投入筹码的数额
-     */
-    void commitChips(Position position, Stack amount);
-
     /**
      * @brief 游戏状态和数据初始化
      */
@@ -86,5 +77,7 @@ public:
      * @return 动作信息
      */
     Action smallBlind();
+
+    bool isRoundEnded() const;
 };
 }

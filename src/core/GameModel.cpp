@@ -24,11 +24,6 @@ Position GameModel::getBigBlindPosition() const  {
     return players->nextPosition(getSmallBlindPosition());
 }
 
-void GameModel::commitChips(Position position, Stack amount) {
-    betting_round->commitChips(position, amount);
-    pot_manager->addChipsToPot(amount);
-}
-
 void GameModel::setup() {
     game_state = GameState::IDLE;
     pot_manager->clearPot();
@@ -60,21 +55,23 @@ void GameModel::dealCards() {
 
 Action GameModel::bigBlind() {
     Position position = getBigBlindPosition();
-    commitChips(position, big_blind);
+    betting_round->commitChips(position, big_blind);
     return {position, ActionType::BIG_BLIND, big_blind};
 }
 
 Action GameModel::smallBlind() {
     Position position = getSmallBlindPosition();
     Stack small_blind = big_blind / 2;
-    commitChips(position, small_blind);
+    betting_round->commitChips(position, small_blind);
     return {position, ActionType::SMALL_BLIND, small_blind};
 }
 
+bool GameModel::isRoundEnded() const {
+    return betting_round->isRoundEnded();
+}
+
 Action GameModel::takeAction(const Action& action) {
-    auto [position, action_type, amount] = betting_round->handleAction(action, big_blind);
-    commitChips(position, amount);
-    return {position, action_type, amount};
+    return betting_round->handleAction(action, big_blind);
 }
 
 void GameModel::nextActor() {

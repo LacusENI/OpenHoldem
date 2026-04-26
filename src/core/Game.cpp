@@ -31,7 +31,7 @@ void Game::run() {
     // 依次经过 Flop/Turn/River 阶段
     while (model->game_state != GameState::AWARD) {
         view->onRoundStarted({*model});
-        while (!model->betting_round->isRoundEnded()) {
+        while (!model->isRoundEnded()) {
             Action action = view->onPlayerTurn({model->betting_round->getCurrentPosition()}).action;
             action = model->takeAction(action);
             view->onPlayerActed({action});
