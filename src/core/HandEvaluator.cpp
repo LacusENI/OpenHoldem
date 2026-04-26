@@ -3,6 +3,15 @@
 
 #include "HandEvaluator.h"
 
+namespace holdem::utils {
+Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
+    Cards7 cards7;
+    std::ranges::copy(cards2, cards7.begin());
+    std::ranges::copy(cards5, cards7.begin() + 2);
+    return cards7;
+}
+}
+
 namespace holdem::internal {
 
 std::vector<Cards5> enum5from7(const Cards7& hand7) {

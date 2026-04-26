@@ -55,11 +55,4 @@ std::string Card::toString() const {
     return utils::castSuitToString(suit) + utils::castRankToString(rank);
 }
 
-Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
-    Cards7 cards7;
-    std::ranges::copy(cards2, cards7.begin());
-    std::ranges::copy(cards5, cards7.begin() + 2);
-    return cards7;
-}
-
 }

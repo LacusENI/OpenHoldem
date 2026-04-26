@@ -6,10 +6,12 @@ std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(
     const std::vector<Player>& players,
     const Cards5& community_cards) {
     std::vector<std::pair<Position, HandValue>> result;
+    Cards7 hand = utils::concatCards({}, community_cards);
     for (const Player& player : players) {
-        if (!player.is_folded) {
-            Cards7 hand7 = concatCards(player.hole_cards, community_cards);
-            HandValue hand_value = HandEvaluator::evaluate(hand7);
+        if (player.isActive()) {
+            hand[0] = player.hole_cards[0];
+            hand[1] = player.hole_cards[1];
+            HandValue hand_value = HandEvaluator::evaluate(hand);
             result.emplace_back(player.position, hand_value);
         }
     }

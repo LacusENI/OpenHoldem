@@ -16,7 +16,6 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
-
 Position GameModel::getCurrentPosition() const {
     return betting_round->getCurrentPosition();
 }

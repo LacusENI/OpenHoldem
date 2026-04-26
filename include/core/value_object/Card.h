@@ -65,9 +65,6 @@ using Cards7 = std::array<Card, 7>;
 using Cards2 = std::array<Card, 2>;
 using Cards5 = std::array<Card, 5>;
 
-/* 将2张牌和5张牌数组拼接成一个7张牌数组 */
-Cards7 concatCards(const Cards2& cards2, const Cards5& cards5);
-
 namespace utils {
 std::string castSuitToString(Suit suit);
 std::string castRankToString(Rank rank);

@@ -7,6 +7,11 @@
 
 namespace holdem {
 
+namespace utils {
+/* 将2张牌和5张牌数组拼接成一个7张牌数组 */
+Cards7 concatCards(const Cards2& cards2, const Cards5& cards5);
+}
+
 /**
  * @brief 扑克牌型评估器
  */
