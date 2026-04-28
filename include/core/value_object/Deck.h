@@ -1,11 +1,13 @@
 #pragma once
 
 #include <random>
-#include <vector>
+#include <array>
 
 #include "Card.h"
 
 namespace holdem {
+
+constexpr int CARDS_SIZE = 52;
 
 /**
  * @brief 扑克牌组接口
@@ -22,7 +24,7 @@ public:
  */
 class Deck final : public IDeck {
 private:
-    std::vector<Card> cards;
+    std::array<Card, CARDS_SIZE> cards;
     std::mt19937 rng;
     size_t next_card_index = 0;
 public:

@@ -3,14 +3,12 @@
 
 #include "Deck.h"
 
-constexpr int CARDS_SIZE = 52;
-
 namespace holdem {
 Deck::Deck() {
-    cards.reserve(CARDS_SIZE);
+    int i = 0;
     for (int s = MIN_SUIT; s <= MAX_SUIT; ++s) {
         for (int r = MIN_RANK; r <= MAX_RANK; ++r) {
-            cards.emplace_back(static_cast<Suit>(s), static_cast<Rank>(r));
+            cards[i++] = Card(static_cast<Suit>(s), static_cast<Rank>(r));
         }
     }
     const auto seed = std::chrono::system_clock::now().time_since_epoch().count();
