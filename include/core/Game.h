@@ -7,7 +7,7 @@ class GameModel;
 class IGameView;
 
 /**
- * @brief 负责控制一局游戏的流程
+ * @brief 负责一局游戏
  */
 class Game {
 public:
@@ -20,8 +20,6 @@ public:
     ~Game();
 
     void run();
-
-    void handleAward();
 };
 
 } // namespace holdem

@@ -40,7 +40,7 @@ public:
     /**
      * @brief 游戏状态和数据初始化
      */
-    void setup();
+    void startGame();
     /**
      * @brief 负责发放底牌或公共牌
      */

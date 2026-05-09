@@ -1,6 +1,7 @@
 #include "BettingRound.h"
 #include "PotManager.h"
 #include "PlayerSet.h"
+#include "RoundTracker.h"
 
 namespace holdem {
 constexpr Stack BIG_BLIND = 10;
@@ -26,44 +27,33 @@ Action BettingRound::processAction(const Action& action) const {
     return {action.actor_position, action_type, amount};
 }
 
-void BettingRound::updateState(Position position, bool is_raise, bool is_fold) {
-    if (is_raise) {
-        pending_players_count = players_can_act_count;
-        last_raiser_position = position;
-    } else {
-        pending_players_count--;
-    }
-    if (is_fold) active_players_count--;
-    if (is_fold) players_can_act_count--;
-}
-
 BettingRound::BettingRound(
     std::shared_ptr<PlayerSet> players,
     std::shared_ptr<PotManager> pot_manager
-    )
-    : player_set(std::move(players)), pot_manager(std::move(pot_manager)) {}
+    ) :
+    player_set(std::move(players)),
+    pot_manager(std::move(pot_manager)),
+    round_tracker(std::make_unique<RoundTracker>()) {}
 
 BettingRound::~BettingRound() = default;
 
 bool BettingRound::isRoundEnded() const {
-    return (active_players_count == 1 || players_can_act_count == 1 || pending_players_count == 0);
+    return round_tracker->isRoundEnded();
 }
 
-void BettingRound::setup() {
+void BettingRound::onGameStarted() {
     const int players_count = player_set->size();
     player_bets.resize(players_count, 0);
-    active_players_count = players_count;
-    players_can_act_count = players_count;
+    round_tracker->onGameStarted(players_count);
 }
 
-void BettingRound::prepare(Position start_position) {
+void BettingRound::onRoundStarted(Position start_position) {
     current_position = start_position;
     for (auto& bet : player_bets) {
         bet = 0;
     }
     round_bet = 0;
-    pending_players_count = players_can_act_count;
-    last_raiser_position = -1;
+    round_tracker->onRoundStarted();
 }
 
 void BettingRound::nextTurn() {
@@ -84,10 +74,8 @@ void BettingRound::commitChips(Position position, Stack amount) {
 
 Action BettingRound::handleAction(const Action& action) {
     auto [position, action_type, amount] = processAction(action);
-    bool is_raise = action_type == ActionType::RAISE;
-    bool is_fold = action_type == ActionType::FOLD;
     commitChips(position, amount);
-    updateState(position, is_raise, is_fold);
+    round_tracker->onPlayerActed(action_type);
     nextTurn();
     return {position, action_type, amount};
 }

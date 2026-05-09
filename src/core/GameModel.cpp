@@ -20,11 +20,11 @@ Position GameModel::getCurrentPosition() const {
     return betting_round->getCurrentPosition();
 }
 
-void GameModel::setup() {
+void GameModel::startGame() {
     game_state = GameState::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
-    betting_round->setup();
+    betting_round->onGameStarted();
 }
 
 void GameModel::dealCards() {
@@ -104,6 +104,6 @@ void GameModel::nextStreet() {
     default: break;
     }
     dealCards();
-    betting_round->prepare(current_position);
+    betting_round->onRoundStarted(current_position);
 }
 }

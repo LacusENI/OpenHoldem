@@ -15,7 +15,7 @@ Game::~Game() = default;
 
 void Game::run() {
     // 初始化
-    model->setup();
+    model->startGame();
 
     view->onGameStarted({});
 
@@ -39,21 +39,21 @@ void Game::run() {
         model->nextStreet();
     }
     // 摊牌阶段
-    handleAward();
 
-    // 打印最终结果
-    view->onGameOver({*model});
-}
-
-void Game::handleAward() {
+    // 评估手牌
     auto hand_values = ShowdownHandler::evalHandValues(
         model->players->getPlayers(), model->community_cards);
+    // 计算赢家
     auto winners = ShowdownHandler::determineWinners(
         hand_values);
+    // 计算奖金
     auto amounts = ShowdownHandler::calculateDistribution(
         model->pot_manager->get(), winners.size());
     view->onShowdownCompleted({*model, hand_values});
     view->onWinnerDeclared({winners, amounts});
     model->distributePot(amounts, winners);
+
+    // 打印最终结果
+    view->onGameOver({*model});
 }
 }
