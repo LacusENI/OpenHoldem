@@ -16,6 +16,11 @@ public:
     void onGameStarted(int players_count);
     void onRoundStarted();
     void onPlayerActed(ActionType action);
+    /* 本此下注轮是否已结束 */
     bool isRoundEnded() const;
+    /* 只剩下一名活跃玩家 */
+    bool isOnlyOnePlayerActive() const;
+    /* 只有一名玩家能够行动 */
+    bool isNoPlayerNeedToAct() const;
 };
 } // holdem
