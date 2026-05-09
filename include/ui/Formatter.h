@@ -11,7 +11,7 @@ class Card;
 enum class HandType;
 class HandValue;
 enum class ActionType;
-class Action;
+struct Action;
 enum class GameState;
 class Player;
 }

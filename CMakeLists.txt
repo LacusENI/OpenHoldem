@@ -20,6 +20,7 @@ add_library(poker_core
         include/core/IGameView.h
         include/core/PlayerSet.h
         include/core/PotManager.h
+        include/core/RoundTracker.h
         include/core/ShowdownHandler.h
 
         src/core/value_object/Card.cpp
@@ -31,6 +32,7 @@ add_library(poker_core
         src/core/HandEvaluator.cpp
         src/core/PlayerSet.cpp
         src/core/PotManager.cpp
+        src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
 )
 
