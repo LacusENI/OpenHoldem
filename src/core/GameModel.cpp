@@ -80,6 +80,12 @@ void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vect
     pot_manager->clearPot();
 }
 
+ActionPrompt GameModel::getActionPrompt() const {
+    Position position = betting_round->getCurrentPosition();
+    Stack chips_to_call = betting_round->getChipsToCall();
+    return {position, chips_to_call};
+}
+
 void GameModel::nextStreet() {
     Position current_position = 0;
     switch (game_state) {

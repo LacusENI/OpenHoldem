@@ -33,5 +33,6 @@ public:
     void onRoundStarted(Position start_position);
     Action handleAction(const Action& action);
     void commitChips(Position position, Stack amount);
+    Stack getChipsToCall() const;
 };
 } // namespace holdem

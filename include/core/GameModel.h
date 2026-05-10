@@ -13,6 +13,11 @@ class PlayerSet;
 class BettingRound;
 class PotManager;
 
+struct ActionPrompt {
+    Position position;
+    Stack chips_to_call;
+};
+
 /**
  * @brief 一局游戏的数据模型
  */
@@ -59,6 +64,7 @@ public:
 
     void distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners);
 
+    ActionPrompt getActionPrompt() const;
     /**
      * @brief 执行大盲注
      * @return 动作信息

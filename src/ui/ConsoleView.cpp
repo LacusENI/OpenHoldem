@@ -72,15 +72,21 @@ void ConsoleView::onPlayerActed(const OnPlayerActedData& data) const {
 
 PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
     Position position = data.position;
-    std::cout << "[@P" << position + 1 << "]Input chips Or Fold(f): ";
     std::string input;
-    std::cin >> input;
     ActionType action_type = ActionType::VOID;
     Stack amount = 0;
-    if (input == "f" || input == "F")
-        action_type = ActionType::FOLD;
-    else
-        amount = std::stoi(input);
+    bool is_fold = false;
+    do {
+        std::cout << std::format("{} Input chips Or Fold(f): ", formatter::format(position));
+        std::cin >> input;
+        if (input == "f" || input == "F") {
+            action_type = ActionType::FOLD;
+            is_fold = true;
+        }
+        else {
+            amount = std::stoi(input);
+        }
+    } while (amount < data.chips_to_call && !is_fold);
     return {Action(position, action_type, amount)};
 }
 

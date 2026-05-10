@@ -32,7 +32,11 @@ void Game::run() {
     while (model->game_state != GameState::AWARD) {
         view->onRoundStarted({*model});
         while (!model->isRoundEnded()) {
-            Action action = view->onPlayerTurn({model->getCurrentPosition()}).action;
+            OnPlayerTurnData on_player_turn_data = {};
+            ActionPrompt prompt = model->getActionPrompt();
+            on_player_turn_data.position = prompt.position;
+            on_player_turn_data.chips_to_call = prompt.chips_to_call;
+            Action action = view->onPlayerTurn(on_player_turn_data).action;
             action = model->takeAction(action);
             view->onPlayerActed({action});
         }

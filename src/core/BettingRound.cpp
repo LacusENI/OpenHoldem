@@ -57,6 +57,11 @@ void BettingRound::commitChips(Position position, Stack amount) {
     pot_manager->addChipsToPot(amount);
 }
 
+Stack BettingRound::getChipsToCall() const {
+    Stack player_bet = player_bets[current_position];
+    return round_bet - player_bet;
+}
+
 Action BettingRound::handleAction(const Action& action) {
     auto [position, action_type, amount] = processAction(action);
     commitChips(position, amount);

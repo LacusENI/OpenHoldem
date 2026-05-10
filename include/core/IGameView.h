@@ -18,11 +18,12 @@ struct OnRoundStartedData {
 };
 
 struct OnPlayerTurnData {
-    const Position position;
+    Position position;
+    Stack chips_to_call;
 };
 
 struct PlayerInputData {
-    Action action;
+    const Action& action;
 };
 
 struct OnPlayerActedData {
