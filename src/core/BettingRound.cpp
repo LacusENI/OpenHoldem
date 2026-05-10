@@ -7,24 +7,9 @@ namespace holdem {
 constexpr Stack BIG_BLIND = 10;
 
 Action BettingRound::processAction(const Action& action) const {
-    Player& player = player_set->at(current_position);
-    if (action.type == ActionType::FOLD) {
-        player.is_folded = true;
-        return {current_position, ActionType::FOLD, 0};
-    }
-    ActionType action_type;
-    Stack amount = 0;
-    Stack player_bet = player_bets[current_position];
-    if (round_bet == 0) {
-        action_type = ActionType::BET;
-        amount = BIG_BLIND;
-    } else if (player_bet < round_bet) {
-        action_type = ActionType::CALL;
-        amount = round_bet - player_bet;
-    } else {
-        action_type = ActionType::CHECK;
-    }
-    return {action.actor_position, action_type, amount};
+    if (action.type == ActionType::FOLD)
+        return {action.actor_position, ActionType::FOLD, action.amount};
+    return {action.actor_position, ActionType::BET, action.amount};
 }
 
 BettingRound::BettingRound(
