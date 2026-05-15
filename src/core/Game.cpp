@@ -36,6 +36,7 @@ void Game::run() {
             ActionPrompt prompt = model->getActionPrompt();
             on_player_turn_data.position = prompt.position;
             on_player_turn_data.chips_to_call = prompt.chips_to_call;
+            on_player_turn_data.chips_to_min_raise = prompt.chips_to_min_raise;
             Action action = view->onPlayerTurn(on_player_turn_data).action;
             action = model->takeAction(action);
             view->onPlayerActed({action});

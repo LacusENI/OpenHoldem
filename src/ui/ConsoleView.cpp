@@ -75,6 +75,8 @@ PlayerInputData ConsoleView::onPlayerTurn(const OnPlayerTurnData& data) const {
     std::string input;
     ActionType action_type = ActionType::VOID;
     Stack amount = 0;
+    std::cout << std::format("Options: ${} to call, ${}~ to raise, or fold\n",
+        data.chips_to_call, data.chips_to_min_raise);
     bool is_fold = false;
     do {
         std::cout << std::format("{} Input chips Or Fold(f): ", formatter::format(position));

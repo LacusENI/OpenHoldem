@@ -16,6 +16,7 @@ class PotManager;
 struct ActionPrompt {
     Position position;
     Stack chips_to_call;
+    Stack chips_to_min_raise;
 };
 
 /**

@@ -83,7 +83,8 @@ void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vect
 ActionPrompt GameModel::getActionPrompt() const {
     Position position = betting_round->getCurrentPosition();
     Stack chips_to_call = betting_round->getChipsToCall();
-    return {position, chips_to_call};
+    Stack chips_to_min_raise = betting_round->getChipsToMinRaise();
+    return {position, chips_to_call, chips_to_min_raise};
 }
 
 void GameModel::nextStreet() {

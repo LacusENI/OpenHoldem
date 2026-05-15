@@ -20,6 +20,7 @@ struct OnRoundStartedData {
 struct OnPlayerTurnData {
     Position position;
     Stack chips_to_call;
+    Stack chips_to_min_raise;
 };
 
 struct PlayerInputData {

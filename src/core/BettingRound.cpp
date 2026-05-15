@@ -9,7 +9,9 @@ constexpr Stack BIG_BLIND = 10;
 Action BettingRound::processAction(const Action& action) const {
     if (action.type == ActionType::FOLD)
         return {action.actor_position, ActionType::FOLD, action.amount};
-    return {action.actor_position, ActionType::BET, action.amount};
+    if (action.amount == getChipsToCall())
+        return {action.actor_position, ActionType::CALL, action.amount};
+    return {action.actor_position, ActionType::RAISE, action.amount};
 }
 
 BettingRound::BettingRound(
@@ -51,6 +53,7 @@ void BettingRound::commitChips(Position position, Stack amount) {
     player.chips -= amount;
     player_bet += amount;
     if (player_bet > round_bet) {
+        min_raise = player_bet - round_bet;
         round_bet = player_bet;
     }
     player_bets[position] = player_bet;
@@ -60,6 +63,11 @@ void BettingRound::commitChips(Position position, Stack amount) {
 Stack BettingRound::getChipsToCall() const {
     Stack player_bet = player_bets[current_position];
     return round_bet - player_bet;
+}
+
+Stack BettingRound::getChipsToMinRaise() const {
+    Stack player_bet = player_bets[current_position];
+    return round_bet + min_raise - player_bet;
 }
 
 Action BettingRound::handleAction(const Action& action) {

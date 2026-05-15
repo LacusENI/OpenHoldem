@@ -34,5 +34,6 @@ public:
     Action handleAction(const Action& action);
     void commitChips(Position position, Stack amount);
     Stack getChipsToCall() const;
+    Stack getChipsToMinRaise() const;
 };
 } // namespace holdem
