@@ -14,7 +14,7 @@ add_library(poker_core
         include/core/value_object/Deck.h
         include/core/value_object/GameTypes.h
         include/core/BettingRound.h
-        include/core/Game.h
+        include/core/GameController.h
         include/core/GameModel.h
         include/core/HandEvaluator.h
         include/core/IGameView.h
@@ -27,7 +27,7 @@ add_library(poker_core
         src/core/value_object/Deck.cpp
         src/core/value_object/HandValue.cpp
         src/core/BettingRound.cpp
-        src/core/Game.cpp
+        src/core/GameController.cpp
         src/core/GameModel.cpp
         src/core/HandEvaluator.cpp
         src/core/PlayerSet.cpp

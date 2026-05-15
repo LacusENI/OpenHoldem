@@ -9,15 +9,15 @@ class IGameView;
 /**
  * @brief 负责一局游戏
  */
-class Game {
+class GameController {
 public:
     std::unique_ptr<GameModel> model;
     std::unique_ptr<IGameView> view;
 
-    explicit Game(
+    explicit GameController(
         std::unique_ptr<GameModel> model,
         std::unique_ptr<IGameView> view);
-    ~Game();
+    ~GameController();
 
     void run();
 };

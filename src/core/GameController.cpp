@@ -1,4 +1,4 @@
-#include "Game.h"
+#include "GameController.h"
 
 #include "BettingRound.h"
 #include "IGameView.h"
@@ -8,12 +8,12 @@
 #include "ShowdownHandler.h"
 
 namespace holdem {
-Game::Game(std::unique_ptr<GameModel> model, std::unique_ptr<IGameView> view)
+GameController::GameController(std::unique_ptr<GameModel> model, std::unique_ptr<IGameView> view)
     : model(std::move(model)), view(std::move(view)) {}
 
-Game::~Game() = default;
+GameController::~GameController() = default;
 
-void Game::run() {
+void GameController::run() {
     // 初始化
     model->startGame();
 
