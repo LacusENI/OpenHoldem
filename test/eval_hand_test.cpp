@@ -7,7 +7,7 @@ using namespace poker::math;
 using namespace poker::internal::eval_hand;
 
 // 测试生成的组合的数量是否正确
-TEST(HandEvaluatorTest, CombinationSize) {
+TEST(EvalHandTest, CombinationSize) {
     Cards7 hand7 = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"),
         Card("HJ"), Card("DK"), Card("HQ")
@@ -18,7 +18,7 @@ TEST(HandEvaluatorTest, CombinationSize) {
 }
 
 // 测试生成的组合是否不重复
-TEST(HandEvaluatorTest, CombinationsUniqueness) {
+TEST(EvalHandTest, CombinationsUniqueness) {
     Cards7 hand7 = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"),
         Card("HJ"), Card("DK"), Card("HQ")
@@ -35,7 +35,7 @@ TEST(HandEvaluatorTest, CombinationsUniqueness) {
 }
 
 // 测试点数频次统计是否正确
-TEST(HandEvaluatorTest, GetSortedCounts) {
+TEST(EvalHandTest, GetSortedCounts) {
     Cards5 highCard = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"), Card("HJ")
     }; // A, 2, 8, 3, J -> A, J, 8, 3, 2
@@ -67,7 +67,7 @@ TEST(HandEvaluatorTest, GetSortedCounts) {
 }
 
 // 测试牌型判断是否正确
-TEST(HandEvaluatorTest, EvaluateHandType) {
+TEST(EvalHandTest, EvaluateHandType) {
     Cards5 flush = {
         Card("HA"), Card("H2"), Card("HJ"), Card("H7"), Card("HK")
     }; // 同花 A, 2, J, 7, K
@@ -94,7 +94,7 @@ TEST(HandEvaluatorTest, EvaluateHandType) {
 }
 
 // 测试手牌分值计算是否正确
-TEST(HandEvaluatorTest, GetHandValue) {
+TEST(EvalHandTest, GetHandValue) {
     Cards5 fullHouse = {
         Card("C8"), Card("H8"), Card("S5"), Card("D5"), Card("C5")
     }; // 葫芦 8, 8, 5, 5, 5 -> 5, 5, 5, 8, 8
@@ -134,7 +134,7 @@ TEST(HandEvaluatorTest, GetHandValue) {
 }
 
 // 测试最终评估结果
-TEST(HandEvaluatorTest, FinalEvaluation) {
+TEST(EvalHandTest, FinalEvaluation) {
     Cards7 seven_card = {
         Card("CK"), Card("CQ"), Card("SQ"), Card("DQ"),
         Card("DK"), Card("CA"), Card("CJ")
