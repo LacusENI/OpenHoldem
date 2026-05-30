@@ -4,7 +4,6 @@
 
 namespace holdem {
 class GameModel;
-class IGameView;
 
 /**
  * @brief 负责一局游戏
@@ -12,11 +11,9 @@ class IGameView;
 class GameController {
 public:
     std::unique_ptr<GameModel> model;
-    std::unique_ptr<IGameView> view;
 
     explicit GameController(
-        std::unique_ptr<GameModel> model,
-        std::unique_ptr<IGameView> view);
+        std::unique_ptr<GameModel> model);
     ~GameController();
 
     void run();

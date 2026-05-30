@@ -5,7 +5,6 @@
 #include "Deck.h"
 #include "GameModel.h"
 #include "GameController.h"
-#include "ConsoleView.h"
 #include "Formatter.h"
 #include "PlayerSet.h"
 #include "PotManager.h"
@@ -25,7 +24,7 @@ int main() {
     auto betting_round = std::make_unique<BettingRound>(player_set, pot_manager);
     auto game_model = std::make_unique<GameModel>(
         std::move(deck), player_set, pot_manager, std::move(betting_round));
-    GameController game(std::move(game_model), std::make_unique<ui::ConsoleView>());
+    GameController game(std::move(game_model));
     player_set->addNewPlayer();
     player_set->addNewPlayer();
     player_set->addNewPlayer();

@@ -17,7 +17,6 @@ add_library(poker_core
         include/core/GameController.h
         include/core/GameModel.h
         include/core/HandEvaluator.h
-        include/core/IGameView.h
         include/core/PlayerSet.h
         include/core/PotManager.h
         include/core/RoundTracker.h
@@ -44,10 +43,8 @@ target_include_directories(poker_core PUBLIC
 
 # 程序 UI
 add_library(poker_ui
-        include/ui/ConsoleView.h
         include/ui/Formatter.h
 
-        src/ui/ConsoleView.cpp
         src/ui/Formatter.cpp
 )
 
@@ -74,7 +71,6 @@ target_link_libraries(open_holdem PRIVATE
 # 测试
 add_executable(poker_test
         test/include/MockDeck.h
-        test/include/MockGameView.h
 
         test/card_test.cpp
         test/hand_evaluator_test.cpp
