@@ -9,7 +9,7 @@
 #include "PlayerSet.h"
 #include "PotManager.h"
 
-using namespace holdem;
+using namespace poker;
 
 int main() {
     std::cout << ui::formatter::format(Card("CA"));

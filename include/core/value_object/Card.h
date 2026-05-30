@@ -4,7 +4,7 @@
 #include <string>
 #include <array>
 
-namespace holdem {
+namespace poker {
 
 /**
  * @brief 扑克牌的花色

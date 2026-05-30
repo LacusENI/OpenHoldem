@@ -5,7 +5,7 @@
 
 #include "Card.h"
 
-namespace holdem {
+namespace poker {
 namespace utils {
 std::string castSuitToString(Suit suit) {
     static std::vector<std::string> suits = {

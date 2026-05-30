@@ -3,7 +3,7 @@
 
 #include "Deck.h"
 
-namespace holdem {
+namespace poker {
 Deck::Deck() {
     int i = 0;
     for (int s = MIN_SUIT; s <= MAX_SUIT; ++s) {

@@ -1,6 +1,6 @@
 #include "RoundTracker.h"
 
-namespace holdem {
+namespace poker {
 void RoundTracker::onGameStarted(int players_count) {
     active_players_count = players_count;
     players_can_act_count = players_count;

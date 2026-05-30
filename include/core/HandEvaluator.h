@@ -5,7 +5,7 @@
 #include "Card.h"
 #include "HandValue.h"
 
-namespace holdem {
+namespace poker {
 
 namespace utils {
 /* 将2张牌和5张牌数组拼接成一个7张牌数组 */
@@ -26,7 +26,7 @@ public:
 };
 } // namespace holdem
 
-namespace holdem::internal {
+namespace poker::internal {
 
 /**
  * @brief 记录频次统计中的某一点数及其频次的数据结构

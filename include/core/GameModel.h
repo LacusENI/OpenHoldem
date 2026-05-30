@@ -6,7 +6,7 @@
 #include "Card.h"
 #include "GameTypes.h"
 
-namespace holdem {
+namespace poker {
 
 class IDeck;
 class PlayerSet;

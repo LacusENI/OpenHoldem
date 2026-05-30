@@ -1,7 +1,7 @@
 #include "ShowdownHandler.h"
 #include "HandEvaluator.h"
 
-namespace holdem {
+namespace poker {
 std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(
     const std::vector<Player>& players,
     const Cards5& community_cards) {

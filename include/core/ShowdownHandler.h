@@ -6,7 +6,7 @@
 #include "HandValue.h"
 #include "Player.h"
 
-namespace holdem {
+namespace poker {
 
 class ShowdownHandler {
 public:

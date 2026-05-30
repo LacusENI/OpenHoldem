@@ -4,7 +4,7 @@
 
 #include "Card.h"
 
-namespace holdem {
+namespace poker {
 
 /* 牌型 */
 enum class HandType {

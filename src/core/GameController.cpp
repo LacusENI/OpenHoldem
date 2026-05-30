@@ -6,7 +6,7 @@
 #include "PotManager.h"
 #include "ShowdownHandler.h"
 
-namespace holdem {
+namespace poker {
 GameController::GameController(std::unique_ptr<GameModel> model)
     : model(std::move(model)) {}
 

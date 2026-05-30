@@ -5,7 +5,7 @@
 
 #include "GameTypes.h"
 
-namespace holdem {
+namespace poker {
 class PlayerSet;
 class PotManager;
 class RoundTracker;

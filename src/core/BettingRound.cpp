@@ -3,7 +3,7 @@
 #include "PlayerSet.h"
 #include "RoundTracker.h"
 
-namespace holdem {
+namespace poker {
 constexpr Stack BIG_BLIND = 10;
 
 Action BettingRound::processAction(const Action& action) const {

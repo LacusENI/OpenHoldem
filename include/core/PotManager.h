@@ -1,7 +1,7 @@
 #pragma once
 #include "GameTypes.h"
 
-namespace holdem {
+namespace poker {
 /**
  * @brief 管理底池的类
  */

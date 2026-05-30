@@ -3,7 +3,7 @@
 
 #include "Player.h"
 
-namespace holdem {
+namespace poker {
 class PlayerSet {
 private:
     std::vector<Player> players;

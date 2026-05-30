@@ -1,6 +1,6 @@
 #include "PlayerSet.h"
 
-namespace holdem {
+namespace poker {
 void PlayerSet::addNewPlayer() {
     Position position = players.size();
     players.emplace_back(position);

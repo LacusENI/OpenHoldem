@@ -1,7 +1,7 @@
 #pragma once
 #include "GameTypes.h"
 
-namespace holdem {
+namespace poker {
 /**
  * @brief 下注轮进度追踪器
  * @details 追踪下注轮的进度，判断轮次是否结束

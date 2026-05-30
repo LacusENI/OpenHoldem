@@ -2,7 +2,7 @@
 
 #include <memory>
 
-namespace holdem {
+namespace poker {
 class GameModel;
 
 /**

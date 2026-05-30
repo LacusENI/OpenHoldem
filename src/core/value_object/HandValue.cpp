@@ -2,7 +2,7 @@
 
 #include <format>
 
-namespace holdem {
+namespace poker {
 namespace utils {
 std::string castHandTypeToString(HandType hand_type) {
     switch (hand_type) {

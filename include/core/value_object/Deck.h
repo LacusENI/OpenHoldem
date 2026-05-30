@@ -5,7 +5,7 @@
 
 #include "Card.h"
 
-namespace holdem {
+namespace poker {
 
 constexpr int CARDS_SIZE = 52;
 

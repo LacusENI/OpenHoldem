@@ -1,6 +1,6 @@
 #pragma once
 
-namespace holdem {
+namespace poker {
 using Position = int; // 玩家座位
 using Stack = int;    // 筹码数量
 

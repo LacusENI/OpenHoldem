@@ -2,8 +2,8 @@
 
 #include "HandEvaluator.h"
 
-using namespace holdem;
-using namespace holdem::internal;
+using namespace poker;
+using namespace poker::internal;
 
 // 测试生成的组合的数量是否正确
 TEST(HandEvaluatorTest, CombinationSize) {

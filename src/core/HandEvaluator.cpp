@@ -3,7 +3,7 @@
 
 #include "HandEvaluator.h"
 
-namespace holdem::utils {
+namespace poker::utils {
 Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
     Cards7 cards7;
     std::ranges::copy(cards2, cards7.begin());
@@ -12,7 +12,7 @@ Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
 }
 }
 
-namespace holdem::internal {
+namespace poker::internal {
 
 std::vector<Cards5> enum5from7(const Cards7& hand7) {
     std::vector<Cards5> combos;
@@ -139,7 +139,7 @@ HandType evalHandType(const Cards5& hand5, const HandCounts& counts) {
 }
 }
 
-namespace holdem {
+namespace poker {
 HandValue HandEvaluator::evaluate(const Cards7& hand7) {
     auto best_hand_value = HandValue(0);
     for (Cards5 hand5 : internal::enum5from7(hand7)) {

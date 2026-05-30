@@ -3,7 +3,7 @@
 #include "GameTypes.h"
 #include "Card.h"
 
-namespace holdem {
+namespace poker {
 /**
  * @brief 玩家实体类
  */

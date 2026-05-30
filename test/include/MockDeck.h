@@ -5,15 +5,15 @@
 
 #include "Deck.h"
 
-class MockDeck : public holdem::IDeck {
+class MockDeck : public poker::IDeck {
 public:
     MOCK_METHOD(void, shuffle, (), (override));
-    MOCK_METHOD(holdem::Card, deal, (), (override));
+    MOCK_METHOD(poker::Card, deal, (), (override));
 };
 
-class MockEmptyDeck : public holdem::IDeck {
+class MockEmptyDeck : public poker::IDeck {
 public:
     void shuffle() override {}
 
-    holdem::Card deal() override { return holdem::Card(); }
+    poker::Card deal() override { return poker::Card(); }
 };

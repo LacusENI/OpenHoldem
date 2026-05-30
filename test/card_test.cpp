@@ -2,7 +2,7 @@
 
 #include "Card.h"
 
-using namespace holdem;
+using namespace poker;
 
 // 测试 Card 的 toString() 方法
 TEST(CardTest, ToStringFunction) {

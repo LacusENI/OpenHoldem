@@ -5,7 +5,7 @@
 #include "HandValue.h"
 #include "GameTypes.h"
 
-namespace holdem::ui::formatter {
+namespace poker::ui::formatter {
 std::string format(Rank rank) {
     switch (rank) {
     case Rank::ACE: return "Ace";

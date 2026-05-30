@@ -4,7 +4,7 @@
 #include "Deck.h"
 #include "PotManager.h"
 
-namespace holdem {
+namespace poker {
 GameModel::GameModel(
     std::unique_ptr<IDeck> deck,
     std::shared_ptr<PlayerSet> players,

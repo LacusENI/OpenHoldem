@@ -1,4 +1,4 @@
 #include "PotManager.h"
 
-namespace holdem {
+namespace poker {
 } // holdem
