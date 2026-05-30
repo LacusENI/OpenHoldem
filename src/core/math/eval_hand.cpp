@@ -1,19 +1,8 @@
-#include <vector>
 #include <algorithm>
 
-#include "HandEvaluator.h"
+#include "eval_hand.h"
 
-namespace poker::utils {
-Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
-    Cards7 cards7;
-    std::ranges::copy(cards2, cards7.begin());
-    std::ranges::copy(cards5, cards7.begin() + 2);
-    return cards7;
-}
-}
-
-namespace poker::internal {
-
+namespace poker::internal::eval_hand {
 std::vector<Cards5> enum5from7(const Cards7& hand7) {
     std::vector<Cards5> combos;
     std::vector mask = {0, 0, 1, 1, 1, 1, 1};
@@ -137,15 +126,19 @@ HandType evalHandType(const Cards5& hand5, const HandCounts& counts) {
         return evalPatternHandType(counts);
     return evalUniqueHandType(hand5, counts);
 }
-}
+} // namespace poker::internal::eval_hand
 
-namespace poker {
-HandValue HandEvaluator::evaluate(const Cards7& hand7) {
+namespace poker::math {
+HandValue eval_hand(Cards7 seven_cards) {
+    using namespace internal::eval_hand;
+
+    // 枚举21个五牌组合, 选择牌值最大者
     auto best_hand_value = HandValue(0);
-    for (Cards5 hand5 : internal::enum5from7(hand7)) {
-        HandValue handValue = internal::evalHandValue(hand5);
+    for (Cards5 five_cards : enum5from7(seven_cards)) {
+        HandValue handValue = evalHandValue(five_cards);
         best_hand_value = std::max(best_hand_value, handValue);
     }
+
     return best_hand_value;
 }
-}
+} // namespace poker::math

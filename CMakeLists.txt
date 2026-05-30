@@ -10,25 +10,25 @@ find_package(GTest CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
+        include/core/math/eval_hand.h
         include/core/value_object/Card.h
         include/core/value_object/Deck.h
         include/core/value_object/GameTypes.h
         include/core/BettingRound.h
         include/core/GameController.h
         include/core/GameModel.h
-        include/core/HandEvaluator.h
         include/core/PlayerSet.h
         include/core/PotManager.h
         include/core/RoundTracker.h
         include/core/ShowdownHandler.h
 
+        src/core/math/eval_hand.cpp
         src/core/value_object/Card.cpp
         src/core/value_object/Deck.cpp
         src/core/value_object/HandValue.cpp
         src/core/BettingRound.cpp
         src/core/GameController.cpp
         src/core/GameModel.cpp
-        src/core/HandEvaluator.cpp
         src/core/PlayerSet.cpp
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
@@ -36,6 +36,7 @@ add_library(poker_core
 )
 
 target_include_directories(poker_core PUBLIC
+        include/core/math
         include/core/value_object
         include/core
 )
@@ -73,7 +74,7 @@ add_executable(poker_test
         test/include/MockDeck.h
 
         test/card_test.cpp
-        test/hand_evaluator_test.cpp
+        test/eval_hand_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE

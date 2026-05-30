@@ -1,9 +1,10 @@
 #include <gtest/gtest.h>
 
-#include "HandEvaluator.h"
+#include "eval_hand.h"
 
 using namespace poker;
-using namespace poker::internal;
+using namespace poker::math;
+using namespace poker::internal::eval_hand;
 
 // 测试生成的组合的数量是否正确
 TEST(HandEvaluatorTest, CombinationSize) {
@@ -142,5 +143,5 @@ TEST(HandEvaluatorTest, FinalEvaluation) {
         Card("CQ"), Card("SQ"), Card("DQ"), Card("CK"), Card("DK")
     };
     HandValue best_five_value = evalHandValue(best_five);
-    EXPECT_EQ(HandEvaluator::evaluate(seven_card), best_five_value);
+    EXPECT_EQ(eval_hand(seven_card), best_five_value);
 }

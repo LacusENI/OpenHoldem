@@ -1,17 +1,26 @@
+#include <algorithm>
+
 #include "ShowdownHandler.h"
-#include "HandEvaluator.h"
+#include "eval_hand.h"
 
 namespace poker {
+Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
+    Cards7 cards7;
+    std::ranges::copy(cards2, cards7.begin());
+    std::ranges::copy(cards5, cards7.begin() + 2);
+    return cards7;
+}
+
 std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(
-    const std::vector<Player>& players,
-    const Cards5& community_cards) {
+        const std::vector<Player>& players,
+        const Cards5& community_cards) {
     std::vector<std::pair<Position, HandValue>> result;
-    Cards7 hand = utils::concatCards({}, community_cards);
+    Cards7 hand = concatCards({}, community_cards);
     for (const Player& player : players) {
         if (player.isActive()) {
             hand[0] = player.hole_cards[0];
             hand[1] = player.hole_cards[1];
-            HandValue hand_value = HandEvaluator::evaluate(hand);
+            HandValue hand_value = math::eval_hand(hand);
             result.emplace_back(player.position, hand_value);
         }
     }
