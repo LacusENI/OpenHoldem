@@ -42,7 +42,6 @@ public:
         std::unique_ptr<BettingRound>);
     ~GameModel();
 
-    seat_idx_t getCurrentPosition() const;
     /**
      * @brief 游戏状态和数据初始化
      */
@@ -56,27 +55,8 @@ public:
      * @note 每次发公共牌前不烧牌
      */
     void nextStreet();
-    /**
-     * @brief 当前玩家采取行动
-     * @note demo_v2 阶段只有"投入大盲注等额"一种行动
-     * @return 此次玩家所采取的动作信息
-     */
-    Action takeAction(const Action& action);
 
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 
-    ActionPrompt getActionPrompt() const;
-    /**
-     * @brief 执行大盲注
-     * @return 动作信息
-     */
-    Action bigBlind();
-    /**
-     * @brief 执行小盲注
-     * @return 动作信息
-     */
-    Action smallBlind();
-
-    bool isRoundEnded() const;
 };
 }

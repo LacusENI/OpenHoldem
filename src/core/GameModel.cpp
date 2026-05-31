@@ -16,15 +16,11 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
-seat_idx_t GameModel::getCurrentPosition() const {
-    return betting_round->getCurrentPosition();
-}
-
 void GameModel::startGame() {
     game_state = GameState::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
-    betting_round->onGameStarted();
+
 }
 
 void GameModel::dealCards() {
@@ -50,27 +46,6 @@ void GameModel::dealCards() {
     }
 }
 
-Action GameModel::bigBlind() {
-    seat_idx_t position = players->getBbPosition(btn_position);
-    betting_round->commitChips(position, big_blind);
-    return {position, ActionType::BIG_BLIND, big_blind};
-}
-
-Action GameModel::smallBlind() {
-    seat_idx_t position = players->getSbPosition(btn_position);
-    chips_t small_blind = big_blind / 2;
-    betting_round->commitChips(position, small_blind);
-    return {position, ActionType::SMALL_BLIND, small_blind};
-}
-
-bool GameModel::isRoundEnded() const {
-    return betting_round->isRoundEnded();
-}
-
-Action GameModel::takeAction(const Action& action) {
-    return betting_round->handleAction(action);
-}
-
 void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
         Player& player = players->at(winners[i]);
@@ -78,13 +53,6 @@ void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::ve
         player.chips += amount;
     }
     pot_manager->clearPot();
-}
-
-ActionPrompt GameModel::getActionPrompt() const {
-    seat_idx_t position = betting_round->getCurrentPosition();
-    chips_t chips_to_call = betting_round->getChipsToCall();
-    chips_t chips_to_min_raise = betting_round->getChipsToMinRaise();
-    return {position, chips_to_call, chips_to_min_raise};
 }
 
 void GameModel::nextStreet() {
@@ -111,6 +79,5 @@ void GameModel::nextStreet() {
     default: break;
     }
     dealCards();
-    betting_round->onRoundStarted(current_position);
 }
 }
