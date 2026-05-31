@@ -8,15 +8,15 @@ namespace poker {
  * @brief 玩家实体类
  */
 struct Player {
-    Position position; // 玩家所在位置
+    seat_idx_t position; // 玩家所在位置
     Cards2 hole_cards; // 玩家的底牌
 
-    Stack chips = 0;        // 玩家拥有的筹码
+    chips_t chips = 0;        // 玩家拥有的筹码
     bool is_folded = false; // 玩家是否已弃牌
     bool is_allin = false;  // 玩家是否已 all-in
 
     Player() = default;
-    explicit Player(Position position) : position(position) {}
+    explicit Player(seat_idx_t position) : position(position) {}
 
     /* 玩家是否在场(未弃牌) */
     bool isActive() const { return !is_folded; }

@@ -31,5 +31,5 @@ std::string format(const ActionType& action_type);
 
 std::string format(const GameState& state);
 
-std::string format(const Position& position);
+std::string format(const seat_idx_t& position);
 }

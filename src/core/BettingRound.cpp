@@ -4,7 +4,7 @@
 #include "RoundTracker.h"
 
 namespace poker {
-constexpr Stack BIG_BLIND = 10;
+constexpr chips_t BIG_BLIND = 10;
 
 Action BettingRound::processAction(const Action& action) const {
     if (action.type == ActionType::FOLD)
@@ -34,7 +34,7 @@ void BettingRound::onGameStarted() {
     round_tracker->onGameStarted(players_count);
 }
 
-void BettingRound::onRoundStarted(Position start_position) {
+void BettingRound::onRoundStarted(seat_idx_t start_position) {
     current_position = start_position;
     for (auto& bet : player_bets) {
         bet = 0;
@@ -47,9 +47,9 @@ void BettingRound::nextTurn() {
     current_position = player_set->nextPositionToAct(current_position);
 }
 
-void BettingRound::commitChips(Position position, Stack amount) {
+void BettingRound::commitChips(seat_idx_t position, chips_t amount) {
     Player& player = player_set->at(position);
-    Stack player_bet = player_bets[position];
+    chips_t player_bet = player_bets[position];
     player.chips -= amount;
     player_bet += amount;
     if (player_bet > round_bet) {
@@ -60,13 +60,13 @@ void BettingRound::commitChips(Position position, Stack amount) {
     pot_manager->addChipsToPot(amount);
 }
 
-Stack BettingRound::getChipsToCall() const {
-    Stack player_bet = player_bets[current_position];
+chips_t BettingRound::getChipsToCall() const {
+    chips_t player_bet = player_bets[current_position];
     return round_bet - player_bet;
 }
 
-Stack BettingRound::getChipsToMinRaise() const {
-    Stack player_bet = player_bets[current_position];
+chips_t BettingRound::getChipsToMinRaise() const {
+    chips_t player_bet = player_bets[current_position];
     return round_bet + min_raise - player_bet;
 }
 

@@ -16,7 +16,7 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
-Position GameModel::getCurrentPosition() const {
+seat_idx_t GameModel::getCurrentPosition() const {
     return betting_round->getCurrentPosition();
 }
 
@@ -51,14 +51,14 @@ void GameModel::dealCards() {
 }
 
 Action GameModel::bigBlind() {
-    Position position = players->getBbPosition(btn_position);
+    seat_idx_t position = players->getBbPosition(btn_position);
     betting_round->commitChips(position, big_blind);
     return {position, ActionType::BIG_BLIND, big_blind};
 }
 
 Action GameModel::smallBlind() {
-    Position position = players->getSbPosition(btn_position);
-    Stack small_blind = big_blind / 2;
+    seat_idx_t position = players->getSbPosition(btn_position);
+    chips_t small_blind = big_blind / 2;
     betting_round->commitChips(position, small_blind);
     return {position, ActionType::SMALL_BLIND, small_blind};
 }
@@ -71,24 +71,24 @@ Action GameModel::takeAction(const Action& action) {
     return betting_round->handleAction(action);
 }
 
-void GameModel::distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners) {
+void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
         Player& player = players->at(winners[i]);
-        Stack amount = amounts[i];
+        chips_t amount = amounts[i];
         player.chips += amount;
     }
     pot_manager->clearPot();
 }
 
 ActionPrompt GameModel::getActionPrompt() const {
-    Position position = betting_round->getCurrentPosition();
-    Stack chips_to_call = betting_round->getChipsToCall();
-    Stack chips_to_min_raise = betting_round->getChipsToMinRaise();
+    seat_idx_t position = betting_round->getCurrentPosition();
+    chips_t chips_to_call = betting_round->getChipsToCall();
+    chips_t chips_to_min_raise = betting_round->getChipsToMinRaise();
     return {position, chips_to_call, chips_to_min_raise};
 }
 
 void GameModel::nextStreet() {
-    Position current_position = 0;
+    seat_idx_t current_position = 0;
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;

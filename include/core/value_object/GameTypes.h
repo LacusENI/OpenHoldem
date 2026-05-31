@@ -1,8 +1,8 @@
 #pragma once
 
 namespace poker {
-using Position = int; // 玩家座位
-using Stack = int;    // 筹码数量
+using seat_idx_t = int; // 玩家座位
+using chips_t = int;    // 筹码数量
 
 enum class GameState {
     IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
@@ -18,8 +18,8 @@ enum class ActionType {
 };
 
 struct Action {
-    Position actor_position;
+    seat_idx_t actor_position;
     ActionType type;
-    Stack amount;
+    chips_t amount;
 };
 }

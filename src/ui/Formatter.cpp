@@ -146,7 +146,7 @@ std::string format(const GameState& state) {
     }
 }
 
-std::string format(const Position& position) {
+std::string format(const seat_idx_t& position) {
     return std::format("[@P{}]", position + 1);
 }
 }

@@ -10,14 +10,14 @@ namespace poker {
 
 class ShowdownHandler {
 public:
-    static std::vector<std::pair<Position, HandValue>> evalHandValues(
+    static std::vector<std::pair<seat_idx_t, HandValue>> evalHandValues(
         const std::vector<Player>& players,
         const Cards5& community_cards);
 
-    static std::vector<Position> determineWinners(
-        const std::vector<std::pair<Position, HandValue>>& hand_values);
+    static std::vector<seat_idx_t> determineWinners(
+        const std::vector<std::pair<seat_idx_t, HandValue>>& hand_values);
 
-    static std::vector<Stack> calculateDistribution(
+    static std::vector<chips_t> calculateDistribution(
         int pot, int winners_n);
 };
 

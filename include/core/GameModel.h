@@ -14,9 +14,9 @@ class BettingRound;
 class PotManager;
 
 struct ActionPrompt {
-    Position position;
-    Stack chips_to_call;
-    Stack chips_to_min_raise;
+    seat_idx_t position;
+    chips_t chips_to_call;
+    chips_t chips_to_min_raise;
 };
 
 /**
@@ -26,8 +26,8 @@ class GameModel {
 public:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
-    Position btn_position = 0; // 庄家位置
-    Stack big_blind = 10;      // 大盲注额
+    seat_idx_t btn_position = 0; // 庄家位置
+    chips_t big_blind = 10;      // 大盲注额
 
     Cards5 community_cards;
     std::unique_ptr<IDeck> deck;
@@ -42,7 +42,7 @@ public:
         std::unique_ptr<BettingRound>);
     ~GameModel();
 
-    Position getCurrentPosition() const;
+    seat_idx_t getCurrentPosition() const;
     /**
      * @brief 游戏状态和数据初始化
      */
@@ -63,7 +63,7 @@ public:
      */
     Action takeAction(const Action& action);
 
-    void distributePot(const std::vector<Stack>& amounts, const std::vector<Position>& winners);
+    void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 
     ActionPrompt getActionPrompt() const;
     /**
