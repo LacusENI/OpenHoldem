@@ -13,7 +13,7 @@ class HandValue;
 enum class ActionType;
 struct Action;
 enum class GameState;
-class Player;
+struct Player;
 }
 
 namespace poker::ui::formatter {

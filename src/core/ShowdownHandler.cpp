@@ -4,23 +4,24 @@
 #include "eval_hand.h"
 
 namespace poker {
-Cards7 concatCards(const Cards2& cards2, const Cards5& cards5) {
-    Cards7 cards7;
-    std::ranges::copy(cards2, cards7.begin());
-    std::ranges::copy(cards5, cards7.begin() + 2);
-    return cards7;
+void join_community_cards(Cards7& cards7, const Cards5& cards5) {
+    std::ranges::copy(cards5, cards7.begin());
+}
+
+void join_hole_cards(Cards7& cards7, const Cards2& cards2) {
+    std::ranges::copy(cards2, cards7.begin() + 2);
 }
 
 std::vector<std::pair<Position, HandValue>> ShowdownHandler::evalHandValues(
         const std::vector<Player>& players,
         const Cards5& community_cards) {
     std::vector<std::pair<Position, HandValue>> result;
-    Cards7 hand = concatCards({}, community_cards);
+    Cards7 seven_cards;
+    join_community_cards(seven_cards, community_cards);
     for (const Player& player : players) {
         if (player.isActive()) {
-            hand[0] = player.hole_cards[0];
-            hand[1] = player.hole_cards[1];
-            HandValue hand_value = math::eval_hand(hand);
+            join_hole_cards(seven_cards, player.hole_cards);
+            HandValue hand_value = math::eval_hand(seven_cards);
             result.emplace_back(player.position, hand_value);
         }
     }

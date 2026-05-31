@@ -21,6 +21,7 @@ add_library(poker_core
         include/core/PlayerSet.h
         include/core/PotManager.h
         include/core/RoundTracker.h
+        include/core/SeatingManager.h
         include/core/ShowdownHandler.h
 
         src/core/math/chips_calc.cpp
