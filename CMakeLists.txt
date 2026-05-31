@@ -18,7 +18,6 @@ add_library(poker_core
         include/core/BettingRound.h
         include/core/GameController.h
         include/core/GameModel.h
-        include/core/PlayerSet.h
         include/core/PotManager.h
         include/core/RoundTracker.h
         include/core/SeatingManager.h
@@ -32,7 +31,6 @@ add_library(poker_core
         src/core/BettingRound.cpp
         src/core/GameController.cpp
         src/core/GameModel.cpp
-        src/core/PlayerSet.cpp
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp

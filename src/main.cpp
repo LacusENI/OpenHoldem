@@ -6,8 +6,8 @@
 #include "GameModel.h"
 #include "GameController.h"
 #include "Formatter.h"
-#include "PlayerSet.h"
 #include "PotManager.h"
+#include "SeatingManager.h"
 
 using namespace poker;
 
@@ -19,17 +19,17 @@ int main() {
     std::cout << " OpenHoldem\n";
 
     auto deck = std::make_unique<Deck>();
-    auto player_set = std::make_shared<PlayerSet>();
+    auto seating_manager = std::make_shared<SeatingManager>();
     auto pot_manager = std::make_shared<PotManager>();
-    auto betting_round = std::make_unique<BettingRound>(player_set, pot_manager);
+    auto betting_round = std::make_unique<BettingRound>(seating_manager, pot_manager);
     auto game_model = std::make_unique<GameModel>(
-        std::move(deck), player_set, pot_manager, std::move(betting_round));
+        std::move(deck), pot_manager, seating_manager, std::move(betting_round));
     GameController game(std::move(game_model));
-    player_set->addNewPlayer();
-    player_set->addNewPlayer();
-    player_set->addNewPlayer();
-    player_set->addNewPlayer();
-    player_set->addNewPlayer();
+    seating_manager->addNewPlayer();
+    seating_manager->addNewPlayer();
+    seating_manager->addNewPlayer();
+    seating_manager->addNewPlayer();
+    seating_manager->addNewPlayer();
     game.run();
 
     return 0;

@@ -2,9 +2,6 @@
 
 #include "BettingRound.h"
 #include "GameModel.h"
-#include "PlayerSet.h"
-#include "PotManager.h"
-#include "ShowdownHandler.h"
 
 namespace poker {
 GameController::GameController(std::unique_ptr<GameModel> model)

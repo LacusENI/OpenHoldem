@@ -1,7 +1,7 @@
 #include "BettingRound.h"
 #include "PotManager.h"
-#include "PlayerSet.h"
 #include "RoundTracker.h"
+#include "SeatingManager.h"
 
 namespace poker {
 constexpr chips_t BIG_BLIND = 10;
@@ -15,10 +15,10 @@ Action BettingRound::processAction(const Action& action) const {
 }
 
 BettingRound::BettingRound(
-    std::shared_ptr<PlayerSet> players,
+    std::shared_ptr<SeatingManager> seating_manager,
     std::shared_ptr<PotManager> pot_manager
     ) :
-    player_set(std::move(players)),
+    seating_manager(std::move(seating_manager)),
     pot_manager(std::move(pot_manager)),
     round_tracker(std::make_unique<RoundTracker>()) {}
 
@@ -29,9 +29,9 @@ bool BettingRound::isRoundEnded() const {
 }
 
 void BettingRound::onGameStarted() {
-    const int players_count = player_set->size();
-    player_bets.resize(players_count, 0);
-    round_tracker->onGameStarted(players_count);
+    const int player_count = seating_manager->getPlayerCount();
+    player_bets.resize(player_count, 0);
+    round_tracker->onGameStarted(player_count);
 }
 
 void BettingRound::onRoundStarted(seat_idx_t start_position) {
@@ -44,11 +44,11 @@ void BettingRound::onRoundStarted(seat_idx_t start_position) {
 }
 
 void BettingRound::nextTurn() {
-    current_position = player_set->nextPositionToAct(current_position);
+    current_position = seating_manager->nextPositionToAct(current_position);
 }
 
 void BettingRound::commitChips(seat_idx_t position, chips_t amount) {
-    Player& player = player_set->at(position);
+    Player& player = seating_manager->getPlayerAtSeat(position);
     chips_t player_bet = player_bets[position];
     player.chips -= amount;
     player_bet += amount;

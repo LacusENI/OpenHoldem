@@ -6,13 +6,13 @@
 #include "GameTypes.h"
 
 namespace poker {
-class PlayerSet;
+class SeatingManager;
 class PotManager;
 class RoundTracker;
 
 class BettingRound {
 private:
-    std::shared_ptr<PlayerSet> player_set;
+    std::shared_ptr<SeatingManager> seating_manager;
     std::shared_ptr<PotManager> pot_manager;
     std::unique_ptr<RoundTracker> round_tracker;
 
@@ -25,7 +25,7 @@ private:
     void nextTurn();
 public:
     BettingRound(
-        std::shared_ptr<PlayerSet> players, std::shared_ptr<PotManager> pot_manager);
+        std::shared_ptr<SeatingManager> seating_manager, std::shared_ptr<PotManager> pot_manager);
     ~BettingRound();
     seat_idx_t getCurrentPosition() const { return current_position; }
     bool isRoundEnded() const;

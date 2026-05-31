@@ -8,7 +8,7 @@ namespace poker {
 class SeatingManager {
 private:
     std::vector<Player> players;
-    seat_idx_t btn_position;
+    seat_idx_t btn_position = 0;
 public:
     SeatingManager() = default;
     size_t getPlayerCount() const {
@@ -33,10 +33,10 @@ public:
     void advanceBtnPosition() {
         btn_position = nextPosition(btn_position);
     }
-    const Player& getPlayerAt(seat_idx_t position) const {
+    const Player& getPlayerAtSeat(seat_idx_t position) const {
         return players.at(position);
     }
-    Player& getPlayerAt(seat_idx_t position) {
+    Player& getPlayerAtSeat(seat_idx_t position) {
         return players.at(position);
     }
     seat_idx_t nextPosition(seat_idx_t position) const {
@@ -65,5 +65,4 @@ public:
         return getUtgPosition();
     }
 };
-
 } // namespace poker

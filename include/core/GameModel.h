@@ -9,15 +9,9 @@
 namespace poker {
 
 class IDeck;
-class PlayerSet;
+class SeatingManager;
 class BettingRound;
 class PotManager;
-
-struct ActionPrompt {
-    seat_idx_t position;
-    chips_t chips_to_call;
-    chips_t chips_to_min_raise;
-};
 
 /**
  * @brief 一局游戏的数据模型
@@ -31,14 +25,14 @@ public:
 
     Cards5 community_cards;
     std::unique_ptr<IDeck> deck;
-    std::shared_ptr<PlayerSet> players;
     std::shared_ptr<PotManager> pot_manager;
+    std::shared_ptr<SeatingManager> seating_manager;
     std::shared_ptr<BettingRound> betting_round;
 
     GameModel(
         std::unique_ptr<IDeck> deck,
-        std::shared_ptr<PlayerSet> players,
         std::shared_ptr<PotManager> pot_manager,
+        std::shared_ptr<SeatingManager> players,
         std::unique_ptr<BettingRound>);
     ~GameModel();
 
@@ -59,4 +53,4 @@ public:
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 
 };
-}
+} // namespace poker

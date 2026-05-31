@@ -1,16 +1,16 @@
 #include "GameModel.h"
-#include "PlayerSet.h"
 #include "BettingRound.h"
 #include "Deck.h"
+#include "SeatingManager.h"
 #include "PotManager.h"
 
 namespace poker {
 GameModel::GameModel(
     std::unique_ptr<IDeck> deck,
-    std::shared_ptr<PlayerSet> players,
     std::shared_ptr<PotManager> pot_manager,
+    std::shared_ptr<SeatingManager> seating_manager,
     std::unique_ptr<BettingRound> betting_round
-    ) : deck(std::move(deck)), players(std::move(players)),
+    ) : deck(std::move(deck)), seating_manager(std::move(seating_manager)),
         pot_manager(std::move(pot_manager)),
         betting_round(std::move(betting_round)) {}
 
@@ -26,7 +26,7 @@ void GameModel::startGame() {
 void GameModel::dealCards() {
     switch (game_state) {
     case GameState::PREFLOP:
-        for (Player& player : *players) {
+        for (Player& player : seating_manager->getPlayerList()) {
             player.hole_cards[0] = deck->deal();
             player.hole_cards[1] = deck->deal();
         }
@@ -48,7 +48,7 @@ void GameModel::dealCards() {
 
 void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
-        Player& player = players->at(winners[i]);
+        Player& player = seating_manager->getPlayerAtSeat(winners[i]);
         chips_t amount = amounts[i];
         player.chips += amount;
     }
@@ -60,19 +60,19 @@ void GameModel::nextStreet() {
     switch (game_state) {
     case GameState::IDLE:
         game_state = GameState::PREFLOP;
-        current_position = players->getUtgPosition(btn_position);
+        current_position = seating_manager->getPreflopFirstPosition();
         break;
     case GameState::PREFLOP:
         game_state = GameState::FLOP;
-        current_position = players->nextPositionToAct(btn_position);
+        current_position = seating_manager->getPostflopFirstPosition();
         break;
     case GameState::FLOP:
         game_state = GameState::TURN;
-        current_position = players->nextPositionToAct(btn_position);
+        current_position = seating_manager->getPostflopFirstPosition();
         break;
     case GameState::TURN:
         game_state = GameState::RIVER;
-        current_position = players->nextPositionToAct(btn_position);
+        current_position = seating_manager->getPostflopFirstPosition();
         break;
     case GameState::RIVER:
         game_state = GameState::AWARD;
@@ -80,4 +80,4 @@ void GameModel::nextStreet() {
     }
     dealCards();
 }
-}
+} // namespace poker
