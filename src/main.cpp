@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include "spdlog/spdlog.h"
+
 #include "BettingRound.h"
 #include "Card.h"
 #include "Deck.h"
@@ -30,6 +32,7 @@ int main() {
     seating_manager->addNewPlayer();
     seating_manager->addNewPlayer();
     seating_manager->addNewPlayer();
+    spdlog::info("game started");
     game.run();
 
     return 0;

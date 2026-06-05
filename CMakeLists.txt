@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 # 项目依赖
 
 find_package(GTest CONFIG REQUIRED)
-
+find_package(spdlog CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
@@ -56,6 +56,7 @@ target_include_directories(poker_ui PUBLIC
 
 target_link_libraries(poker_ui PUBLIC
         poker_core
+        spdlog::spdlog_header_only
 )
 
 
