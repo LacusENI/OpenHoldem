@@ -33,7 +33,7 @@ public:
         std::unique_ptr<IDeck> deck,
         std::shared_ptr<PotManager> pot_manager,
         std::shared_ptr<SeatingManager> players,
-        std::unique_ptr<BettingRound>);
+        std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 
     /**

@@ -18,6 +18,8 @@ struct Player {
     Player() = default;
     explicit Player(seat_idx_t position) : position(position) {}
 
+    void win(chips_t delta) { chips += delta; }
+    void bet(chips_t delta) { chips -= delta; }
     /* 玩家是否在场(未弃牌) */
     bool isActive() const { return !is_folded; }
     /* 玩家是否能继续行动(未弃牌也未 all-in) */

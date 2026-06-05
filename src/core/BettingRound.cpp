@@ -4,16 +4,6 @@
 #include "SeatingManager.h"
 
 namespace poker {
-constexpr chips_t BIG_BLIND = 10;
-
-Action BettingRound::processAction(const Action& action) const {
-    if (action.type == ActionType::FOLD)
-        return {action.actor_position, ActionType::FOLD, action.amount};
-    if (action.amount == getChipsToCall())
-        return {action.actor_position, ActionType::CALL, action.amount};
-    return {action.actor_position, ActionType::RAISE, action.amount};
-}
-
 BettingRound::BettingRound(
     std::shared_ptr<SeatingManager> seating_manager,
     std::shared_ptr<PotManager> pot_manager
@@ -34,8 +24,8 @@ void BettingRound::onGameStarted() {
     round_tracker->onGameStarted(player_count);
 }
 
-void BettingRound::onRoundStarted(seat_idx_t start_position) {
-    current_position = start_position;
+void BettingRound::startBettingRound(seat_idx_t start_position) {
+    actor_seat = start_position;
     for (auto& bet : player_bets) {
         bet = 0;
     }
@@ -43,40 +33,27 @@ void BettingRound::onRoundStarted(seat_idx_t start_position) {
     round_tracker->onRoundStarted();
 }
 
-void BettingRound::nextTurn() {
-    current_position = seating_manager->nextPositionToAct(current_position);
+math::BettingContext BettingRound::getBettingContext() const {
+    return {
+        .player_chips = seating_manager->getPlayerAtSeat(actor_seat).chips,
+        .player_bet = getPlayerBetAt(actor_seat),
+        .round_bet =  getRoundBet(),
+        .min_raise_delta = getMinRaiseDelta(),
+    };
 }
 
-void BettingRound::commitChips(seat_idx_t position, chips_t amount) {
-    Player& player = seating_manager->getPlayerAtSeat(position);
-    chips_t player_bet = player_bets[position];
-    player.chips -= amount;
-    player_bet += amount;
-    if (player_bet > round_bet) {
-        min_raise = player_bet - round_bet;
-        round_bet = player_bet;
-    }
-    player_bets[position] = player_bet;
-    pot_manager->addChipsToPot(amount);
+void BettingRound::processBettingInput(math::BettingInput betting_input) {
+    math::BettingContext betting_context = getBettingContext();
+    math::BettingResult result = math::process_betting(betting_context, betting_input);
+    Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
+    actor.bet(result.bet_delta);
+    pot_manager->addChipsToPot(result.bet_delta);
+    player_bets[getActorSeat()] = result.player_bet;
+    round_bet = result.round_bet;
+    min_raise_delta = result.min_raise_delta;
 }
 
-chips_t BettingRound::getChipsToCall() const {
-    chips_t player_bet = player_bets[current_position];
-    return round_bet - player_bet;
+void BettingRound::advanceToNextActor() {
+    actor_seat = seating_manager->nextPositionToAct(actor_seat);
 }
-
-chips_t BettingRound::getChipsToMinRaise() const {
-    chips_t player_bet = player_bets[current_position];
-    return round_bet + min_raise - player_bet;
-}
-
-Action BettingRound::handleAction(const Action& action) {
-    auto [position, action_type, amount] = processAction(action);
-    commitChips(position, amount);
-    round_tracker->onPlayerActed(action_type);
-    nextTurn();
-    return {position, action_type, amount};
-}
-
-
 } // namespace holdem
