@@ -16,7 +16,7 @@ int main() {
     auto deck = std::make_unique<Deck>();
     auto seating_manager = std::make_shared<SeatingManager>();
     auto pot_manager = std::make_shared<PotManager>();
-    auto betting_round = std::make_unique<BettingRound>(seating_manager, pot_manager);
+    auto betting_round = std::make_unique<BettingRound>();
     auto game_model = std::make_unique<GameModel>(
         std::move(deck), pot_manager, seating_manager, std::move(betting_round));
     GameController game(std::move(game_model));

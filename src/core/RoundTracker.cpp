@@ -20,15 +20,11 @@ void RoundTracker::onPlayerActed(ActionType action) {
     if (action == ActionType::FOLD || action == ActionType::ALL_IN) players_can_act_count--;
 }
 
-bool RoundTracker::isRoundEnded() const {
+bool RoundTracker::isRoundFinished() const {
     return (active_players_count == 1 || players_can_act_count == 1 || pending_players_count == 0);
 }
 
 bool RoundTracker::isOnlyOnePlayerActive() const {
     return active_players_count == 1;
-}
-
-bool RoundTracker::isNoPlayerNeedToAct() const {
-    return players_can_act_count == 1;
 }
 } // holdem
