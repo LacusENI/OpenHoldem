@@ -55,7 +55,7 @@ void BettingRound::processBettingInput(math::BettingInput betting_input) {
     math::BettingResult result = math::process_betting(betting_context, betting_input);
     Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
     actor.bet(result.bet_delta);
-    pot_manager->addChipsToPot(result.bet_delta);
+    pot_manager->addChips(result.bet_delta);
     player_bets[getActorSeat()] = result.player_bet;
     round_bet = result.round_bet;
     min_raise_delta = result.min_raise_delta;
@@ -64,4 +64,4 @@ void BettingRound::processBettingInput(math::BettingInput betting_input) {
 void BettingRound::advanceToNextActor() {
     actor_seat = seating_manager->nextPositionToAct(actor_seat);
 }
-} // namespace holdem
+} // namespace poker

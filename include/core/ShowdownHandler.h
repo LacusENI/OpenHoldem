@@ -12,7 +12,7 @@ class ShowdownHandler {
 public:
     static std::vector<std::pair<seat_idx_t, HandValue>> evalHandValues(
         const std::vector<Player>& players,
-        const Cards5& community_cards);
+        const cards_5_t& community_cards);
 
     static std::vector<seat_idx_t> determineWinners(
         const std::vector<std::pair<seat_idx_t, HandValue>>& hand_values);
@@ -21,4 +21,4 @@ public:
         int pot, int winners_n);
 };
 
-}
+} // namespace poker

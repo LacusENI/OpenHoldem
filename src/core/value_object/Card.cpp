@@ -6,26 +6,6 @@
 #include "Card.h"
 
 namespace poker {
-namespace utils {
-std::string castSuitToString(Suit suit) {
-    static std::vector<std::string> suits = {
-        "_", "C", "D", "H", "S"
-    };
-    return suits[static_cast<int>(suit)];
-}
-std::string castRankToString(Rank rank) {
-    static std::vector<std::string> ranks = {
-        "_", "?", "2", "3", "4", "5", "6", "7",
-        "8", "9", "T", "J", "Q", "K", "A"
-    };
-    return ranks[static_cast<int>(rank)];
-}
-}
-
-std::ostream& operator<<(std::ostream& os, const Card& card){
-    return os << std::format("Card(\"{}\")", card.toString());
-}
-
 Card::Card(const char* str) {
     switch (str[0]) {
     case '_': suit = Suit::NONE; break;
@@ -51,8 +31,33 @@ Card::Card(const char* str) {
     }
 }
 
-std::string Card::toString() const {
-    return utils::castSuitToString(suit) + utils::castRankToString(rank);
+std::string to_string(Suit suit) {
+    static std::vector<std::string> suits = {
+        "_", "C", "D", "H", "S"
+    };
+    return suits[static_cast<int>(suit)];
+}
+std::string to_string(Rank rank) {
+    static std::vector<std::string> ranks = {
+        "_", "?", "2", "3", "4", "5", "6", "7",
+        "8", "9", "T", "J", "Q", "K", "A"
+    };
+    return ranks[static_cast<int>(rank)];
 }
 
+std::string to_string(Card card) {
+    return to_string(card.suit) + to_string(card.rank);
 }
+
+std::ostream& operator<<(std::ostream& os, Suit suit) {
+    return os << to_string(suit);
+}
+
+std::ostream& operator<<(std::ostream& os, Rank rank) {
+    return os << to_string(rank);
+}
+
+std::ostream& operator<<(std::ostream& os, Card card){
+    return os << std::format("Card(\"{}\")", to_string(card));
+}
+} // namespace poker

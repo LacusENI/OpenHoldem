@@ -9,7 +9,7 @@ namespace poker::math {
  * @param seven_cards 5张公共牌+2张底牌
  * @return 手牌分值
 */
-HandValue eval_hand(Cards7 seven_cards);
+HandValue eval_hand(cards_7_t seven_cards);
 } // namespace poker::math
 
 namespace poker::internal::eval_hand {
@@ -43,7 +43,7 @@ using HandCounts = std::vector<RankCount>;
  * @param five_cards 5张牌
  * @return 频次统计(按频次、点数从高到低依次排列)
  */
-HandCounts evalHandCounts(Cards5 five_cards);
+HandCounts eval_hand_counts(cards_5_t five_cards);
 
 /**
  * 判断5张出牌的牌型
@@ -51,19 +51,19 @@ HandCounts evalHandCounts(Cards5 five_cards);
  * @param counts 其点数统计
  * @return 5张出牌的牌型
  */
-HandType evalHandType(const Cards5& five_cards, const HandCounts& counts);
+HandType eval_hand_type(const cards_5_t& five_cards, const HandCounts& counts);
 
 /**
  * @brief 计算玩家出牌对应的编码
  * @param hand 玩家的出牌
  * @return 出牌对应的编码
  */
-HandValue evalHandValue(const Cards5& hand);
+HandValue eval_hand_value(const cards_5_t& hand);
 
 /**
  * 枚举所有可能的出牌组合(7选5)
  * @param seven_cards 7张手牌
  * @return 所有可能的5张出牌组合
  */
-std::vector<Cards5> enum5from7(const Cards7& seven_cards);
+std::vector<cards_5_t> enum_5_from_7(const cards_7_t& seven_cards);
 } // namespace poker::internal::eval_hand

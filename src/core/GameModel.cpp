@@ -17,7 +17,7 @@ GameModel::GameModel(
 GameModel::~GameModel() = default;
 
 void GameModel::startGame() {
-    game_state = GameState::IDLE;
+    game_state = Street::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
 
@@ -25,21 +25,21 @@ void GameModel::startGame() {
 
 void GameModel::dealCards() {
     switch (game_state) {
-    case GameState::PREFLOP:
+    case Street::PREFLOP:
         for (Player& player : seating_manager->getPlayerList()) {
             player.hole_cards[0] = deck->deal();
             player.hole_cards[1] = deck->deal();
         }
         break;
-    case GameState::FLOP:
+    case Street::FLOP:
         community_cards[0] = deck->deal();
         community_cards[1] = deck->deal();
         community_cards[2] = deck->deal();
         break;
-    case GameState::TURN:
+    case Street::TURN:
         community_cards[3] = deck->deal();
         break;
-    case GameState::RIVER:
+    case Street::RIVER:
         community_cards[4] = deck->deal();
         break;
     default: break;
@@ -58,24 +58,24 @@ void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::ve
 void GameModel::nextStreet() {
     seat_idx_t current_position = 0;
     switch (game_state) {
-    case GameState::IDLE:
-        game_state = GameState::PREFLOP;
+    case Street::IDLE:
+        game_state = Street::PREFLOP;
         current_position = seating_manager->getPreflopFirstPosition();
         break;
-    case GameState::PREFLOP:
-        game_state = GameState::FLOP;
+    case Street::PREFLOP:
+        game_state = Street::FLOP;
         current_position = seating_manager->getPostflopFirstPosition();
         break;
-    case GameState::FLOP:
-        game_state = GameState::TURN;
+    case Street::FLOP:
+        game_state = Street::TURN;
         current_position = seating_manager->getPostflopFirstPosition();
         break;
-    case GameState::TURN:
-        game_state = GameState::RIVER;
+    case Street::TURN:
+        game_state = Street::RIVER;
         current_position = seating_manager->getPostflopFirstPosition();
         break;
-    case GameState::RIVER:
-        game_state = GameState::AWARD;
+    case Street::RIVER:
+        game_state = Street::AWARD;
     default: break;
     }
     dealCards();

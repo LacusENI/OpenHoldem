@@ -5,7 +5,6 @@
 #include <array>
 
 namespace poker {
-
 /**
  * @brief 扑克牌的花色 (Club/Diamond/heart/spade)
  */
@@ -41,9 +40,6 @@ struct Card {
     explicit Card(const char* str);
     Card(Suit suit, Rank rank) : suit(suit), rank(rank) {}
 
-    /* 用于输出到日志中的展示字符串 */
-    std::string toString() const;
-
     bool operator<(const Card& other) const {
         if (rank == other.rank) return suit < other.suit;
         return rank < other.rank;
@@ -59,14 +55,14 @@ struct Card {
     }
 };
 
-std::ostream& operator<<(std::ostream& os, const Card& card);
+using cards_7_t = std::array<Card, 7>;
+using cards_2_t = std::array<Card, 2>;
+using cards_5_t = std::array<Card, 5>;
 
-using Cards7 = std::array<Card, 7>;
-using Cards2 = std::array<Card, 2>;
-using Cards5 = std::array<Card, 5>;
-
-namespace utils {
-std::string castSuitToString(Suit suit);
-std::string castRankToString(Rank rank);
-}
+std::string to_string(Suit suit);
+std::string to_string(Rank rank);
+std::string to_string(Card card);
+std::ostream& operator<<(std::ostream& os, Suit suit);
+std::ostream& operator<<(std::ostream& os, Rank rank);
+std::ostream& operator<<(std::ostream& os, Card card);
 } // namespace holdem

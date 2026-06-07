@@ -7,8 +7,6 @@
 
 namespace poker {
 
-constexpr int CARDS_SIZE = 52;
-
 /**
  * @brief 扑克牌组接口
  */
@@ -24,6 +22,7 @@ public:
  */
 class Deck final : public IDeck {
 private:
+    static constexpr int CARDS_SIZE = 52;
     std::array<Card, CARDS_SIZE> cards;
     std::mt19937 rng;
     size_t next_card_index = 0;
@@ -36,4 +35,4 @@ public:
     /* 发牌 */
     Card deal() override;
 };
-}
+} // namespace poker

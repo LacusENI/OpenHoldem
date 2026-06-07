@@ -3,11 +3,11 @@
 #include "eval_hand.h"
 
 namespace poker::internal::eval_hand {
-std::vector<Cards5> enum5from7(const Cards7& hand7) {
-    std::vector<Cards5> combos;
+std::vector<cards_5_t> enum_5_from_7(const cards_7_t& hand7) {
+    std::vector<cards_5_t> combos;
     std::vector mask = {0, 0, 1, 1, 1, 1, 1};
     do {
-        Cards5 combo;
+        cards_5_t combo;
         int combo_i = 0;
         for (int i = 0; i < mask.size(); i++) {
             if (mask[i]) { combo[combo_i++] = hand7[i]; }
@@ -17,9 +17,9 @@ std::vector<Cards5> enum5from7(const Cards7& hand7) {
     return combos;
 }
 
-HandValue evalHandValue(const Cards5& hand) {
-    HandCounts counts = evalHandCounts(hand);
-    HandType hand_type = evalHandType(hand, counts);
+HandValue eval_hand_value(const cards_5_t& hand) {
+    HandCounts counts = eval_hand_counts(hand);
+    HandType hand_type = eval_hand_type(hand, counts);
     std::vector<Rank> ranks;
     for (auto [rank, _] : counts) {
         ranks.push_back(rank);
@@ -27,7 +27,7 @@ HandValue evalHandValue(const Cards5& hand) {
     return HandValue::build(hand_type, ranks);
 }
 
-HandCounts evalHandCounts(Cards5 hand5) {
+HandCounts eval_hand_counts(cards_5_t hand5) {
     std::ranges::sort(hand5, std::greater());
     HandCounts counts;
     counts.emplace_back(hand5[0].rank, 0);
@@ -55,7 +55,7 @@ HandCounts evalHandCounts(Cards5 hand5) {
  * @param hand5 5张牌
  * @return true 若5张牌是同花
  */
-bool isFlush(const Cards5& hand5) {
+bool isFlush(const cards_5_t& hand5) {
     Suit suit = hand5[0].suit;
     return std::ranges::all_of(hand5,
         [suit](Card c) { return c.suit == suit; });
@@ -89,7 +89,7 @@ bool isStraight(const HandCounts& counts) {
  * @param counts 牌的点数统计
  * @return 牌型
  */
-HandType evalUniqueHandType(const Cards5& hand5, const HandCounts& counts) {
+HandType evalUniqueHandType(const cards_5_t& hand5, const HandCounts& counts) {
     bool is_flush = isFlush(hand5);
     bool is_straight = isStraight(counts);
     if (is_flush && is_straight) {
@@ -121,7 +121,7 @@ HandType evalPatternHandType(const HandCounts& counts) {
     return table[2*(max1 - 2) + (max2 - 1)];
 }
 
-HandType evalHandType(const Cards5& hand5, const HandCounts& counts) {
+HandType eval_hand_type(const cards_5_t& hand5, const HandCounts& counts) {
     if (counts.size() != 5)
         return evalPatternHandType(counts);
     return evalUniqueHandType(hand5, counts);
@@ -129,13 +129,13 @@ HandType evalHandType(const Cards5& hand5, const HandCounts& counts) {
 } // namespace poker::internal::eval_hand
 
 namespace poker::math {
-HandValue eval_hand(Cards7 seven_cards) {
+HandValue eval_hand(cards_7_t seven_cards) {
     using namespace internal::eval_hand;
 
     // 枚举21个五牌组合, 选择牌值最大者
     auto best_hand_value = HandValue(0);
-    for (Cards5 five_cards : enum5from7(seven_cards)) {
-        HandValue handValue = evalHandValue(five_cards);
+    for (cards_5_t five_cards : enum_5_from_7(seven_cards)) {
+        HandValue handValue = eval_hand_value(five_cards);
         best_hand_value = std::max(best_hand_value, handValue);
     }
 

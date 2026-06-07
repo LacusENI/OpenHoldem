@@ -12,7 +12,7 @@ enum class HandType;
 class HandValue;
 enum class ActionType;
 struct Action;
-enum class GameState;
+enum class Street;
 struct Player;
 }
 
@@ -29,7 +29,7 @@ std::string format(const HandValue& hand_value);
 
 std::string format(const ActionType& action_type);
 
-std::string format(const GameState& state);
+std::string format(const Street& state);
 
 std::string format(const seat_idx_t& position);
 }

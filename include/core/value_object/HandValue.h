@@ -12,9 +12,7 @@ enum class HandType {
     FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
 };
 
-namespace utils {
-std::string castHandTypeToString(HandType hand_type);
-}
+std::string to_string(HandType hand_type);
 
 /**
  * @brief 表示一手牌的强度和比较逻辑的类型
@@ -75,4 +73,4 @@ public:
      */
     HandValue static build(HandType hand_type, std::vector<Rank> ranks);
 };
-}
+} // namespace poker

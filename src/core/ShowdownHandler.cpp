@@ -4,19 +4,19 @@
 #include "eval_hand.h"
 
 namespace poker {
-void join_community_cards(Cards7& cards7, const Cards5& cards5) {
+void join_community_cards(cards_7_t& cards7, const cards_5_t& cards5) {
     std::ranges::copy(cards5, cards7.begin());
 }
 
-void join_hole_cards(Cards7& cards7, const Cards2& cards2) {
+void join_hole_cards(cards_7_t& cards7, const cards_2_t& cards2) {
     std::ranges::copy(cards2, cards7.begin() + 2);
 }
 
 std::vector<std::pair<seat_idx_t, HandValue>> ShowdownHandler::evalHandValues(
         const std::vector<Player>& players,
-        const Cards5& community_cards) {
+        const cards_5_t& community_cards) {
     std::vector<std::pair<seat_idx_t, HandValue>> result;
-    Cards7 seven_cards;
+    cards_7_t seven_cards;
     join_community_cards(seven_cards, community_cards);
     for (const Player& player : players) {
         if (player.isActive()) {

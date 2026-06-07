@@ -8,24 +8,24 @@ using namespace poker::internal::eval_hand;
 
 // 测试生成的组合的数量是否正确
 TEST(EvalHandTest, CombinationSize) {
-    Cards7 hand7 = {
+    cards_7_t hand7 = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"),
         Card("HJ"), Card("DK"), Card("HQ")
     };
-    auto combos = enum5from7(hand7);
+    auto combos = enum_5_from_7(hand7);
 
     EXPECT_EQ(combos.size(), 21);
 }
 
 // 测试生成的组合是否不重复
 TEST(EvalHandTest, CombinationsUniqueness) {
-    Cards7 hand7 = {
+    cards_7_t hand7 = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"),
         Card("HJ"), Card("DK"), Card("HQ")
     };
 
-    auto combos = enum5from7(hand7);
-    std::set<Cards5> uniqueCombos;
+    auto combos = enum_5_from_7(hand7);
+    std::set<cards_5_t> uniqueCombos;
     for (auto combo : combos) {
         std::sort(combo.begin(), combo.end());
         uniqueCombos.insert(combo);
@@ -36,10 +36,10 @@ TEST(EvalHandTest, CombinationsUniqueness) {
 
 // 测试点数频次统计是否正确
 TEST(EvalHandTest, GetSortedCounts) {
-    Cards5 highCard = {
+    cards_5_t highCard = {
         Card("CA"), Card("H2"), Card("D8"), Card("C3"), Card("HJ")
     }; // A, 2, 8, 3, J -> A, J, 8, 3, 2
-    auto resultHighCard = evalHandCounts(highCard);
+    auto resultHighCard = eval_hand_counts(highCard);
     ASSERT_EQ(resultHighCard.size(), 5);
     EXPECT_EQ(resultHighCard[0], RankCount(Rank::ACE, 1));
     EXPECT_EQ(resultHighCard[1], RankCount(Rank::JACK, 1));
@@ -47,20 +47,20 @@ TEST(EvalHandTest, GetSortedCounts) {
     EXPECT_EQ(resultHighCard[3], RankCount(Rank::THREE, 1));
     EXPECT_EQ(resultHighCard[4], RankCount(Rank::TWO, 1));
 
-    Cards5 twoPair = {
+    cards_5_t twoPair = {
         Card("CA"), Card("H2"), Card("D3"), Card("C3"), Card("HJ")
     }; // A, 2, 3, 3, J -> 3, 3, A, J, 2
-    auto resultTwoPair = evalHandCounts(twoPair);
+    auto resultTwoPair = eval_hand_counts(twoPair);
     ASSERT_EQ(resultTwoPair.size(), 4);
     EXPECT_EQ(resultTwoPair[0], RankCount(Rank::THREE, 2));
     EXPECT_EQ(resultTwoPair[1], RankCount(Rank::ACE, 1));
     EXPECT_EQ(resultTwoPair[2], RankCount(Rank::JACK, 1));
     EXPECT_EQ(resultTwoPair[3], RankCount(Rank::TWO, 1));
 
-    Cards5 fullHouse = {
+    cards_5_t fullHouse = {
         Card("C8"), Card("H4"), Card("D8"), Card("C4"), Card("D4"),
     }; // 8, 4, 8, 4, 4 -> 4, 4, 4, 8, 8
-    auto resultFullHouse = evalHandCounts(fullHouse);
+    auto resultFullHouse = eval_hand_counts(fullHouse);
     ASSERT_EQ(resultFullHouse.size(), 2);
     EXPECT_EQ(resultFullHouse[0], RankCount(Rank::FOUR, 3));
     EXPECT_EQ(resultFullHouse[1], RankCount(Rank::EIGHT, 2));
@@ -68,54 +68,54 @@ TEST(EvalHandTest, GetSortedCounts) {
 
 // 测试牌型判断是否正确
 TEST(EvalHandTest, EvaluateHandType) {
-    Cards5 flush = {
+    cards_5_t flush = {
         Card("HA"), Card("H2"), Card("HJ"), Card("H7"), Card("HK")
     }; // 同花 A, 2, J, 7, K
-    HandValue flushValue = evalHandValue(flush);
+    HandValue flushValue = eval_hand_value(flush);
     EXPECT_EQ(flushValue.getHandType(), HandType::FLUSH);
 
-    Cards5 fullHouse = {
+    cards_5_t fullHouse = {
         Card("C8"), Card("H8"),Card("S5"),Card("D5"),Card("C5"),
     }; // 葫芦 8, 8, 5, 5, 5
-    HandValue fullHouseValue = evalHandValue(fullHouse);
+    HandValue fullHouseValue = eval_hand_value(fullHouse);
     EXPECT_EQ(fullHouseValue.getHandType(), HandType::FULL_HOUSE);
 
-    Cards5 straight = {
+    cards_5_t straight = {
         Card("C2"), Card("HA"), Card("H4"), Card("D3"), Card("S5"),
     }; // 顺子 2, A, 4, 3, 5
-    HandValue straightValue = evalHandValue(straight);
+    HandValue straightValue = eval_hand_value(straight);
     EXPECT_EQ(straightValue.getHandType(), HandType::STRAIGHT);
 
-    Cards5 royalFlush = {
+    cards_5_t royalFlush = {
         Card("ST"), Card("SA"), Card("SJ"), Card("SQ"), Card("SK")
     }; // 皇家同花顺
-    HandValue royalFlushValue = evalHandValue(royalFlush);
+    HandValue royalFlushValue = eval_hand_value(royalFlush);
     EXPECT_EQ(royalFlushValue.getHandType(), HandType::ROYAL_FLUSH);
 }
 
 // 测试手牌分值计算是否正确
 TEST(EvalHandTest, GetHandValue) {
-    Cards5 fullHouse = {
+    cards_5_t fullHouse = {
         Card("C8"), Card("H8"), Card("S5"), Card("D5"), Card("C5")
     }; // 葫芦 8, 8, 5, 5, 5 -> 5, 5, 5, 8, 8
-    HandValue fullHouseValue = evalHandValue(fullHouse);
+    HandValue fullHouseValue = eval_hand_value(fullHouse);
     EXPECT_EQ(fullHouseValue.getHandType(), HandType::FULL_HOUSE);
     EXPECT_EQ(fullHouseValue.getRank(0), Rank::FIVE);
     EXPECT_EQ(fullHouseValue.getRank(1), Rank::EIGHT);
 
-    Cards5 highCard = {
+    cards_5_t highCard = {
         Card("C8"), Card("H9"), Card("ST"), Card("DQ"), Card("C3")
     }; // 高牌 8, 9, 10, Q, 3 -> Q, 10, 9, 8, 3
-    HandValue highCardValue = evalHandValue(highCard);
+    HandValue highCardValue = eval_hand_value(highCard);
     EXPECT_EQ(highCardValue.getHandType(), HandType::HIGH_CARD);
     HandValue expectedHighCardValue = HandValue::build(
         HandType::HIGH_CARD, {Rank::QUEEN, Rank::TEN, Rank::NINE, Rank::EIGHT, Rank::THREE});
     EXPECT_EQ(highCardValue, expectedHighCardValue);
 
-    Cards5 straight = {
+    cards_5_t straight = {
         Card("C2"), Card("HA"), Card("H4"), Card("D3"), Card("S5")
     }; // 顺子 2, A, 4, 3, 5 -> 5, 4, 3, 2, A
-    HandValue straightValue = evalHandValue(straight);
+    HandValue straightValue = eval_hand_value(straight);
     EXPECT_EQ(straightValue.getHandType(), HandType::STRAIGHT);
     EXPECT_EQ(straightValue.getRank(0), Rank::FIVE);
     EXPECT_EQ(straightValue.getRank(1), Rank::FOUR);
@@ -123,10 +123,10 @@ TEST(EvalHandTest, GetHandValue) {
     EXPECT_EQ(straightValue.getRank(3), Rank::TWO);
     EXPECT_EQ(straightValue.getRank(4), Rank::ACE);
 
-    Cards5 twoPair = {
+    cards_5_t twoPair = {
         Card("C2"), Card("D2"), Card("ST"), Card("SQ"), Card("CT"),
     }; // 两对 2, 2, 10, Q, 10 -> 10, 10, 2, 2, Q
-    HandValue twoPairValue = evalHandValue(twoPair);
+    HandValue twoPairValue = eval_hand_value(twoPair);
     EXPECT_EQ(twoPairValue.getHandType(), HandType::TWO_PAIR);
     EXPECT_EQ(twoPairValue.getRank(0), Rank::TEN);
     EXPECT_EQ(twoPairValue.getRank(1), Rank::TWO);
@@ -135,13 +135,13 @@ TEST(EvalHandTest, GetHandValue) {
 
 // 测试最终评估结果
 TEST(EvalHandTest, FinalEvaluation) {
-    Cards7 seven_card = {
+    cards_7_t seven_card = {
         Card("CK"), Card("CQ"), Card("SQ"), Card("DQ"),
         Card("DK"), Card("CA"), Card("CJ")
     };
-    Cards5 best_five = {
+    cards_5_t best_five = {
         Card("CQ"), Card("SQ"), Card("DQ"), Card("CK"), Card("DK")
     };
-    HandValue best_five_value = evalHandValue(best_five);
+    HandValue best_five_value = eval_hand_value(best_five);
     EXPECT_EQ(eval_hand(seven_card), best_five_value);
 }

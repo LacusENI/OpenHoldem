@@ -9,7 +9,7 @@ namespace poker {
  */
 struct Player {
     seat_idx_t position; // 玩家所在位置
-    Cards2 hole_cards; // 玩家的底牌
+    cards_2_t hole_cards; // 玩家的底牌
 
     chips_t chips = 0;        // 玩家拥有的筹码
     bool is_folded = false; // 玩家是否已弃牌
@@ -26,4 +26,4 @@ struct Player {
     bool canAct() const { return !is_folded && !is_allin; }
 };
 
-}
+} // namespace poker

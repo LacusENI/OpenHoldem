@@ -26,7 +26,7 @@ std::string format(Suit suit) {
 }
 
 std::string format(const Card& card) {
-    return format(card.suit) + utils::castRankToString(card.rank);
+    return format(card.suit) + to_string(card.rank);
 }
 
 std::string format(const HandType& hand_type) {
@@ -120,26 +120,22 @@ std::string format(const ActionType& action_type) {
         return "Fold";
     case ActionType::ALL_IN:
         return "All-in";
-    case ActionType::SMALL_BLIND:
-        return "Small Blind";
-    case ActionType::BIG_BLIND:
-        return "Big Blind";
     default:
         return "???";
     }
 }
 
-std::string format(const GameState& state) {
+std::string format(const Street& state) {
     switch (state) {
-    case GameState::AWARD:
+    case Street::AWARD:
         return "SHOWDOWN";
-    case GameState::RIVER:
+    case Street::RIVER:
         return "RIVER";
-    case GameState::TURN:
+    case Street::TURN:
         return "TURN";
-    case GameState::FLOP:
+    case Street::FLOP:
         return "FLOP";
-    case GameState::PREFLOP:
+    case Street::PREFLOP:
         return "PREFLOP";
     default:
         return "???";

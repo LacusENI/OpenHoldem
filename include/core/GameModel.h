@@ -7,7 +7,6 @@
 #include "GameTypes.h"
 
 namespace poker {
-
 class IDeck;
 class SeatingManager;
 class BettingRound;
@@ -18,12 +17,12 @@ class PotManager;
  */
 class GameModel {
 private:
-    GameState game_state = GameState::IDLE; // 游戏状态机
+    Street game_state = Street::IDLE; // 游戏状态机
 
     seat_idx_t btn_position = 0; // 庄家位置
     chips_t big_blind = 10;      // 大盲注额
 
-    Cards5 community_cards;
+    cards_5_t community_cards;
     std::unique_ptr<IDeck> deck;
     std::shared_ptr<PotManager> pot_manager;
     std::shared_ptr<SeatingManager> seating_manager;

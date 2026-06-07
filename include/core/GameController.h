@@ -19,4 +19,4 @@ public:
     void run();
 };
 
-} // namespace holdem
+} // namespace poker

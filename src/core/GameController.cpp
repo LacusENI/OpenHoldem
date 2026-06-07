@@ -12,4 +12,4 @@ GameController::~GameController() = default;
 void GameController::run() {
 
 }
-}
+} // namespace poker

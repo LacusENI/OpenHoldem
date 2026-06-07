@@ -41,4 +41,4 @@ public:
     bool isOnlyOnePlayerActive() const;
     bool isNoPlayerNeedToAct() const;
 };
-} // namespace holdem
+} // namespace poker

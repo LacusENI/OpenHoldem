@@ -3,8 +3,8 @@
 #include <format>
 
 namespace poker {
-namespace utils {
-std::string castHandTypeToString(HandType hand_type) {
+
+std::string to_string(HandType hand_type) {
     switch (hand_type) {
     case HandType::HIGH_CARD:
         return "HIGH_CARD";
@@ -30,7 +30,6 @@ std::string castHandTypeToString(HandType hand_type) {
         return "UNKNOWN";
     }
 }
-}
 
 HandValue HandValue::build(HandType hand_type, std::vector<Rank> ranks) {
     int handValue = static_cast<int>(hand_type);
@@ -44,4 +43,4 @@ HandValue HandValue::build(HandType hand_type, std::vector<Rank> ranks) {
     }
     return HandValue(handValue);
 }
-}
+} // namespace poker

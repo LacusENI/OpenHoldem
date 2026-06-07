@@ -8,11 +8,11 @@ using namespace poker;
 TEST(CardTest, ToStringFunction) {
     Card card1(Suit::CLUB, Rank::ACE);
 
-    EXPECT_EQ("CA", card1.toString());
+    EXPECT_EQ("CA", to_string(card1));
 
     Card card2(Suit::DIAMOND, Rank::KING);
 
-    EXPECT_EQ("DK", card2.toString());
+    EXPECT_EQ("DK", to_string(card2));
 }
 
 TEST(CardTest, FromStringBuilder) {
