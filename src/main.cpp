@@ -10,6 +10,8 @@
 #include "Formatter.h"
 #include "PotManager.h"
 #include "SeatingManager.h"
+#include "Event.h"
+#include "EventBus.h"
 
 using namespace poker;
 
@@ -20,6 +22,7 @@ int main() {
     std::cout << ui::formatter::format(Card("S8"));
     std::cout << " OpenHoldem\n";
 
+    auto event_bus = std::make_unique<EventBus>();
     auto deck = std::make_unique<Deck>();
     auto seating_manager = std::make_shared<SeatingManager>();
     auto pot_manager = std::make_shared<PotManager>();
@@ -32,8 +35,14 @@ int main() {
     seating_manager->addNewPlayer();
     seating_manager->addNewPlayer();
     seating_manager->addNewPlayer();
-    spdlog::info("game started");
+    event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
+       spdlog::info("Game Started");
+    });
+    event_bus->subscribe<Event::GameEnded>([](const Event::GameEnded&) {
+       spdlog::info("Game Ended");
+    });
+    event_bus->publish(Event::GameStarted{});
     game.run();
-
+    event_bus->publish(Event::GameEnded{});
     return 0;
 }

@@ -23,4 +23,4 @@ public:
     /* 只有一名玩家能够行动 */
     bool isNoPlayerNeedToAct() const;
 };
-} // holdem
+} // namespace poker

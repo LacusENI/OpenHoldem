@@ -18,6 +18,14 @@ bool BettingRound::isRoundEnded() const {
     return round_tracker->isRoundEnded();
 }
 
+bool BettingRound::isOnlyOnePlayerActive() const {
+    return round_tracker->isOnlyOnePlayerActive();
+}
+
+bool BettingRound::isNoPlayerNeedToAct() const {
+    return round_tracker->isNoPlayerNeedToAct();
+}
+
 void BettingRound::onGameStarted() {
     const int player_count = seating_manager->getPlayerCount();
     player_bets.resize(player_count, 0);

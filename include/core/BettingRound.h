@@ -35,5 +35,7 @@ public:
     void processBettingInput(math::BettingInput betting_input);
     void advanceToNextActor();
     bool isRoundEnded() const;
+    bool isOnlyOnePlayerActive() const;
+    bool isNoPlayerNeedToAct() const;
 };
 } // namespace holdem

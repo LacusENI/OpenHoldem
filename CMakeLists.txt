@@ -34,9 +34,12 @@ add_library(poker_core
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
+        include/core/event/Event.h
+        include/core/event/EventBus.h
 )
 
 target_include_directories(poker_core PUBLIC
+        include/core/event
         include/core/math
         include/core/value_object
         include/core
