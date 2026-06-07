@@ -10,6 +10,9 @@ find_package(spdlog CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
+        include/core/event/Event.h
+        include/core/event/EventBus.h
+        include/core/interface/ILogger.h
         include/core/math/chips_calc.h
         include/core/math/eval_hand.h
         include/core/value_object/Card.h
@@ -34,8 +37,6 @@ add_library(poker_core
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
-        include/core/event/Event.h
-        include/core/event/EventBus.h
 )
 
 target_include_directories(poker_core PUBLIC

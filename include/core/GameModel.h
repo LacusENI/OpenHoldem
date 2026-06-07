@@ -14,10 +14,10 @@ class BettingRound;
 class PotManager;
 
 /**
- * @brief 一局游戏的数据模型
+ * @brief 游戏领域模型
  */
 class GameModel {
-public:
+private:
     GameState game_state = GameState::IDLE; // 游戏状态机
 
     seat_idx_t btn_position = 0; // 庄家位置
@@ -28,7 +28,7 @@ public:
     std::shared_ptr<PotManager> pot_manager;
     std::shared_ptr<SeatingManager> seating_manager;
     std::shared_ptr<BettingRound> betting_round;
-
+public:
     GameModel(
         std::unique_ptr<IDeck> deck,
         std::shared_ptr<PotManager> pot_manager,

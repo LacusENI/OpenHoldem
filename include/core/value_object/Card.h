@@ -7,7 +7,7 @@
 namespace poker {
 
 /**
- * @brief 扑克牌的花色
+ * @brief 扑克牌的花色 (Club/Diamond/heart/spade)
  */
 enum class Suit : uint8_t {
     NONE = 0,
@@ -18,7 +18,7 @@ enum class Suit : uint8_t {
 };
 
 /**
- * @brief 扑克牌的点数 (2-10, J, Q, K, A)
+ * @brief 扑克牌的点数 (2~10/Jack/Queen/King/Ace)
  */
 enum class Rank : uint8_t {
     NONE = 0, TWO = 2, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN,

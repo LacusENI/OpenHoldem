@@ -6,7 +6,7 @@ namespace poker {
 class GameModel;
 
 /**
- * @brief 负责一局游戏
+ * @brief 游戏控制器
  */
 class GameController {
 public:

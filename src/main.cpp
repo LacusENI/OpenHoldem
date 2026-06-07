@@ -1,13 +1,9 @@
-#include <iostream>
-
 #include "spdlog/spdlog.h"
 
 #include "BettingRound.h"
-#include "Card.h"
 #include "Deck.h"
 #include "GameModel.h"
 #include "GameController.h"
-#include "Formatter.h"
 #include "PotManager.h"
 #include "SeatingManager.h"
 #include "Event.h"
@@ -16,12 +12,6 @@
 using namespace poker;
 
 int main() {
-    std::cout << ui::formatter::format(Card("CA"));
-    std::cout << ui::formatter::format(Card("DJ"));
-    std::cout << ui::formatter::format(Card("HT"));
-    std::cout << ui::formatter::format(Card("S8"));
-    std::cout << " OpenHoldem\n";
-
     auto event_bus = std::make_unique<EventBus>();
     auto deck = std::make_unique<Deck>();
     auto seating_manager = std::make_shared<SeatingManager>();

@@ -5,6 +5,9 @@
 #include "Player.h"
 
 namespace poker {
+/**
+ * @brief 玩家与座位管理类
+ */
 class SeatingManager {
 private:
     std::vector<Player> players;

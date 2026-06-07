@@ -11,6 +11,9 @@ class SeatingManager;
 class PotManager;
 class RoundTracker;
 
+/**
+ * @brief 下注轮领域模型
+ */
 class BettingRound {
 private:
     std::shared_ptr<SeatingManager> seating_manager;
