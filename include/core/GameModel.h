@@ -7,6 +7,7 @@
 #include "GameTypes.h"
 
 namespace poker {
+class EventBus;
 class IDeck;
 class SeatingManager;
 class BettingRound;
@@ -17,39 +18,41 @@ class PotManager;
  */
 class GameModel {
 private:
-    Street game_state = Street::IDLE; // 游戏状态机
-
-    seat_idx_t btn_position = 0; // 庄家位置
-    chips_t big_blind = 10;      // 大盲注额
-
-    cards_5_t community_cards;
+    std::shared_ptr<EventBus> event_bus;
     std::unique_ptr<IDeck> deck;
     std::shared_ptr<PotManager> pot_manager;
     std::shared_ptr<SeatingManager> seating_manager;
     std::shared_ptr<BettingRound> betting_round;
+
+    Street street = Street::IDLE; // 游戏状态机
+    chips_t big_blind = 10;      // 大盲注额
+    cards_5_t community_cards;
+    void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
+    void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
+    void postSmallBlind();
+    void postBigBlind();
 public:
     GameModel(
+        std::shared_ptr<EventBus> event_bus,
         std::unique_ptr<IDeck> deck,
         std::shared_ptr<PotManager> pot_manager,
         std::shared_ptr<SeatingManager> players,
         std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 
-    /**
-     * @brief 游戏状态和数据初始化
-     */
+    /* 开始一局游戏 */
     void startGame();
-    /**
-     * @brief 负责发放底牌或公共牌
-     */
-    void dealCards();
-    /**
-     * @brief 进入下一个阶段，翻开此轮的公共牌
-     * @note 每次发公共牌前不烧牌
-     */
-    void nextStreet();
+    /* 向所有玩家发放底牌 */
+    void dealHoleCards();
+    /* 发放公共牌 */
+    void dealCommunityCards();
+    /* 执行盲注 */
+    void postForcedBlind();
+    /* 进入第一个阶段(Pre-flop) */
+    void enterPreflopStreet();
+    /* 进入下一个阶段 */
+    void advanceToNextStreet();
 
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
-
 };
 } // namespace poker

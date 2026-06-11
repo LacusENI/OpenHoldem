@@ -25,10 +25,12 @@ private:
 public:
     BettingRound();
     ~BettingRound();
+
     chips_t getPlayerBetAtSeat(seat_idx_t seat) const { return player_bets[seat]; }
     chips_t getRoundBet() const { return round_bet; }
     chips_t getMinRaiseDelta() const { return min_raise_delta; }
     seat_idx_t getActorSeat() const { return actor_seat; }
+
     void onGameStarted(int player_count);
     void onRoundStarted(seat_idx_t start_position);
     math::BettingContext getBettingContext(chips_t actor_chips) const;

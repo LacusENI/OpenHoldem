@@ -3,6 +3,7 @@
 #include <memory>
 
 namespace poker {
+class EventBus;
 class GameModel;
 
 /**
@@ -10,13 +11,17 @@ class GameModel;
  */
 class GameController {
 public:
-    std::unique_ptr<GameModel> model;
+    std::shared_ptr<EventBus> event_bus;
+    std::unique_ptr<GameModel> game_model;
 
     explicit GameController(
+        std::shared_ptr<EventBus> event_bus,
         std::unique_ptr<GameModel> model);
     ~GameController();
 
-    void run();
+    void startGame();
+
+    void enterPreflopStreet();
 };
 
 } // namespace poker

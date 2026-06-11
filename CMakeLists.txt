@@ -37,6 +37,7 @@ add_library(poker_core
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
+        src/core/value_object/GameTypes.cpp
 )
 
 target_include_directories(poker_core PUBLIC
