@@ -46,6 +46,13 @@ void BettingRound::applyBettingResult(const math::BettingResult& result) {
     round_tracker->onPlayerActed(result.action_type);
 }
 
+void BettingRound::processForcedBlind(seat_idx_t sb_seat, seat_idx_t bb_seat, chips_t big_blind) {
+    player_bets[sb_seat] = big_blind / 2;
+    player_bets[bb_seat] = big_blind;
+    round_bet = big_blind;
+    min_raise_delta = big_blind;
+}
+
 void BettingRound::advanceToNextActor(seat_idx_t next_actor_seat) {
     actor_seat = next_actor_seat;
 }

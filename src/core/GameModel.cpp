@@ -17,11 +17,11 @@ void GameModel::takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips) {
     seating_manager->getPlayerAtSeat(player_seat).win(chips);
 }
 
-void GameModel::postSmallBlind() {
-
-}
-
-void GameModel::postBigBlind() {
+void GameModel::applyBettingResult(seat_idx_t player_seat, math::BettingResult result) {
+    if (result.is_target_bet_valid) {
+        takePlayerChipsToPot(player_seat, result.bet_delta);
+        betting_round->applyBettingResult(result);
+    }
 }
 
 GameModel::GameModel(
@@ -36,10 +36,23 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
+Street GameModel::getStreet() const {
+    return street;
+}
+
+chips_t GameModel::getBigBlind() const {
+    return big_blind;
+}
+
+cards_5_t GameModel::getCommunityCards() const {
+    return community_cards;
+}
+
 void GameModel::startGame() {
     street = Street::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
+    betting_round->onGameStarted(seating_manager->getPlayerCount());
 }
 
 void GameModel::dealHoleCards() {
@@ -70,16 +83,24 @@ void GameModel::dealCommunityCards() {
         break;
     default: break;
     }
+    event_bus->publish(Event::CommunityCardsDealt{
+        community_cards
+    });
 }
 
 void GameModel::postForcedBlind() {
-    postSmallBlind();
+    // Small Blind
+    seat_idx_t sb_seat = seating_manager->getSbPosition();
+    takePlayerChipsToPot(sb_seat, big_blind / 2);
     event_bus->publish(Event::BlindPosted{
         .seat = seating_manager->getSbPosition(),
         .amount = big_blind / 2,
         .is_big_blind = false
     });
-    postBigBlind();
+    // Big Blind
+    seat_idx_t bb_seat = seating_manager->getBbPosition();
+    takePlayerChipsToPot(bb_seat, big_blind);
+    betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
     event_bus->publish(Event::BlindPosted{
         .seat = seating_manager->getBbPosition(),
         .amount = big_blind,
@@ -103,27 +124,13 @@ void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::ve
 }
 
 void GameModel::advanceToNextStreet() {
-    seat_idx_t first_actor_seat = 0;
-    switch (street) {
-    case Street::IDLE:
-        street = Street::PREFLOP;
-        first_actor_seat = seating_manager->getPreflopFirstPosition();
-        break;
-    case Street::PREFLOP:
-        street = Street::FLOP;
-        first_actor_seat = seating_manager->getPostflopFirstPosition();
-        break;
-    case Street::FLOP:
-        street = Street::TURN;
-        first_actor_seat = seating_manager->getPostflopFirstPosition();
-        break;
-    case Street::TURN:
-        street = Street::RIVER;
-        first_actor_seat = seating_manager->getPostflopFirstPosition();
-        break;
-    case Street::RIVER:
-        street = Street::AWARD;
-    default: break;
-    }
+    street = next_street(street);
+}
+
+void GameModel::startBettingRound() {
+    seat_idx_t first_actor_seat = (street == Street::PREFLOP) ?
+        seating_manager->getPreflopFirstPosition() :
+        seating_manager->getPostflopFirstPosition();
+    betting_round->onRoundStarted(first_actor_seat);
 }
 } // namespace poker

@@ -22,5 +22,16 @@ void GameController::startGame() {
 void GameController::enterPreflopStreet() {
     game_model->enterPreflopStreet();
     game_model->postForcedBlind();
+    while (game_model->getStreet() != Street::AWARD) {
+        event_bus->publish(Event::StreetStarted{
+            game_model->getStreet()
+        });
+        // 发放公共牌
+        game_model->dealCommunityCards();
+        // 移至下一阶段
+        game_model->advanceToNextStreet();
+    }
 }
+
+
 } // namespace poker

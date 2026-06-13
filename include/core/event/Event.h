@@ -25,6 +25,10 @@ struct BlindPosted {
     bool is_big_blind;
 };
 
+struct CommunityCardsDealt {
+    cards_5_t community_cards;
+};
+
 struct GameEnded {
     chips_t pot;
 };

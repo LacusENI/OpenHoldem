@@ -10,6 +10,7 @@ enum class Street {
     IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
 };
 
+Street next_street(Street street);
 std::string to_string(Street street);
 
 enum class ActionType {

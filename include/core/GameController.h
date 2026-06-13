@@ -19,9 +19,11 @@ public:
         std::unique_ptr<GameModel> model);
     ~GameController();
 
+    /* 开始一局游戏 */
     void startGame();
-
+    /* 进入 Pre-flop 阶段 */
     void enterPreflopStreet();
+
 };
 
 } // namespace poker

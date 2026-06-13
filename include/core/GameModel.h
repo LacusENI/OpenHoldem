@@ -5,6 +5,7 @@
 
 #include "Card.h"
 #include "GameTypes.h"
+#include "chips_calc.h"
 
 namespace poker {
 class EventBus;
@@ -29,8 +30,7 @@ private:
     cards_5_t community_cards;
     void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
     void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
-    void postSmallBlind();
-    void postBigBlind();
+    void applyBettingResult(seat_idx_t player_seat, math::BettingResult result);
 public:
     GameModel(
         std::shared_ptr<EventBus> event_bus,
@@ -39,6 +39,10 @@ public:
         std::shared_ptr<SeatingManager> players,
         std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
+
+    Street getStreet() const;
+    chips_t getBigBlind() const;
+    cards_5_t getCommunityCards() const;
 
     /* 开始一局游戏 */
     void startGame();
@@ -52,7 +56,8 @@ public:
     void enterPreflopStreet();
     /* 进入下一个阶段 */
     void advanceToNextStreet();
-
+    /* 开始下注轮 */
+    void startBettingRound();
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 };
 } // namespace poker
