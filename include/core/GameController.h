@@ -23,7 +23,8 @@ public:
     void startGame();
     /* 进入 Pre-flop 阶段 */
     void enterPreflopStreet();
-
+    /* 开始下注轮 */
+    void startBettingRound();
 };
 
 } // namespace poker

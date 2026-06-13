@@ -13,7 +13,6 @@ GameController::GameController(
 GameController::~GameController() = default;
 
 void GameController::startGame() {
-    event_bus->publish(Event::GameStarted{});
     game_model->startGame();
     game_model->dealHoleCards();
     enterPreflopStreet();
@@ -28,10 +27,14 @@ void GameController::enterPreflopStreet() {
         });
         // 发放公共牌
         game_model->dealCommunityCards();
+        // 开始下注轮
+        startBettingRound();
         // 移至下一阶段
         game_model->advanceToNextStreet();
     }
 }
 
-
+void GameController::startBettingRound() {
+    game_model->startBettingRound();
+}
 } // namespace poker

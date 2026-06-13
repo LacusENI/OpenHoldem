@@ -28,7 +28,7 @@ int main() {
     seating_manager->addNewPlayer();
 
     event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
-        spdlog::info("Game Started");
+        spdlog::info(std::format("Game Started: Btn=#{}", event.btn_seat));
     });
     event_bus->subscribe<Event::GameEnded>([](const Event::GameEnded&) {
         spdlog::info("Game Ended");
@@ -44,7 +44,9 @@ int main() {
        std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
        spdlog::info(std::format("Blind Posted: Player#{} Chips={} ({})", event.seat, event.amount, blind_type));
     });
-
+    event_bus->subscribe<Event::BettingRoundStarted>([](const Event::BettingRoundStarted& event) {
+       spdlog::info(std::format("Betting Round Started: First actor -> Player#{}", event.first_actor_seat));
+    });
     game_controller.startGame();
 
     return 0;

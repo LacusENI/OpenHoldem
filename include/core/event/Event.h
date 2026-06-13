@@ -29,6 +29,10 @@ struct CommunityCardsDealt {
     cards_5_t community_cards;
 };
 
+struct BettingRoundStarted {
+    seat_idx_t first_actor_seat;
+};
+
 struct GameEnded {
     chips_t pot;
 };

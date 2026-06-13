@@ -53,6 +53,9 @@ void GameModel::startGame() {
     deck->shuffle();
     pot_manager->clearPot();
     betting_round->onGameStarted(seating_manager->getPlayerCount());
+    event_bus->publish(Event::GameStarted{
+        seating_manager->getBtnPosition()
+    });
 }
 
 void GameModel::dealHoleCards() {
@@ -132,5 +135,8 @@ void GameModel::startBettingRound() {
         seating_manager->getPreflopFirstPosition() :
         seating_manager->getPostflopFirstPosition();
     betting_round->onRoundStarted(first_actor_seat);
+    event_bus->publish(Event::BettingRoundStarted{
+        first_actor_seat
+    });
 }
 } // namespace poker
