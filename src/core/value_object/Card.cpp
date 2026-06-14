@@ -49,6 +49,23 @@ std::string to_string(Card card) {
     return to_string(card.suit) + to_string(card.rank);
 }
 
+std::string to_string(const cards_2_t& cards) {
+    return std::format("[{}, {}]", to_string(cards[0]), to_string(cards[1]));
+}
+std::string to_string(const cards_5_t& cards) {
+    return std::format("[{}, {}, {}, {}, {}]",
+        to_string(cards[0]), to_string(cards[1]),
+        to_string(cards[2]), to_string(cards[3]),
+        to_string(cards[4]));
+}
+std::string to_string(const cards_7_t& cards) {
+    return std::format("[{}, {}, {}, {}, {}, {}, {}]",
+        to_string(cards[0]), to_string(cards[1]),
+        to_string(cards[2]), to_string(cards[3]),
+        to_string(cards[4]), to_string(cards[5]),
+        to_string(cards[6]));
+}
+
 std::ostream& operator<<(std::ostream& os, Suit suit) {
     return os << to_string(suit);
 }
@@ -58,6 +75,16 @@ std::ostream& operator<<(std::ostream& os, Rank rank) {
 }
 
 std::ostream& operator<<(std::ostream& os, Card card){
-    return os << std::format("Card(\"{}\")", to_string(card));
+    return os << to_string(card);
+}
+
+std::ostream& operator<<(std::ostream& os, const cards_2_t& cards) {
+    return os << to_string(cards);
+}
+std::ostream& operator<<(std::ostream& os, const cards_5_t& cards) {
+    return os << to_string(cards);
+}
+std::ostream& operator<<(std::ostream& os, const cards_7_t& cards) {
+    return os << to_string(cards);
 }
 } // namespace poker

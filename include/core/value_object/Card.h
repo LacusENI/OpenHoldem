@@ -62,7 +62,13 @@ using cards_5_t = std::array<Card, 5>;
 std::string to_string(Suit suit);
 std::string to_string(Rank rank);
 std::string to_string(Card card);
+std::string to_string(const cards_2_t& cards);
+std::string to_string(const cards_5_t& cards);
+std::string to_string(const cards_7_t& cards);
 std::ostream& operator<<(std::ostream& os, Suit suit);
 std::ostream& operator<<(std::ostream& os, Rank rank);
 std::ostream& operator<<(std::ostream& os, Card card);
-} // namespace holdem
+std::ostream& operator<<(std::ostream& os, const cards_2_t& cards);
+std::ostream& operator<<(std::ostream& os, const cards_5_t& cards);
+std::ostream& operator<<(std::ostream& os, const cards_7_t& cards);
+} // namespace poker

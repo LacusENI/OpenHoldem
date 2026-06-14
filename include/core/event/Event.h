@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include <vector>
 
 #include "Card.h"
 #include "GameTypes.h"
@@ -31,6 +32,18 @@ struct CommunityCardsDealt {
 
 struct BettingRoundStarted {
     seat_idx_t first_actor_seat;
+};
+
+struct AwaitPlayerInput {
+    seat_idx_t actor_seat;
+    chips_t player_chips;
+    chips_t player_bet;
+    chips_t round_bet;
+    chips_t min_raise_delta;
+};
+
+struct ShowdownCompleted {
+    std::vector<cards_2_t> hole_cards_list;
 };
 
 struct GameEnded {

@@ -15,26 +15,48 @@ GameController::~GameController() = default;
 void GameController::startGame() {
     game_model->startGame();
     game_model->dealHoleCards();
-    enterPreflopStreet();
+    game_model->enterPreflopStreet();
+    startStreet();
 }
 
-void GameController::enterPreflopStreet() {
-    game_model->enterPreflopStreet();
-    game_model->postForcedBlind();
-    while (game_model->getStreet() != Street::AWARD) {
-        event_bus->publish(Event::StreetStarted{
-            game_model->getStreet()
-        });
-        // 发放公共牌
-        game_model->dealCommunityCards();
-        // 开始下注轮
-        startBettingRound();
-        // 移至下一阶段
-        game_model->advanceToNextStreet();
+void GameController::startStreet() {
+    event_bus->publish(Event::StreetStarted{
+        game_model->getStreet()
+    });
+    if (game_model->getStreet() == Street::PREFLOP) {
+        game_model->postForcedBlind();
     }
+    // 发放公共牌
+    game_model->dealCommunityCards();
+    // 开始下注轮
+    startBettingRound();
 }
 
 void GameController::startBettingRound() {
     game_model->startBettingRound();
+    awaitPlayerInput();
+    finishBettingRound();
+}
+
+void GameController::awaitPlayerInput() {
+    game_model->awaitPlayerInput();
+}
+
+void GameController::finishBettingRound() {
+    advanceToNextStreet();
+}
+
+void GameController::advanceToNextStreet() {
+    game_model->advanceToNextStreet();
+    if (game_model->getStreet() != Street::AWARD) {
+        startStreet();
+    }
+    else {
+        enterShowdownStreet();
+    }
+}
+
+void GameController::enterShowdownStreet() {
+    game_model->processShowdown();
 }
 } // namespace poker

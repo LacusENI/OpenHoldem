@@ -28,25 +28,41 @@ int main() {
     seating_manager->addNewPlayer();
 
     event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
-        spdlog::info(std::format("Game Started: Btn=#{}", event.btn_seat));
+        spdlog::info(std::format("[Game] Game Started | btn_seat={}",
+            event.btn_seat));
     });
     event_bus->subscribe<Event::GameEnded>([](const Event::GameEnded&) {
-        spdlog::info("Game Ended");
+        spdlog::info("[Game] Game Ended");
     });
     event_bus->subscribe<Event::StreetStarted>([](const Event::StreetStarted& event) {
-        spdlog::info(std::format("Street Started: {}", to_string(event.street)));
+        spdlog::info(std::format("[Game] Street Started | street={}",
+            to_string(event.street)));
     });
     event_bus->subscribe<Event::HoleCardsDealt>([](const Event::HoleCardsDealt& event) {
-       spdlog::info(std::format("Hole Cards Dealt: Player#{} -> {} {}",
-           event.player_seat, to_string(event.hole_cards[0]), to_string(event.hole_cards[1])));
+        spdlog::info(std::format("[Game] Hole Cards Dealt | player_seat={} hole_cards={}",
+           event.player_seat, to_string(event.hole_cards)));
+    });
+    event_bus->subscribe<Event::CommunityCardsDealt>([](const Event::CommunityCardsDealt& event) {
+       spdlog::info(std::format("[Game] Community Cards Dealt | community_cards={}",
+           to_string(event.community_cards)));
     });
     event_bus->subscribe<Event::BlindPosted>([](const Event::BlindPosted& event) {
-       std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
-       spdlog::info(std::format("Blind Posted: Player#{} Chips={} ({})", event.seat, event.amount, blind_type));
+        std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
+        spdlog::info(std::format("[Game] Blind Posted({}) | seat={} amount={} ",
+           blind_type, event.seat, event.amount));
     });
     event_bus->subscribe<Event::BettingRoundStarted>([](const Event::BettingRoundStarted& event) {
-       spdlog::info(std::format("Betting Round Started: First actor -> Player#{}", event.first_actor_seat));
+        spdlog::info(std::format("[Game] Betting Round Started | first_actor_seat={}",
+           event.first_actor_seat));
     });
+    event_bus->subscribe<Event::AwaitPlayerInput>([](const Event::AwaitPlayerInput& event) {
+        spdlog::info(std::format("[Game] Await Player Input | actor_seat={}",
+           event.actor_seat));
+    });
+    event_bus->subscribe<Event::ShowdownCompleted>([](const Event::ShowdownCompleted& event) {
+        spdlog::info("[Game] Showdown Completed");
+    });
+
     game_controller.startGame();
 
     return 0;

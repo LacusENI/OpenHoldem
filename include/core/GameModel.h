@@ -43,6 +43,7 @@ public:
     Street getStreet() const;
     chips_t getBigBlind() const;
     cards_5_t getCommunityCards() const;
+    seat_idx_t getActorSeat() const;
 
     /* 开始一局游戏 */
     void startGame();
@@ -58,8 +59,10 @@ public:
     void advanceToNextStreet();
     /* 开始下注轮 */
     void startBettingRound();
-
-
+    /* 等待玩家输入 */
+    void awaitPlayerInput();
+    /* 处理摊牌 */
+    void processShowdown();
 
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 };

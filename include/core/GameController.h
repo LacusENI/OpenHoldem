@@ -21,10 +21,18 @@ public:
 
     /* 开始一局游戏 */
     void startGame();
-    /* 进入 Pre-flop 阶段 */
-    void enterPreflopStreet();
+    /* 开始一个阶段 */
+    void startStreet();
     /* 开始下注轮 */
     void startBettingRound();
+    /* 等待玩家输入 */
+    void awaitPlayerInput();
+    /* 完成下注轮 */
+    void finishBettingRound();
+    /* 移至下一个阶段 */
+    void advanceToNextStreet();
+    /* 进入摊牌阶段 */
+    void enterShowdownStreet();
 };
 
 } // namespace poker

@@ -48,6 +48,12 @@ cards_5_t GameModel::getCommunityCards() const {
     return community_cards;
 }
 
+seat_idx_t GameModel::getActorSeat() const {
+    return betting_round->getActorSeat();
+}
+
+
+
 void GameModel::startGame() {
     street = Street::IDLE;
     deck->shuffle();
@@ -60,7 +66,7 @@ void GameModel::startGame() {
 
 void GameModel::dealHoleCards() {
     for (Player& player : seating_manager->getPlayerList()) {
-        cards_2_t hole_cards = {deck->deal(), deck->deal()};
+        cards_2_t hole_cards = { deck->deal(), deck->deal() };
         player.hole_cards = hole_cards;
         event_bus->publish(Event::HoleCardsDealt{
             .player_seat = player.position,
@@ -138,5 +144,26 @@ void GameModel::startBettingRound() {
     event_bus->publish(Event::BettingRoundStarted{
         first_actor_seat
     });
+}
+
+void GameModel::awaitPlayerInput() {
+    seat_idx_t actor_seat = betting_round->getActorSeat();
+    const Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
+    math::BettingContext context = betting_round->getBettingContext(actor.chips);
+    event_bus->publish(Event::AwaitPlayerInput{
+        actor_seat,
+        context.player_chips,
+        context.player_bet,
+        context.round_bet,
+        context.min_raise_delta
+    });
+}
+
+void GameModel::processShowdown() {
+    std::vector<cards_2_t> hole_cards_list;
+    for (const Player& player: seating_manager->getPlayerList()) {
+        hole_cards_list.push_back(player.hole_cards);
+    }
+    event_bus->publish(Event::ShowdownCompleted{hole_cards_list});
 }
 } // namespace poker
