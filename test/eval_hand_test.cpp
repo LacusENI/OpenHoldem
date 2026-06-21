@@ -3,7 +3,7 @@
 #include "eval_hand.h"
 
 using namespace poker;
-using namespace poker::math;
+using namespace poker::algo;
 using namespace poker::internal::eval_hand;
 
 // 测试生成的组合的数量是否正确

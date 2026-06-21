@@ -30,7 +30,7 @@ void BettingRound::onRoundStarted(seat_idx_t start_position) {
     round_tracker->onRoundStarted();
 }
 
-math::BettingContext BettingRound::getBettingContext(chips_t actor_chips) const {
+algo::BettingContext BettingRound::getBettingContext(chips_t actor_chips) const {
     return {
         .player_chips = actor_chips,
         .player_bet = getPlayerBetAtSeat(actor_seat),
@@ -39,7 +39,7 @@ math::BettingContext BettingRound::getBettingContext(chips_t actor_chips) const 
     };
 }
 
-void BettingRound::applyBettingResult(const math::BettingResult& result) {
+void BettingRound::applyBettingResult(const algo::BettingResult& result) {
     player_bets[getActorSeat()] = result.player_bet;
     round_bet = result.round_bet;
     min_raise_delta = result.min_raise_delta;

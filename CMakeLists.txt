@@ -10,14 +10,14 @@ find_package(spdlog CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
+        include/core/algo/chips_calc.h
+        include/core/algo/eval_hand.h
         include/core/event/Event.h
         include/core/event/EventBus.h
         include/core/interface/ILogger.h
-        include/core/math/chips_calc.h
-        include/core/math/eval_hand.h
-        include/core/value_object/Card.h
-        include/core/value_object/Deck.h
-        include/core/value_object/GameTypes.h
+        include/core/types/Card.h
+        include/core/types/Deck.h
+        include/core/types/GameTypes.h
         include/core/BettingRound.h
         include/core/GameController.h
         include/core/GameModel.h
@@ -26,24 +26,24 @@ add_library(poker_core
         include/core/SeatingManager.h
         include/core/ShowdownHandler.h
 
-        src/core/math/chips_calc.cpp
-        src/core/math/eval_hand.cpp
-        src/core/value_object/Card.cpp
-        src/core/value_object/Deck.cpp
-        src/core/value_object/HandValue.cpp
+        src/core/algo/chips_calc.cpp
+        src/core/algo/eval_hand.cpp
+        src/core/types/Card.cpp
+        src/core/types/Deck.cpp
+        src/core/types/HandValue.cpp
         src/core/BettingRound.cpp
         src/core/GameController.cpp
         src/core/GameModel.cpp
         src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
-        src/core/value_object/GameTypes.cpp
+        src/core/types/GameTypes.cpp
 )
 
 target_include_directories(poker_core PUBLIC
         include/core/event
-        include/core/math
-        include/core/value_object
+        include/core/algo
+        include/core/types
         include/core
 )
 

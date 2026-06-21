@@ -32,7 +32,7 @@ private:
 
     void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
     void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
-    void applyBettingResult(seat_idx_t player_seat, math::BettingResult result);
+    void applyBettingResult(seat_idx_t player_seat, algo::BettingResult result);
 public:
     GameModel(
         std::shared_ptr<EventBus> event_bus,

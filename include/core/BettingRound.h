@@ -33,8 +33,8 @@ public:
 
     void onGameStarted(int player_count);
     void onRoundStarted(seat_idx_t start_position);
-    math::BettingContext getBettingContext(chips_t actor_chips) const;
-    void applyBettingResult(const math::BettingResult& result);
+    algo::BettingContext getBettingContext(chips_t actor_chips) const;
+    void applyBettingResult(const algo::BettingResult& result);
     void processForcedBlind(seat_idx_t sb_seat, seat_idx_t bb_seat, chips_t big_blind);
     void advanceToNextActor(seat_idx_t next_actor_seat);
     bool isRoundFinished() const;

@@ -26,7 +26,7 @@ void GameModel::takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips) {
     seating_manager->getPlayerAtSeat(player_seat).win(chips);
 }
 
-void GameModel::applyBettingResult(seat_idx_t player_seat, math::BettingResult result) {
+void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult result) {
     if (result.is_target_bet_valid) {
         takePlayerChipsToPot(player_seat, result.bet_delta);
         betting_round->applyBettingResult(result);
@@ -158,7 +158,7 @@ void GameModel::startBettingRound() {
 void GameModel::awaitPlayerInput() {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
-    math::BettingContext context = betting_round->getBettingContext(actor.chips);
+    algo::BettingContext context = betting_round->getBettingContext(actor.chips);
     event_bus->publish(Event::AwaitPlayerInput{
         actor_seat,
         context.player_chips,
@@ -176,9 +176,9 @@ void GameModel::advanceToNextActor() {
 void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
-    math::BettingContext context = betting_round->getBettingContext(actor.chips);
-    math::BettingInput input = { event.target_bet, event.is_fold };
-    math::BettingResult result = math::process_betting(context, input);
+    algo::BettingContext context = betting_round->getBettingContext(actor.chips);
+    algo::BettingInput input = { event.target_bet, event.is_fold };
+    algo::BettingResult result = algo::process_betting(context, input);
     takePlayerChipsToPot(getActorSeat(), result.bet_delta);
     betting_round->applyBettingResult(result);
 }
@@ -190,7 +190,7 @@ void GameModel::processShowdown() {
     for (const Player& player : seating_manager->getPlayerList()) {
         if (player.isActive()) {
             join_hole_cards(seven_cards, player.hole_cards);
-            HandValue hand_value = math::eval_hand(seven_cards);
+            HandValue hand_value = algo::eval_hand(seven_cards);
             event.hand_values.push_back(hand_value);
             event.active_players.push_back(player.position);
             event.hole_cards.push_back(player.hole_cards);

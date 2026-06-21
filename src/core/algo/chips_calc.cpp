@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace poker::math {
+namespace poker::algo {
 BettingResult process_betting(BettingContext context, BettingInput input) {
     BettingResult result;
     result.bet_delta = input.target_bet - context.player_bet;

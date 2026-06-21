@@ -3,7 +3,7 @@
 #include "Card.h"
 #include "HandValue.h"
 
-namespace poker::math {
+namespace poker::algo {
 /**
  * 计算该玩家的手牌大小
  * @param seven_cards 5张公共牌+2张底牌

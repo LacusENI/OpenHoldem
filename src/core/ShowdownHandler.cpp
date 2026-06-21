@@ -21,7 +21,7 @@ std::vector<std::pair<seat_idx_t, HandValue>> ShowdownHandler::evalHandValues(
     for (const Player& player : players) {
         if (player.isActive()) {
             join_hole_cards(seven_cards, player.hole_cards);
-            HandValue hand_value = math::eval_hand(seven_cards);
+            HandValue hand_value = algo::eval_hand(seven_cards);
             result.emplace_back(player.position, hand_value);
         }
     }

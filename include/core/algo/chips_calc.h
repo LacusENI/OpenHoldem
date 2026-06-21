@@ -2,7 +2,7 @@
 
 #include "GameTypes.h"
 
-namespace poker::math {
+namespace poker::algo {
 
 struct BettingContext {
     chips_t player_chips;

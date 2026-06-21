@@ -3,7 +3,7 @@
 #include "chips_calc.h"
 
 using namespace poker;
-using namespace poker::math;
+using namespace poker::algo;
 
 TEST(ProcessBettingTest, Bet) {
     BettingContext context = {

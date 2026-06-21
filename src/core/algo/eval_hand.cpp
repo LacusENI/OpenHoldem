@@ -128,7 +128,7 @@ HandType eval_hand_type(const cards_5_t& hand5, const HandCounts& counts) {
 }
 } // namespace poker::internal::eval_hand
 
-namespace poker::math {
+namespace poker::algo {
 HandValue eval_hand(cards_7_t seven_cards) {
     using namespace internal::eval_hand;
 
