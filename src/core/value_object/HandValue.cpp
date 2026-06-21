@@ -43,4 +43,19 @@ HandValue HandValue::build(HandType hand_type, std::vector<Rank> ranks) {
     }
     return HandValue(handValue);
 }
+
+std::string to_string(HandValue hand_value) {
+    return std::format("{}|{} {} {} {} {}",
+        to_string(hand_value.getHandType()),
+        to_string(hand_value.getRank(0)),
+        to_string(hand_value.getRank(1)),
+        to_string(hand_value.getRank(2)),
+        to_string(hand_value.getRank(3)),
+        to_string(hand_value.getRank(4))
+    );
+}
+
+std::ostream& operator<<(std::ostream& os, const HandValue& hand_value) {
+    return os << to_string(hand_value);
+}
 } // namespace poker

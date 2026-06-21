@@ -2,6 +2,8 @@
 
 #include <memory>
 
+#include "Event.h"
+
 namespace poker {
 class EventBus;
 class GameModel;
@@ -19,6 +21,9 @@ public:
         std::unique_ptr<GameModel> model);
     ~GameController();
 
+    /* 订阅事件 */
+    void subscribe();
+
     /* 开始一局游戏 */
     void startGame();
     /* 开始一个阶段 */
@@ -27,8 +32,12 @@ public:
     void startBettingRound();
     /* 等待玩家输入 */
     void awaitPlayerInput();
+    /* 询问玩家行动 */
+    void onAwaitPlayerInput(const Event::AwaitPlayerInput& event);
+    /* 处理玩家输入 */
+    void onPlayerInputSubmitted(const Event::PlayerInputSubmitted& event);
     /* 完成下注轮 */
-    void finishBettingRound();
+    void closeBettingRound();
     /* 移至下一个阶段 */
     void advanceToNextStreet();
     /* 进入摊牌阶段 */

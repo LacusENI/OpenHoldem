@@ -62,7 +62,7 @@ int main() {
     event_bus->subscribe<Event::ShowdownCompleted>([](const Event::ShowdownCompleted& event) {
         spdlog::info("[Game] Showdown Completed");
     });
-
+    game_controller.subscribe();
     game_controller.startGame();
 
     return 0;

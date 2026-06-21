@@ -73,4 +73,7 @@ public:
      */
     HandValue static build(HandType hand_type, std::vector<Rank> ranks);
 };
+
+std::string to_string(HandValue hand_value);
+std::ostream& operator<<(std::ostream& os, const HandValue& hand_value);
 } // namespace poker

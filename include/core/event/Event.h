@@ -4,6 +4,7 @@
 
 #include "Card.h"
 #include "GameTypes.h"
+#include "HandValue.h"
 
 namespace poker {
 namespace Event {
@@ -42,8 +43,24 @@ struct AwaitPlayerInput {
     chips_t min_raise_delta;
 };
 
+struct PlayerInputSubmitted {
+    chips_t target_bet;
+    bool is_fold;
+};
+
+struct PlayerActed {
+    seat_idx_t actor_seat;
+    ActionType action_type;
+};
+
 struct ShowdownCompleted {
-    std::vector<cards_2_t> hole_cards_list;
+    std::vector<seat_idx_t> active_players;
+    std::vector<cards_2_t> hole_cards;
+    std::vector<HandValue> hand_values;
+};
+
+struct WinnerDeclared {
+    std::vector<std::pair<seat_idx_t, chips_t>> winners_and_awards;
 };
 
 struct GameEnded {

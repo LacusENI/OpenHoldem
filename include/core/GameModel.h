@@ -6,6 +6,7 @@
 #include "Card.h"
 #include "GameTypes.h"
 #include "chips_calc.h"
+#include "Event.h"
 
 namespace poker {
 class EventBus;
@@ -28,6 +29,7 @@ private:
     Street street = Street::IDLE; // 游戏状态机
     chips_t big_blind = 10;      // 大盲注额
     cards_5_t community_cards;
+
     void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
     void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
     void applyBettingResult(seat_idx_t player_seat, math::BettingResult result);
@@ -44,6 +46,7 @@ public:
     chips_t getBigBlind() const;
     cards_5_t getCommunityCards() const;
     seat_idx_t getActorSeat() const;
+    bool isRoundFinished() const;
 
     /* 开始一局游戏 */
     void startGame();
@@ -61,9 +64,12 @@ public:
     void startBettingRound();
     /* 等待玩家输入 */
     void awaitPlayerInput();
+    /* 移至下一个行动玩家 */
+    void advanceToNextActor();
+    /* 处理玩家输入 */
+    void processPlayerInput(const Event::PlayerInputSubmitted& event);
     /* 处理摊牌 */
     void processShowdown();
-
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 };
 } // namespace poker

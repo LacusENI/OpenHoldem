@@ -3,10 +3,19 @@
 #include "Event.h"
 #include "EventBus.h"
 #include "Deck.h"
+#include "eval_hand.h"
 #include "SeatingManager.h"
 #include "PotManager.h"
 
 namespace poker {
+void join_community_cards(cards_7_t& cards7, const cards_5_t& cards5) {
+    std::ranges::copy(cards5, cards7.begin());
+}
+
+void join_hole_cards(cards_7_t& cards7, const cards_2_t& cards2) {
+    std::ranges::copy(cards2, cards7.begin() + 2);
+}
+
 void GameModel::takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips) {
     seating_manager->getPlayerAtSeat(player_seat).bet(chips);
     pot_manager->addChips(chips);
@@ -52,6 +61,9 @@ seat_idx_t GameModel::getActorSeat() const {
     return betting_round->getActorSeat();
 }
 
+bool GameModel::isRoundFinished() const {
+    return betting_round->isRoundFinished();
+}
 
 
 void GameModel::startGame() {
@@ -119,9 +131,6 @@ void GameModel::postForcedBlind() {
 
 void GameModel::enterPreflopStreet() {
     street = Street::PREFLOP;
-    event_bus->publish(Event::StreetStarted{
-        .street = street
-    });
 }
 
 void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
@@ -159,11 +168,34 @@ void GameModel::awaitPlayerInput() {
     });
 }
 
+void GameModel::advanceToNextActor() {
+    seat_idx_t next_actor_seat = seating_manager->nextPositionToAct(betting_round->getActorSeat());
+    betting_round->advanceToNextActor(next_actor_seat);
+}
+
+void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
+    seat_idx_t actor_seat = betting_round->getActorSeat();
+    const Player& actor = seating_manager->getPlayerAtSeat(actor_seat);
+    math::BettingContext context = betting_round->getBettingContext(actor.chips);
+    math::BettingInput input = { event.target_bet, event.is_fold };
+    math::BettingResult result = math::process_betting(context, input);
+    takePlayerChipsToPot(getActorSeat(), result.bet_delta);
+    betting_round->applyBettingResult(result);
+}
+
 void GameModel::processShowdown() {
-    std::vector<cards_2_t> hole_cards_list;
-    for (const Player& player: seating_manager->getPlayerList()) {
-        hole_cards_list.push_back(player.hole_cards);
+    Event::ShowdownCompleted event;
+    cards_7_t seven_cards;
+    join_community_cards(seven_cards, community_cards);
+    for (const Player& player : seating_manager->getPlayerList()) {
+        if (player.isActive()) {
+            join_hole_cards(seven_cards, player.hole_cards);
+            HandValue hand_value = math::eval_hand(seven_cards);
+            event.hand_values.push_back(hand_value);
+            event.active_players.push_back(player.position);
+            event.hole_cards.push_back(player.hole_cards);
+        }
     }
-    event_bus->publish(Event::ShowdownCompleted{hole_cards_list});
+    event_bus->publish(event);
 }
 } // namespace poker
