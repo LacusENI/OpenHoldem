@@ -4,8 +4,8 @@
 #include "EventBus.h"
 #include "Deck.h"
 #include "eval_hand.h"
-#include "SeatingManager.h"
-#include "PotManager.h"
+#include "Table.h"
+#include "Pot.h"
 
 namespace poker {
 void join_community_cards(cards_7_t& cards7, const cards_5_t& cards5) {
@@ -36,8 +36,8 @@ void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult r
 GameModel::GameModel(
     std::shared_ptr<EventBus> event_bus,
     std::unique_ptr<IDeck> deck,
-    std::shared_ptr<PotManager> pot_manager,
-    std::shared_ptr<SeatingManager> seating_manager,
+    std::shared_ptr<Pot> pot_manager,
+    std::shared_ptr<Table> seating_manager,
     std::unique_ptr<BettingRound> betting_round
     ) : event_bus(std::move(event_bus)), deck(std::move(deck)), seating_manager(std::move(seating_manager)),
         pot_manager(std::move(pot_manager)),
@@ -72,7 +72,7 @@ void GameModel::startGame() {
     pot_manager->clearPot();
     betting_round->onGameStarted(seating_manager->getPlayerCount());
     event_bus->publish(Event::GameStarted{
-        seating_manager->getBtnPosition()
+        seating_manager->getBtnSeat()
     });
 }
 
@@ -111,19 +111,19 @@ void GameModel::dealCommunityCards() {
 
 void GameModel::postForcedBlind() {
     // Small Blind
-    seat_idx_t sb_seat = seating_manager->getSbPosition();
+    seat_idx_t sb_seat = seating_manager->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
     event_bus->publish(Event::BlindPosted{
-        .seat = seating_manager->getSbPosition(),
+        .seat = seating_manager->getSbSeat(),
         .amount = big_blind / 2,
         .is_big_blind = false
     });
     // Big Blind
-    seat_idx_t bb_seat = seating_manager->getBbPosition();
+    seat_idx_t bb_seat = seating_manager->getBbSeat();
     takePlayerChipsToPot(bb_seat, big_blind);
     betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
     event_bus->publish(Event::BlindPosted{
-        .seat = seating_manager->getBbPosition(),
+        .seat = seating_manager->getBbSeat(),
         .amount = big_blind,
         .is_big_blind = true
     });
@@ -147,8 +147,8 @@ void GameModel::advanceToNextStreet() {
 
 void GameModel::startBettingRound() {
     seat_idx_t first_actor_seat = (street == Street::PREFLOP) ?
-        seating_manager->getPreflopFirstPosition() :
-        seating_manager->getPostflopFirstPosition();
+        seating_manager->getPreflopFirstActorSeat() :
+        seating_manager->getPostflopFirstActorSeat();
     betting_round->onRoundStarted(first_actor_seat);
     event_bus->publish(Event::BettingRoundStarted{
         first_actor_seat

@@ -8,12 +8,12 @@ namespace poker {
 /**
  * @brief 玩家与座位管理类
  */
-class SeatingManager {
+class Table {
 private:
     std::vector<Player> players;
-    seat_idx_t btn_position = 0;
+    seat_idx_t btn_seat = 0;
 public:
-    SeatingManager() = default;
+    Table() = default;
     size_t getPlayerCount() const {
         return players.size();
     }
@@ -27,14 +27,14 @@ public:
         seat_idx_t position = players.size();
         players.emplace_back(position);
     }
-    void setBtnPosition(seat_idx_t new_btn_position) {
-        btn_position = new_btn_position;
+    void setBtnSeat(seat_idx_t new_btn_position) {
+        btn_seat = new_btn_position;
     }
-    seat_idx_t getBtnPosition() const {
-        return btn_position;
+    seat_idx_t getBtnSeat() const {
+        return btn_seat;
     }
-    void advanceBtnPosition() {
-        btn_position = nextPosition(btn_position);
+    void advanceBtnSeat() {
+        btn_seat = nextPosition(btn_seat);
     }
     const Player& getPlayerAtSeat(seat_idx_t position) const {
         return players.at(position);
@@ -52,20 +52,20 @@ public:
         }
         return players[next_pos].is_folded ? -1 : next_pos;
     }
-    seat_idx_t getSbPosition() const {
-        return (btn_position + 1) % static_cast<int>(players.size());
+    seat_idx_t getSbSeat() const {
+        return (btn_seat + 1) % static_cast<int>(players.size());
     }
-    seat_idx_t getBbPosition() const {
-        return (btn_position + 2) % static_cast<int>(players.size());
+    seat_idx_t getBbSeat() const {
+        return (btn_seat + 2) % static_cast<int>(players.size());
     }
-    seat_idx_t getUtgPosition() const {
-        return (btn_position + 3) % static_cast<int>(players.size());
+    seat_idx_t getUtgSeat() const {
+        return (btn_seat + 3) % static_cast<int>(players.size());
     }
-    seat_idx_t getPostflopFirstPosition() const {
-        return nextPositionToAct(btn_position);
+    seat_idx_t getPostflopFirstActorSeat() const {
+        return nextPositionToAct(btn_seat);
     }
-    seat_idx_t getPreflopFirstPosition() const {
-        return getUtgPosition();
+    seat_idx_t getPreflopFirstActorSeat() const {
+        return getUtgSeat();
     }
 };
 } // namespace poker

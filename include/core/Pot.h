@@ -5,11 +5,11 @@ namespace poker {
 /**
  * @brief 管理底池的类
  */
-class PotManager {
+class Pot {
 private:
     chips_t pot = 0;
 public:
-    PotManager() = default;
+    Pot() = default;
 
     /* 获取底池数额 */
     chips_t getPot() const { return pot; }

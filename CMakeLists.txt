@@ -21,23 +21,22 @@ add_library(poker_core
         include/core/BettingRound.h
         include/core/GameController.h
         include/core/GameModel.h
-        include/core/PotManager.h
+        include/core/Pot.h
         include/core/RoundTracker.h
-        include/core/SeatingManager.h
+        include/core/Table.h
         include/core/ShowdownHandler.h
 
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
         src/core/types/Card.cpp
         src/core/types/Deck.cpp
+        src/core/types/GameTypes.cpp
         src/core/types/HandValue.cpp
         src/core/BettingRound.cpp
         src/core/GameController.cpp
         src/core/GameModel.cpp
-        src/core/PotManager.cpp
         src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
-        src/core/types/GameTypes.cpp
 )
 
 target_include_directories(poker_core PUBLIC

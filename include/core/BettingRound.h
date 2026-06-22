@@ -7,8 +7,8 @@
 #include "GameTypes.h"
 
 namespace poker {
-class SeatingManager;
-class PotManager;
+class Table;
+class Pot;
 class RoundTracker;
 
 /**

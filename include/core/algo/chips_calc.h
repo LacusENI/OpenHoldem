@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "GameTypes.h"
 
 namespace poker::algo {
@@ -28,4 +30,5 @@ struct BettingResult {
 
 BettingResult process_betting(BettingContext context, BettingInput input);
 
+std::vector<chips_t> calculate_awards(int pot, int winners_n);
 } // namespace poker::math

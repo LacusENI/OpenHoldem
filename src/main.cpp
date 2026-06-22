@@ -4,8 +4,8 @@
 #include "Deck.h"
 #include "GameModel.h"
 #include "GameController.h"
-#include "PotManager.h"
-#include "SeatingManager.h"
+#include "Pot.h"
+#include "Table.h"
 #include "Event.h"
 #include "EventBus.h"
 
@@ -14,8 +14,8 @@ int main() {
 
     auto event_bus = std::make_shared<EventBus>();
     auto deck = std::make_unique<Deck>();
-    auto seating_manager = std::make_shared<SeatingManager>();
-    auto pot_manager = std::make_shared<PotManager>();
+    auto seating_manager = std::make_shared<Table>();
+    auto pot_manager = std::make_shared<Pot>();
     auto betting_round = std::make_unique<BettingRound>();
     auto game_model = std::make_unique<GameModel>(event_bus,
         std::move(deck), pot_manager, seating_manager, std::move(betting_round));
