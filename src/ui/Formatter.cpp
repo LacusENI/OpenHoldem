@@ -106,36 +106,36 @@ std::string format(const HandValue& hand_value) {
     return std::format("{}, {}", format(hand_type), description);
 }
 
-std::string format(const ActionType& action_type) {
-    switch (action_type) {
-    case ActionType::CALL:
+std::string format(const Action& action) {
+    switch (action) {
+    case Action::CALL:
         return "Call";
-    case ActionType::CHECK:
+    case Action::CHECK:
         return "Check";
-    case ActionType::RAISE:
+    case Action::RAISE:
         return "Raise";
-    case ActionType::BET:
+    case Action::BET:
         return "Bet";
-    case ActionType::FOLD:
+    case Action::FOLD:
         return "Fold";
-    case ActionType::ALL_IN:
+    case Action::ALL_IN:
         return "All-in";
     default:
         return "???";
     }
 }
 
-std::string format(const Street& state) {
-    switch (state) {
-    case Street::AWARD:
+std::string format(const Stage& stage) {
+    switch (stage) {
+    case Stage::SHOWDOWN:
         return "SHOWDOWN";
-    case Street::RIVER:
+    case Stage::RIVER:
         return "RIVER";
-    case Street::TURN:
+    case Stage::TURN:
         return "TURN";
-    case Street::FLOP:
+    case Stage::FLOP:
         return "FLOP";
-    case Street::PREFLOP:
+    case Stage::PREFLOP:
         return "PREFLOP";
     default:
         return "???";

@@ -23,7 +23,7 @@ struct BettingResult {
     chips_t player_bet;
     chips_t round_bet;
     chips_t min_raise_delta;
-    ActionType action_type;
+    Action action;
     bool is_target_bet_valid;
     bool has_sufficient_chips;
 };

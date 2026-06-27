@@ -13,39 +13,24 @@ GameController::GameController(
 
 GameController::~GameController() = default;
 
-void GameController::subscribe() {
+void GameController::subscribeEvents() {
     event_bus->subscribe<Event::AwaitPlayerInput>([this](const auto& event) {
         this->onAwaitPlayerInput(event);
     });
     event_bus->subscribe<Event::PlayerInputSubmitted>([this](const auto& event) {
-        this->onPlayerInputSubmitted(event);
+        this->handlePlayerInput(event);
     });
 }
 
 void GameController::startGame() {
     game_model->startGame();
-    game_model->dealHoleCards();
-    game_model->enterPreflopStreet();
-    startStreet();
-}
-
-void GameController::startStreet() {
-    event_bus->publish(Event::StreetStarted{
-        game_model->getStreet()
-    });
-    if (game_model->getStreet() == Street::PREFLOP) {
-        game_model->postForcedBlind();
-    }
-    // 发放公共牌
-    else {
-        game_model->dealCommunityCards();
-    }
-    // 开始下注轮
-    startBettingRound();
+    event_bus->publish(Event::GameStarted{});
+    enterStage(Stage::PREFLOP);
 }
 
 void GameController::startBettingRound() {
-    game_model->startBettingRound();
+    game_model->setupRoundStart();
+    event_bus->publish(Event::BettingRoundStarted{});
     awaitPlayerInput();
 }
 
@@ -57,10 +42,10 @@ void GameController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {
     event_bus->publish(Event::PlayerInputSubmitted{game_model->getBigBlind(), false});
 }
 
-void GameController::onPlayerInputSubmitted(const Event::PlayerInputSubmitted& event) {
+void GameController::handlePlayerInput(const Event::PlayerInputSubmitted& event) {
     game_model->processPlayerInput(event);
     if (game_model->isRoundFinished()) {
-        closeBettingRound();
+        handleRoundEnded();
     }
     else {
         game_model->advanceToNextActor();
@@ -68,21 +53,38 @@ void GameController::onPlayerInputSubmitted(const Event::PlayerInputSubmitted& e
     }
 }
 
-void GameController::closeBettingRound() {
-    advanceToNextStreet();
+void GameController::handleRoundEnded() {
+    event_bus->publish(Event::BettingRoundEnded{});
+    Stage stage = game_model->getCurrentStage();
+    enterStage(next_stage(stage));
 }
 
-void GameController::advanceToNextStreet() {
-    game_model->advanceToNextStreet();
-    if (game_model->getStreet() != Street::AWARD) {
-        startStreet();
+void GameController::processShowdown() {
+    game_model->revealHoleCards();
+
+}
+
+void GameController::processSettlement() {
+
+}
+
+void GameController::enterStage(Stage stage) {
+    game_model->setCurrentStage(stage);
+    event_bus->publish(Event::StageChanged{stage});
+    if (stage == Stage::IDLE) {}
+    else if (stage == Stage::PREFLOP) {
+        game_model->dealHoleCards();
+        game_model->postForcedBlind();
+        startBettingRound();
+    } else if (stage == Stage::SHOWDOWN) {
+        processShowdown();
+        enterStage(Stage::SETTLEMENT);
+    } else if (stage == Stage::SETTLEMENT) {
+        // TODO
     }
     else {
-        enterShowdownStreet();
+        game_model->dealCommunityCards();
+        startBettingRound();
     }
-}
-
-void GameController::enterShowdownStreet() {
-    game_model->processShowdown();
 }
 } // namespace poker

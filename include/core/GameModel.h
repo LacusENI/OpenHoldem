@@ -26,7 +26,7 @@ private:
     std::shared_ptr<Table> seating_manager;
     std::shared_ptr<BettingRound> betting_round;
 
-    Street street = Street::IDLE; // 游戏状态机
+    Stage current_stage = Stage::IDLE; // 游戏状态机
     chips_t big_blind = 10;      // 大盲注额
     cards_5_t community_cards;
 
@@ -42,7 +42,8 @@ public:
         std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 
-    Street getStreet() const;
+    Stage getCurrentStage() const;
+    void setCurrentStage(Stage next_street);
     chips_t getBigBlind() const;
     cards_5_t getCommunityCards() const;
     seat_idx_t getActorSeat() const;
@@ -61,7 +62,7 @@ public:
     /* 进入下一个阶段 */
     void advanceToNextStreet();
     /* 开始下注轮 */
-    void startBettingRound();
+    void setupRoundStart();
     /* 等待玩家输入 */
     void awaitPlayerInput();
     /* 移至下一个行动玩家 */
@@ -69,7 +70,7 @@ public:
     /* 处理玩家输入 */
     void processPlayerInput(const Event::PlayerInputSubmitted& event);
     /* 处理摊牌 */
-    void processShowdown();
+    void revealHoleCards();
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
 };
 } // namespace poker

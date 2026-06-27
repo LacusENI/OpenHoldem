@@ -22,12 +22,12 @@ public:
     ~GameController();
 
     /* 订阅事件 */
-    void subscribe();
+    void subscribeEvents();
 
     /* 开始一局游戏 */
     void startGame();
-    /* 开始一个阶段 */
-    void startStreet();
+    /* 进入指定阶段 */
+    void enterStage(Stage stage);
     /* 开始下注轮 */
     void startBettingRound();
     /* 等待玩家输入 */
@@ -35,13 +35,13 @@ public:
     /* 询问玩家行动 */
     void onAwaitPlayerInput(const Event::AwaitPlayerInput& event);
     /* 处理玩家输入 */
-    void onPlayerInputSubmitted(const Event::PlayerInputSubmitted& event);
+    void handlePlayerInput(const Event::PlayerInputSubmitted& event);
     /* 完成下注轮 */
-    void closeBettingRound();
-    /* 移至下一个阶段 */
-    void advanceToNextStreet();
-    /* 进入摊牌阶段 */
-    void enterShowdownStreet();
+    void handleRoundEnded();
+    /* 执行摊牌阶段 */
+    void processShowdown();
+    /* 执行结算阶段 */
+    void processSettlement();
 };
 
 } // namespace poker

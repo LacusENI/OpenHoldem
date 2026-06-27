@@ -45,8 +45,12 @@ GameModel::GameModel(
 
 GameModel::~GameModel() = default;
 
-Street GameModel::getStreet() const {
-    return street;
+Stage GameModel::getCurrentStage() const {
+    return current_stage;
+}
+
+void GameModel::setCurrentStage(Stage next_street) {
+    current_stage = next_street;
 }
 
 chips_t GameModel::getBigBlind() const {
@@ -67,13 +71,10 @@ bool GameModel::isRoundFinished() const {
 
 
 void GameModel::startGame() {
-    street = Street::IDLE;
+    current_stage = Stage::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
     betting_round->onGameStarted(seating_manager->getPlayerCount());
-    event_bus->publish(Event::GameStarted{
-        seating_manager->getBtnSeat()
-    });
 }
 
 void GameModel::dealHoleCards() {
@@ -88,18 +89,18 @@ void GameModel::dealHoleCards() {
 }
 
 void GameModel::dealCommunityCards() {
-    switch (street) {
-    case Street::PREFLOP:
+    switch (current_stage) {
+    case Stage::PREFLOP:
         break;
-    case Street::FLOP:
+    case Stage::FLOP:
         community_cards[0] = deck->deal();
         community_cards[1] = deck->deal();
         community_cards[2] = deck->deal();
         break;
-    case Street::TURN:
+    case Stage::TURN:
         community_cards[3] = deck->deal();
         break;
-    case Street::RIVER:
+    case Stage::RIVER:
         community_cards[4] = deck->deal();
         break;
     default: break;
@@ -130,7 +131,7 @@ void GameModel::postForcedBlind() {
 }
 
 void GameModel::enterPreflopStreet() {
-    street = Street::PREFLOP;
+    current_stage = Stage::PREFLOP;
 }
 
 void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
@@ -142,17 +143,14 @@ void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::ve
 }
 
 void GameModel::advanceToNextStreet() {
-    street = next_street(street);
+    current_stage = next_stage(current_stage);
 }
 
-void GameModel::startBettingRound() {
-    seat_idx_t first_actor_seat = (street == Street::PREFLOP) ?
+void GameModel::setupRoundStart() {
+    seat_idx_t first_actor_seat = (current_stage == Stage::PREFLOP) ?
         seating_manager->getPreflopFirstActorSeat() :
         seating_manager->getPostflopFirstActorSeat();
     betting_round->onRoundStarted(first_actor_seat);
-    event_bus->publish(Event::BettingRoundStarted{
-        first_actor_seat
-    });
 }
 
 void GameModel::awaitPlayerInput() {
@@ -181,10 +179,13 @@ void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
     algo::BettingResult result = algo::process_betting(context, input);
     takePlayerChipsToPot(getActorSeat(), result.bet_delta);
     betting_round->applyBettingResult(result);
+    event_bus->publish(Event::PlayerActed{
+        .actor_seat = actor_seat, .action = result.action
+    });
 }
 
-void GameModel::processShowdown() {
-    Event::ShowdownCompleted event;
+void GameModel::revealHoleCards() {
+    Event::HoleCardsRevealed event;
     cards_7_t seven_cards;
     join_community_cards(seven_cards, community_cards);
     for (const Player& player : seating_manager->getPlayerList()) {

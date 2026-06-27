@@ -6,14 +6,14 @@ namespace poker {
 using seat_idx_t = int; // 玩家座位
 using chips_t = int;    // 筹码数量
 
-enum class Street {
-    IDLE, PREFLOP, FLOP, TURN, RIVER, AWARD
+enum class Stage {
+    IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT
 };
 
-Street next_street(Street street);
-std::string to_string(Street street);
+Stage next_stage(Stage stage);
+std::string to_string(Stage stage);
 
-enum class ActionType {
+enum class Action {
     VOID,
     CALL,
     CHECK,
@@ -23,9 +23,5 @@ enum class ActionType {
     ALL_IN,
 };
 
-struct Action {
-    seat_idx_t actor_position;
-    ActionType type;
-    chips_t amount;
-};
+std::string to_string(Action action);
 } // namespace poker

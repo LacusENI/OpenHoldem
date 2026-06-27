@@ -17,7 +17,7 @@ TEST(ProcessBettingTest, Bet) {
         .is_fold = false,
     };
     BettingResult result = process_betting(context, input);
-    EXPECT_EQ(result.action_type, ActionType::BET);
+    EXPECT_EQ(result.action, Action::BET);
     EXPECT_EQ(result.bet_delta, 20);
     EXPECT_EQ(result.player_bet, 20);
     EXPECT_EQ(result.round_bet, 20);
@@ -38,7 +38,7 @@ TEST(ProcessBettingTest, Raise) {
         .is_fold = false,
     };
     BettingResult result = process_betting(context, input);
-    EXPECT_EQ(result.action_type, ActionType::RAISE);
+    EXPECT_EQ(result.action, Action::RAISE);
     EXPECT_EQ(result.bet_delta, 50);
     EXPECT_EQ(result.player_bet, 60);
     EXPECT_EQ(result.round_bet, 60);
@@ -59,7 +59,7 @@ TEST(ProcessBettingTest, Call) {
         .is_fold = false,
     };
     BettingResult result = process_betting(context, input);
-    EXPECT_EQ(result.action_type, ActionType::CALL);
+    EXPECT_EQ(result.action, Action::CALL);
     EXPECT_EQ(result.bet_delta, 30);
     EXPECT_EQ(result.player_bet, 50);
     EXPECT_EQ(result.round_bet, 50);
@@ -80,7 +80,7 @@ TEST(ProcessBettingTest, Check) {
         .is_fold = false
     };
     BettingResult result = process_betting(context, input);
-    EXPECT_EQ(result.action_type, ActionType::CHECK);
+    EXPECT_EQ(result.action, Action::CHECK);
     EXPECT_EQ(result.bet_delta, 0);
     EXPECT_EQ(result.player_bet, 10);
     EXPECT_EQ(result.round_bet, 10);
@@ -101,5 +101,5 @@ TEST(ProcessBettingTest, Fold) {
         .is_fold = true,
     };
     BettingResult result = process_betting(context, input);
-    EXPECT_EQ(result.action_type, ActionType::FOLD);
+    EXPECT_EQ(result.action, Action::FOLD);
 }

@@ -8,17 +8,15 @@
 
 namespace poker {
 namespace Event {
-struct GameStarted {
-    seat_idx_t btn_seat;
-};
+struct GameStarted {};
 
 struct HoleCardsDealt {
     seat_idx_t player_seat;
     cards_2_t hole_cards;
 };
 
-struct StreetStarted {
-    Street street;
+struct StageChanged {
+    Stage stage;
 };
 
 struct BlindPosted {
@@ -31,9 +29,9 @@ struct CommunityCardsDealt {
     cards_5_t community_cards;
 };
 
-struct BettingRoundStarted {
-    seat_idx_t first_actor_seat;
-};
+struct BettingRoundStarted {};
+
+struct BettingRoundEnded {};
 
 struct AwaitPlayerInput {
     seat_idx_t actor_seat;
@@ -50,17 +48,18 @@ struct PlayerInputSubmitted {
 
 struct PlayerActed {
     seat_idx_t actor_seat;
-    ActionType action_type;
+    Action action;
 };
 
-struct ShowdownCompleted {
+struct HoleCardsRevealed {
     std::vector<seat_idx_t> active_players;
     std::vector<cards_2_t> hole_cards;
     std::vector<HandValue> hand_values;
 };
 
 struct WinnerDeclared {
-    std::vector<std::pair<seat_idx_t, chips_t>> winners_and_awards;
+    std::vector<seat_idx_t> winners;
+    std::vector<chips_t> awards;
 };
 
 struct GameEnded {

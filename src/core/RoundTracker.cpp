@@ -10,14 +10,14 @@ void RoundTracker::onRoundStarted() {
     pending_players_count = players_can_act_count;
 }
 
-void RoundTracker::onPlayerActed(ActionType action) {
-    if (action == ActionType::RAISE) {
+void RoundTracker::onPlayerActed(Action action) {
+    if (action == Action::RAISE) {
         pending_players_count = players_can_act_count;
     } else {
         pending_players_count--;
     }
-    if (action == ActionType::FOLD) active_players_count--;
-    if (action == ActionType::FOLD || action == ActionType::ALL_IN) players_can_act_count--;
+    if (action == Action::FOLD) active_players_count--;
+    if (action == Action::FOLD || action == Action::ALL_IN) players_can_act_count--;
 }
 
 bool RoundTracker::isRoundFinished() const {

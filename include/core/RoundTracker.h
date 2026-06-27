@@ -15,7 +15,7 @@ public:
     RoundTracker() = default;
     void onGameStarted(int players_count);
     void onRoundStarted();
-    void onPlayerActed(ActionType action);
+    void onPlayerActed(Action action);
     /* 本此下注轮是否已结束 */
     bool isRoundFinished() const;
     /* 只剩下一名活跃玩家 */

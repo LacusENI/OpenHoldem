@@ -43,7 +43,7 @@ void BettingRound::applyBettingResult(const algo::BettingResult& result) {
     player_bets[getActorSeat()] = result.player_bet;
     round_bet = result.round_bet;
     min_raise_delta = result.min_raise_delta;
-    round_tracker->onPlayerActed(result.action_type);
+    round_tracker->onPlayerActed(result.action);
 }
 
 void BettingRound::processForcedBlind(seat_idx_t sb_seat, seat_idx_t bb_seat, chips_t big_blind) {

@@ -10,9 +10,8 @@ enum class Suit : uint8_t;
 class Card;
 enum class HandType;
 class HandValue;
-enum class ActionType;
-struct Action;
-enum class Street;
+enum class Action;
+enum class Stage;
 struct Player;
 }
 
@@ -27,9 +26,9 @@ std::string format(const HandType& hand_type);
 
 std::string format(const HandValue& hand_value);
 
-std::string format(const ActionType& action_type);
+std::string format(const Action& action);
 
-std::string format(const Street& state);
+std::string format(const Stage& stage);
 
 std::string format(const seat_idx_t& position);
 }
