@@ -3,7 +3,7 @@
 #include <typeindex>
 
 namespace poker {
-using Handler = std::function<void(const void *)>;
+using Handler = std::function<void(const void*)>;
 
 /**
  * @brief 事件总线
@@ -14,6 +14,7 @@ private:
         static std::unordered_map<std::type_index, std::vector<Handler>> handlers;
         return handlers;
     }
+
 public:
     /**
      * 订阅事件
@@ -22,9 +23,8 @@ public:
      */
     template <typename T>
     static void subscribe(std::function<void(const T&)> callback) {
-        getHandlers()[typeid(T)].push_back([callback](const void* eventPtr) {
-            callback(*static_cast<const T*>(eventPtr));
-        });
+        getHandlers()[typeid(T)].push_back(
+            [callback](const void* eventPtr) { callback(*static_cast<const T*>(eventPtr)); });
     }
 
     /**

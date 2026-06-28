@@ -8,14 +8,14 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
     result.bet_delta = input.target_bet - context.player_bet;
     result.player_bet = input.target_bet;
     result.round_bet = std::max(context.round_bet, input.target_bet);
-    result.min_raise_delta = std::max(context.min_raise_delta, input.target_bet - context.round_bet);
+    result.min_raise_delta =
+        std::max(context.min_raise_delta, input.target_bet - context.round_bet);
     result.action = Action::VOID;
     result.is_target_bet_valid = true;
     result.has_sufficient_chips = result.bet_delta <= context.player_chips;
     if (input.is_fold) {
         result.action = Action::FOLD;
-    }
-    else if (input.target_bet < context.player_bet) {
+    } else if (input.target_bet < context.player_bet) {
         result.is_target_bet_valid = false;
     } else if (input.target_bet == context.round_bet) {
         if (input.target_bet == context.player_bet) {
@@ -51,4 +51,4 @@ std::vector<chips_t> calculate_awards(int pot, int winners_n) {
     }
     return amounts;
 }
-} // namespace poker::math
+} // namespace poker::algo

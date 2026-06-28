@@ -1,11 +1,12 @@
 #include "GameModel.h"
+
 #include "BettingRound.h"
+#include "Deck.h"
 #include "Event.h"
 #include "EventBus.h"
-#include "Deck.h"
-#include "eval_hand.h"
-#include "Table.h"
 #include "Pot.h"
+#include "Table.h"
+#include "eval_hand.h"
 
 namespace poker {
 void join_community_cards(cards_7_t& cards7, const cards_5_t& cards5) {
@@ -33,15 +34,14 @@ void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult r
     }
 }
 
-GameModel::GameModel(
-    std::shared_ptr<EventBus> event_bus,
-    std::unique_ptr<IDeck> deck,
-    std::shared_ptr<Pot> pot_manager,
-    std::shared_ptr<Table> seating_manager,
-    std::unique_ptr<BettingRound> betting_round
-    ) : event_bus(std::move(event_bus)), deck(std::move(deck)), table(std::move(seating_manager)),
-        pot_manager(std::move(pot_manager)),
-        betting_round(std::move(betting_round)) {}
+GameModel::GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
+                     std::shared_ptr<Pot> pot_manager, std::shared_ptr<Table> seating_manager,
+                     std::unique_ptr<BettingRound> betting_round)
+    : event_bus(std::move(event_bus)),
+      deck(std::move(deck)),
+      table(std::move(seating_manager)),
+      pot_manager(std::move(pot_manager)),
+      betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
 
@@ -69,7 +69,6 @@ bool GameModel::isRoundFinished() const {
     return betting_round->isRoundFinished();
 }
 
-
 void GameModel::startGame() {
     current_stage = Stage::IDLE;
     deck->shuffle();
@@ -79,35 +78,32 @@ void GameModel::startGame() {
 
 void GameModel::dealHoleCards() {
     for (Player& player : table->getPlayerList()) {
-        cards_2_t hole_cards = { deck->deal(), deck->deal() };
+        cards_2_t hole_cards = {deck->deal(), deck->deal()};
         player.hole_cards = hole_cards;
-        event_bus->publish(Event::HoleCardsDealt{
-            .player_seat = player.position,
-            .hole_cards = hole_cards
-        });
+        event_bus->publish(
+            Event::HoleCardsDealt{.player_seat = player.position, .hole_cards = hole_cards});
     }
 }
 
 void GameModel::dealCommunityCards() {
     switch (current_stage) {
-    case Stage::PREFLOP:
-        break;
-    case Stage::FLOP:
-        community_cards[0] = deck->deal();
-        community_cards[1] = deck->deal();
-        community_cards[2] = deck->deal();
-        break;
-    case Stage::TURN:
-        community_cards[3] = deck->deal();
-        break;
-    case Stage::RIVER:
-        community_cards[4] = deck->deal();
-        break;
-    default: break;
+        case Stage::PREFLOP:
+            break;
+        case Stage::FLOP:
+            community_cards[0] = deck->deal();
+            community_cards[1] = deck->deal();
+            community_cards[2] = deck->deal();
+            break;
+        case Stage::TURN:
+            community_cards[3] = deck->deal();
+            break;
+        case Stage::RIVER:
+            community_cards[4] = deck->deal();
+            break;
+        default:
+            break;
     }
-    event_bus->publish(Event::CommunityCardsDealt{
-        community_cards
-    });
+    event_bus->publish(Event::CommunityCardsDealt{community_cards});
 }
 
 void GameModel::postForcedBlind() {
@@ -115,26 +111,21 @@ void GameModel::postForcedBlind() {
     seat_idx_t sb_seat = table->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
     event_bus->publish(Event::BlindPosted{
-        .seat = table->getSbSeat(),
-        .amount = big_blind / 2,
-        .is_big_blind = false
-    });
+        .seat = table->getSbSeat(), .amount = big_blind / 2, .is_big_blind = false});
     // Big Blind
     seat_idx_t bb_seat = table->getBbSeat();
     takePlayerChipsToPot(bb_seat, big_blind);
     betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
-    event_bus->publish(Event::BlindPosted{
-        .seat = table->getBbSeat(),
-        .amount = big_blind,
-        .is_big_blind = true
-    });
+    event_bus->publish(
+        Event::BlindPosted{.seat = table->getBbSeat(), .amount = big_blind, .is_big_blind = true});
 }
 
 void GameModel::enterPreflopStreet() {
     current_stage = Stage::PREFLOP;
 }
 
-void GameModel::distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners) {
+void GameModel::distributePot(const std::vector<chips_t>& amounts,
+                              const std::vector<seat_idx_t>& winners) {
     for (int i = 0; i < amounts.size(); i++) {
         seat_idx_t winner_seat = winners[i];
         takePotChipsToPlayer(winner_seat, amounts[i]);
@@ -147,9 +138,9 @@ void GameModel::advanceToNextStreet() {
 }
 
 void GameModel::setupRoundStart() {
-    seat_idx_t first_actor_seat = (current_stage == Stage::PREFLOP) ?
-        table->getPreflopFirstActorSeat() :
-        table->getPostflopFirstActorSeat();
+    seat_idx_t first_actor_seat = (current_stage == Stage::PREFLOP)
+                                      ? table->getPreflopFirstActorSeat()
+                                      : table->getPostflopFirstActorSeat();
     betting_round->onRoundStarted(first_actor_seat);
 }
 
@@ -157,13 +148,8 @@ void GameModel::awaitPlayerInput() {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = table->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    event_bus->publish(Event::AwaitPlayerInput{
-        actor_seat,
-        context.player_chips,
-        context.player_bet,
-        context.round_bet,
-        context.min_raise_delta
-    });
+    event_bus->publish(Event::AwaitPlayerInput{actor_seat, context.player_chips, context.player_bet,
+                                               context.round_bet, context.min_raise_delta});
 }
 
 void GameModel::advanceToNextActor() {
@@ -175,13 +161,11 @@ void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = table->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    algo::BettingInput input = { event.target_bet, event.is_fold };
+    algo::BettingInput input = {event.target_bet, event.is_fold};
     algo::BettingResult result = algo::process_betting(context, input);
     takePlayerChipsToPot(getActorSeat(), result.bet_delta);
     betting_round->applyBettingResult(result);
-    event_bus->publish(Event::PlayerActed{
-        .actor_seat = actor_seat, .action = result.action
-    });
+    event_bus->publish(Event::PlayerActed{.actor_seat = actor_seat, .action = result.action});
 }
 
 void GameModel::revealHoleCards() {

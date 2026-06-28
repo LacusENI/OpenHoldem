@@ -1,25 +1,22 @@
 #include "GameController.h"
+
+#include "BettingRound.h"
 #include "Event.h"
 #include "EventBus.h"
-#include "BettingRound.h"
 #include "GameModel.h"
 
 namespace poker {
-GameController::GameController(
-    std::shared_ptr<EventBus> event_bus,
-    std::unique_ptr<GameModel> model)
-    : event_bus(std::move(event_bus)), game_model(std::move(model)) {
-}
+GameController::GameController(std::shared_ptr<EventBus> event_bus,
+                               std::unique_ptr<GameModel> model)
+    : event_bus(std::move(event_bus)), game_model(std::move(model)) {}
 
 GameController::~GameController() = default;
 
 void GameController::subscribeEvents() {
-    event_bus->subscribe<Event::AwaitPlayerInput>([this](const auto& event) {
-        this->onAwaitPlayerInput(event);
-    });
-    event_bus->subscribe<Event::PlayerInputSubmitted>([this](const auto& event) {
-        this->handlePlayerInput(event);
-    });
+    event_bus->subscribe<Event::AwaitPlayerInput>(
+        [this](const auto& event) { this->onAwaitPlayerInput(event); });
+    event_bus->subscribe<Event::PlayerInputSubmitted>(
+        [this](const auto& event) { this->handlePlayerInput(event); });
 }
 
 void GameController::startGame() {
@@ -46,8 +43,7 @@ void GameController::handlePlayerInput(const Event::PlayerInputSubmitted& event)
     game_model->processPlayerInput(event);
     if (game_model->isRoundFinished()) {
         handleRoundEnded();
-    }
-    else {
+    } else {
         game_model->advanceToNextActor();
         awaitPlayerInput();
     }
@@ -61,18 +57,15 @@ void GameController::handleRoundEnded() {
 
 void GameController::processShowdown() {
     game_model->revealHoleCards();
-
 }
 
-void GameController::processSettlement() {
-
-}
+void GameController::processSettlement() {}
 
 void GameController::enterStage(Stage stage) {
     game_model->setCurrentStage(stage);
     event_bus->publish(Event::StageChanged{stage});
-    if (stage == Stage::IDLE) {}
-    else if (stage == Stage::PREFLOP) {
+    if (stage == Stage::IDLE) {
+    } else if (stage == Stage::PREFLOP) {
         game_model->dealHoleCards();
         game_model->postForcedBlind();
         startBettingRound();
@@ -81,8 +74,7 @@ void GameController::enterStage(Stage stage) {
         enterStage(Stage::SETTLEMENT);
     } else if (stage == Stage::SETTLEMENT) {
         // TODO
-    }
-    else {
+    } else {
         game_model->dealCommunityCards();
         startBettingRound();
     }

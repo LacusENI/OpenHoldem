@@ -26,13 +26,12 @@ void handlePlayerAction(RoundState& round_state, Action action) {
 }
 
 bool isRoundFinished(const RoundState& round_state) {
-    return round_state.active_players_count == 1 ||
-        round_state.players_can_act_count == 1 ||
-            round_state.pending_players_count == 0;
+    return round_state.active_players_count == 1 || round_state.players_can_act_count == 1 ||
+           round_state.pending_players_count == 0;
 }
 
 bool isOnlyOnePlayerActive(const RoundState& round_state) {
     return round_state.active_players_count == 1;
 }
 
-} // namespace poker
+} // namespace poker::algo

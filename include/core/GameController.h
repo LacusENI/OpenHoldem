@@ -16,9 +16,7 @@ public:
     std::shared_ptr<EventBus> event_bus;
     std::unique_ptr<GameModel> game_model;
 
-    explicit GameController(
-        std::shared_ptr<EventBus> event_bus,
-        std::unique_ptr<GameModel> model);
+    explicit GameController(std::shared_ptr<EventBus> event_bus, std::unique_ptr<GameModel> model);
     ~GameController();
 
     /* 订阅事件 */

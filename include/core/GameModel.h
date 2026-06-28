@@ -4,9 +4,9 @@
 #include <vector>
 
 #include "Card.h"
+#include "Event.h"
 #include "GameTypes.h"
 #include "chips_calc.h"
-#include "Event.h"
 
 namespace poker {
 class EventBus;
@@ -27,19 +27,17 @@ private:
     std::shared_ptr<BettingRound> betting_round;
 
     Stage current_stage = Stage::IDLE; // 游戏状态机
-    chips_t big_blind = 10;      // 大盲注额
+    chips_t big_blind = 10;            // 大盲注额
     cards_5_t community_cards;
 
     void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
     void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
     void applyBettingResult(seat_idx_t player_seat, algo::BettingResult result);
+
 public:
-    GameModel(
-        std::shared_ptr<EventBus> event_bus,
-        std::unique_ptr<IDeck> deck,
-        std::shared_ptr<Pot> pot_manager,
-        std::shared_ptr<Table> players,
-        std::unique_ptr<BettingRound> betting_round);
+    GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
+              std::shared_ptr<Pot> pot_manager, std::shared_ptr<Table> players,
+              std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 
     Stage getCurrentStage() const;

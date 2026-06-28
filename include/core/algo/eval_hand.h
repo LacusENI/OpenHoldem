@@ -8,9 +8,9 @@ namespace poker::algo {
  * 计算该玩家的手牌大小
  * @param seven_cards 5张公共牌+2张底牌
  * @return 手牌分值
-*/
+ */
 HandValue eval_hand(cards_7_t seven_cards);
-} // namespace poker::math
+} // namespace poker::algo
 
 namespace poker::internal::eval_hand {
 /**

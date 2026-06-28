@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "Card.h"
+
+#include <gtest/gtest.h>
 
 using namespace poker;
 

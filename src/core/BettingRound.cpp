@@ -1,8 +1,7 @@
 #include "BettingRound.h"
 
 namespace poker {
-BettingRound::BettingRound(
-    ) {}
+BettingRound::BettingRound() {}
 
 BettingRound::~BettingRound() = default;
 
@@ -33,7 +32,7 @@ algo::BettingContext BettingRound::getBettingContext(chips_t actor_chips) const 
     return {
         .player_chips = actor_chips,
         .player_bet = getPlayerBetAtSeat(actor_seat),
-        .round_bet =  getRoundBet(),
+        .round_bet = getRoundBet(),
         .min_raise_delta = getMinRaiseDelta(),
     };
 }

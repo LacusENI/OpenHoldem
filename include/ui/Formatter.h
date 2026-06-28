@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include <cstdint>
+#include <string>
 
 #include "GameTypes.h"
 
@@ -13,7 +13,7 @@ class HandValue;
 enum class Action;
 enum class Stage;
 struct Player;
-}
+} // namespace poker
 
 namespace poker::ui::formatter {
 std::string format(Rank rank);
@@ -31,4 +31,4 @@ std::string format(const Action& action);
 std::string format(const Stage& stage);
 
 std::string format(const seat_idx_t& position);
-}
+} // namespace poker::ui::formatter

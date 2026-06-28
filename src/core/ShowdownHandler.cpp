@@ -1,6 +1,7 @@
+#include "ShowdownHandler.h"
+
 #include <algorithm>
 
-#include "ShowdownHandler.h"
 #include "eval_hand.h"
 
 namespace poker {
@@ -13,8 +14,7 @@ void join_hole_cards(cards_7_t& cards7, const cards_2_t& cards2) {
 }
 
 std::vector<std::pair<seat_idx_t, HandValue>> ShowdownHandler::evalHandValues(
-        const std::vector<Player>& players,
-        const cards_5_t& community_cards) {
+    const std::vector<Player>& players, const cards_5_t& community_cards) {
     std::vector<std::pair<seat_idx_t, HandValue>> result;
     cards_7_t seven_cards;
     join_community_cards(seven_cards, community_cards);
@@ -43,8 +43,7 @@ std::vector<seat_idx_t> ShowdownHandler::determineWinners(
     return winners;
 }
 
-std::vector<chips_t> ShowdownHandler::calculateDistribution(
-    const int pot, const int winners_n) {
+std::vector<chips_t> ShowdownHandler::calculateDistribution(const int pot, const int winners_n) {
     const int share = pot / winners_n;
     const int remainder = pot % winners_n;
 
@@ -59,4 +58,4 @@ std::vector<chips_t> ShowdownHandler::calculateDistribution(
     return amounts;
 }
 
-}
+} // namespace poker

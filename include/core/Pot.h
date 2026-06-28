@@ -8,6 +8,7 @@ namespace poker {
 class Pot {
 private:
     chips_t pot = 0;
+
 public:
     Pot() = default;
 

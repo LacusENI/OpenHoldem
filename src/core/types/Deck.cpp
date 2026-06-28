@@ -1,7 +1,7 @@
+#include "Deck.h"
+
 #include <algorithm>
 #include <chrono>
-
-#include "Deck.h"
 
 namespace poker {
 Deck::Deck() {
@@ -26,4 +26,4 @@ Card Deck::deal() {
     }
     return cards[next_card_index++];
 }
-}
+} // namespace poker

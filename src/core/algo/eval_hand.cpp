@@ -1,6 +1,6 @@
-#include <algorithm>
-
 #include "eval_hand.h"
+
+#include <algorithm>
 
 namespace poker::internal::eval_hand {
 std::vector<cards_5_t> enum_5_from_7(const cards_7_t& hand7) {
@@ -10,7 +10,9 @@ std::vector<cards_5_t> enum_5_from_7(const cards_7_t& hand7) {
         cards_5_t combo;
         int combo_i = 0;
         for (int i = 0; i < mask.size(); i++) {
-            if (mask[i]) { combo[combo_i++] = hand7[i]; }
+            if (mask[i]) {
+                combo[combo_i++] = hand7[i];
+            }
         }
         combos.push_back(combo);
     } while (std::ranges::next_permutation(mask).found);
@@ -41,9 +43,7 @@ HandCounts eval_hand_counts(cards_5_t hand5) {
     std::ranges::sort(counts, std::greater());
 
     // 处理A2345顺子
-    if (counts.size() == 5 &&
-        counts[0].rank == Rank::ACE &&
-        counts[1].rank == Rank::FIVE &&
+    if (counts.size() == 5 && counts[0].rank == Rank::ACE && counts[1].rank == Rank::FIVE &&
         counts[4].rank == Rank::TWO) {
         std::ranges::rotate(counts, counts.begin() + 1);
     }
@@ -57,8 +57,7 @@ HandCounts eval_hand_counts(cards_5_t hand5) {
  */
 bool isFlush(const cards_5_t& hand5) {
     Suit suit = hand5[0].suit;
-    return std::ranges::all_of(hand5,
-        [suit](Card c) { return c.suit == suit; });
+    return std::ranges::all_of(hand5, [suit](Card c) { return c.suit == suit; });
 }
 
 /**
@@ -69,17 +68,15 @@ bool isFlush(const cards_5_t& hand5) {
 bool isStraight(const HandCounts& counts) {
     if (counts.size() != 5) return false;
 
-    if (static_cast<int>(counts[0].rank) -
-        static_cast<int>(counts[4].rank) == 4) {
+    if (static_cast<int>(counts[0].rank) - static_cast<int>(counts[4].rank) == 4) {
         return true;
-        }
+    }
 
     // 处理A2345顺子
-    if (counts[4].rank == Rank::ACE &&
-        counts[0].rank == Rank::FIVE &&
+    if (counts[4].rank == Rank::ACE && counts[0].rank == Rank::FIVE &&
         counts[3].rank == Rank::TWO) {
         return true;
-        }
+    }
     return false;
 }
 
@@ -94,8 +91,7 @@ HandType evalUniqueHandType(const cards_5_t& hand5, const HandCounts& counts) {
     bool is_straight = isStraight(counts);
     if (is_flush && is_straight) {
         // 最高为A的同花顺，判定为皇家同花顺
-        if (counts[0].rank == Rank::ACE)
-            return HandType::ROYAL_FLUSH;
+        if (counts[0].rank == Rank::ACE) return HandType::ROYAL_FLUSH;
         return HandType::STRAIGHT_FLUSH;
     }
     if (is_flush) return HandType::FLUSH;
@@ -110,20 +106,16 @@ HandType evalUniqueHandType(const cards_5_t& hand5, const HandCounts& counts) {
  */
 HandType evalPatternHandType(const HandCounts& counts) {
     const std::vector table = {
-        HandType::ONE_PAIR,
-        HandType::TWO_PAIR,
-        HandType::THREE_OF_A_KIND,
-        HandType::FULL_HOUSE,
-        HandType::FOUR_OF_A_KIND,
+        HandType::ONE_PAIR,   HandType::TWO_PAIR,       HandType::THREE_OF_A_KIND,
+        HandType::FULL_HOUSE, HandType::FOUR_OF_A_KIND,
     };
     int max1 = counts[0].count;
     int max2 = counts[1].count;
-    return table[2*(max1 - 2) + (max2 - 1)];
+    return table[2 * (max1 - 2) + (max2 - 1)];
 }
 
 HandType eval_hand_type(const cards_5_t& hand5, const HandCounts& counts) {
-    if (counts.size() != 5)
-        return evalPatternHandType(counts);
+    if (counts.size() != 5) return evalPatternHandType(counts);
     return evalUniqueHandType(hand5, counts);
 }
 } // namespace poker::internal::eval_hand
@@ -141,4 +133,4 @@ HandValue eval_hand(cards_7_t seven_cards) {
 
     return best_hand_value;
 }
-} // namespace poker::math
+} // namespace poker::algo

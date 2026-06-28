@@ -1,10 +1,9 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
-#include "chips_calc.h"
 #include "GameTypes.h"
+#include "chips_calc.h"
 #include "round_state.h"
 
 namespace poker {
@@ -17,12 +16,13 @@ class RoundTracker;
  */
 class BettingRound {
 private:
-    std::vector<chips_t> player_bets;  // 玩家的本轮下注额
-    chips_t round_bet = 0;             // 此轮目前的最大下注额
-    chips_t min_raise_delta = 0;       // 当前的最小加注额
-    seat_idx_t actor_seat{};           // 当前行动玩家的位置
+    std::vector<chips_t> player_bets; // 玩家的本轮下注额
+    chips_t round_bet = 0;            // 此轮目前的最大下注额
+    chips_t min_raise_delta = 0;      // 当前的最小加注额
+    seat_idx_t actor_seat{};          // 当前行动玩家的位置
 
     algo::RoundState round_state;
+
 public:
     BettingRound();
     ~BettingRound();

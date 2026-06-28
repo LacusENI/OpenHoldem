@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "chips_calc.h"
+
+#include <gtest/gtest.h>
 
 using namespace poker;
 using namespace poker::algo;
@@ -75,10 +75,7 @@ TEST(ProcessBettingTest, Check) {
         .round_bet = 10,
         .min_raise_delta = 10,
     };
-    BettingInput input = {
-        .target_bet = 10,
-        .is_fold = false
-    };
+    BettingInput input = {.target_bet = 10, .is_fold = false};
     BettingResult result = process_betting(context, input);
     EXPECT_EQ(result.action, Action::CHECK);
     EXPECT_EQ(result.bet_delta, 0);

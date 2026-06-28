@@ -1,0 +1,52 @@
+---
+# 基础语言指定为 C++
+Language: Cpp
+# 基于 Google 风格，这是业界公认最严谨、可读性最好的基底
+BasedOnStyle: Google
+
+# --- 核心排版与缩进 ---
+# 缩进宽度为 4 个空格
+IndentWidth: 4
+# 区分大括号后的缩进
+AccessModifierOffset: -4
+# 连续单行注释、尾随注释、结构体初始化对齐
+AlignTrailingComments: true
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+# case 标签不缩进，与 switch 对齐
+IndentCaseLabels: false
+
+# --- 每行长度限制 ---
+# 单行限制 100 字符
+ColumnLimit: 100
+
+# --- 指针与引用对齐 (最关键) ---
+# 强烈推荐：指针 `*` 和引用 `&` 紧贴类型（如 `const Action& action`）
+# 现代 C++ 认为 `*` 和 `&` 是类型的一部分，而不是变量名的一部分
+PointerAlignment: Left
+
+# --- 花括号与换行策略 ---
+# 决定大括号在哪换行
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass: false      # class MyClass { 不换行
+  AfterControlStatement: false # if (cond) { 不换行
+  AfterEnum: false       # enum Type { 不换行
+  AfterFunction: false   # void func() { 紧跟，让代码更紧凑
+  AfterNamespace: false  # namespace poker { 不换行
+  AfterStruct: false     # struct Seat { 不换行
+  BeforeCatch: false
+  BeforeElse: false      # } else { 保持在同一行，非常适合条件分支
+
+# --- 空格细节调整 ---
+SpaceBeforeParens: ControlStatements # 只有 if/for/while 后面加空格，函数名后不加空格
+SpaceAfterCStyleCast: false          # 强转后不加空格 (int)seat_idx
+SpacesInContainerLiterals: false     # 初始化列表内部不加空格 {1, 2, 3}
+SpacesBeforeTrailingComments: 1      # 右括号和注释之间只留 1 个空格
+
+# --- 自动对齐与排序 ---
+# 自动按字母顺序对 #include 进行排序
+SortIncludes: true
+
+# 允许短的单行函数写在一行
+AllowShortFunctionsOnASingleLine: Inline
