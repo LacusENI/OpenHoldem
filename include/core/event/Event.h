@@ -66,6 +66,28 @@ struct GameEnded {
     chips_t pot;
 };
 
+struct PlayerChipsUpdated {
+    seat_idx_t player_seat;
+    chips_t player_chips;
+};
+
+struct PotUpdated {
+    chips_t pot;
+};
+
+struct PlayerBetUpdated {
+    seat_idx_t player_seat;
+    chips_t player_bet;
+};
+
+struct RoundBetUpdated {
+    chips_t round_bet;
+};
+
+struct MinRaiseDeltaUpdated {
+    chips_t min_raise_delta;
+};
+
 } // namespace Event
 using GameEvent = std::variant<Event::GameStarted, Event::GameEnded>;
 } // namespace poker

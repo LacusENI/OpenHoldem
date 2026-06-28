@@ -14,18 +14,15 @@ int main() {
 
     auto event_bus = std::make_shared<EventBus>();
     auto deck = std::make_unique<Deck>();
-    auto seating_manager = std::make_shared<Table>();
+    auto table = std::make_shared<Table>();
     auto pot_manager = std::make_shared<Pot>();
     auto betting_round = std::make_unique<BettingRound>();
     auto game_model = std::make_unique<GameModel>(event_bus,
-        std::move(deck), pot_manager, seating_manager, std::move(betting_round));
+        std::move(deck), pot_manager, table, std::move(betting_round));
     GameController game_controller(event_bus, std::move(game_model));
 
-    seating_manager->addNewPlayer();
-    seating_manager->addNewPlayer();
-    seating_manager->addNewPlayer();
-    seating_manager->addNewPlayer();
-    seating_manager->addNewPlayer();
+    table->addNewPlayer();
+    table->addNewPlayer();
 
     event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
         spdlog::info(std::format("[Game] Game Started"));

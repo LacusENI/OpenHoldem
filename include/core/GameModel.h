@@ -23,7 +23,7 @@ private:
     std::shared_ptr<EventBus> event_bus;
     std::unique_ptr<IDeck> deck;
     std::shared_ptr<Pot> pot_manager;
-    std::shared_ptr<Table> seating_manager;
+    std::shared_ptr<Table> table;
     std::shared_ptr<BettingRound> betting_round;
 
     Stage current_stage = Stage::IDLE; // 游戏状态机

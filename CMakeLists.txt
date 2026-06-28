@@ -22,7 +22,6 @@ add_library(poker_core
         include/core/GameController.h
         include/core/GameModel.h
         include/core/Pot.h
-        include/core/RoundTracker.h
         include/core/Table.h
         include/core/ShowdownHandler.h
 
@@ -35,8 +34,9 @@ add_library(poker_core
         src/core/BettingRound.cpp
         src/core/GameController.cpp
         src/core/GameModel.cpp
-        src/core/RoundTracker.cpp
         src/core/ShowdownHandler.cpp
+        include/core/algo/round_state.h
+        src/core/algo/round_state.cpp
 )
 
 target_include_directories(poker_core PUBLIC
