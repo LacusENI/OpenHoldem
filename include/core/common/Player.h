@@ -1,17 +1,17 @@
 #pragma once
 
-#include "GameTypes.h"
 #include "Card.h"
+#include "GameTypes.h"
 
 namespace poker {
 /**
  * @brief 玩家实体类
  */
 struct Player {
-    seat_idx_t position; // 玩家所在位置
+    seat_idx_t position;  // 玩家所在位置
     cards_2_t hole_cards; // 玩家的底牌
 
-    chips_t chips = 0;        // 玩家拥有的筹码
+    chips_t chips = 0;      // 玩家拥有的筹码
     bool is_folded = false; // 玩家是否已弃牌
     bool is_allin = false;  // 玩家是否已 all-in
 

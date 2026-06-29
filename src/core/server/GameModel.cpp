@@ -4,8 +4,8 @@
 #include "Deck.h"
 #include "Event.h"
 #include "EventBus.h"
-#include "Pot.h"
-#include "Table.h"
+#include "PotManager.h"
+#include "SeatManager.h"
 #include "eval_hand.h"
 
 namespace poker {
@@ -18,13 +18,13 @@ void join_hole_cards(cards_7_t& cards7, const cards_2_t& cards2) {
 }
 
 void GameModel::takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips) {
-    table->getPlayerAtSeat(player_seat).bet(chips);
+    seat_manager->getPlayerAtSeat(player_seat).bet(chips);
     pot_manager->addChips(chips);
 }
 
 void GameModel::takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips) {
     pot_manager->takeChips(chips);
-    table->getPlayerAtSeat(player_seat).win(chips);
+    seat_manager->getPlayerAtSeat(player_seat).win(chips);
 }
 
 void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult result) {
@@ -35,12 +35,13 @@ void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult r
 }
 
 GameModel::GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
-                     std::shared_ptr<Pot> pot_manager, std::shared_ptr<Table> seating_manager,
+                     std::shared_ptr<PotManager> pot_manager,
+                     std::shared_ptr<SeatManager> seat_manager,
                      std::unique_ptr<BettingRound> betting_round)
     : event_bus(std::move(event_bus)),
       deck(std::move(deck)),
-      table(std::move(seating_manager)),
       pot_manager(std::move(pot_manager)),
+      seat_manager(std::move(seat_manager)),
       betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
@@ -73,11 +74,11 @@ void GameModel::startGame() {
     current_stage = Stage::IDLE;
     deck->shuffle();
     pot_manager->clearPot();
-    betting_round->onGameStarted(table->getPlayerCount());
+    betting_round->onGameStarted(seat_manager->getPlayerCount());
 }
 
 void GameModel::dealHoleCards() {
-    for (Player& player : table->getPlayerList()) {
+    for (Player& player : seat_manager->getPlayerList()) {
         cards_2_t hole_cards = {deck->deal(), deck->deal()};
         player.hole_cards = hole_cards;
         event_bus->publish(
@@ -87,37 +88,37 @@ void GameModel::dealHoleCards() {
 
 void GameModel::dealCommunityCards() {
     switch (current_stage) {
-        case Stage::PREFLOP:
-            break;
-        case Stage::FLOP:
-            community_cards[0] = deck->deal();
-            community_cards[1] = deck->deal();
-            community_cards[2] = deck->deal();
-            break;
-        case Stage::TURN:
-            community_cards[3] = deck->deal();
-            break;
-        case Stage::RIVER:
-            community_cards[4] = deck->deal();
-            break;
-        default:
-            break;
+    case Stage::PREFLOP:
+        break;
+    case Stage::FLOP:
+        community_cards[0] = deck->deal();
+        community_cards[1] = deck->deal();
+        community_cards[2] = deck->deal();
+        break;
+    case Stage::TURN:
+        community_cards[3] = deck->deal();
+        break;
+    case Stage::RIVER:
+        community_cards[4] = deck->deal();
+        break;
+    default:
+        break;
     }
     event_bus->publish(Event::CommunityCardsDealt{community_cards});
 }
 
 void GameModel::postForcedBlind() {
     // Small Blind
-    seat_idx_t sb_seat = table->getSbSeat();
+    seat_idx_t sb_seat = seat_manager->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
     event_bus->publish(Event::BlindPosted{
-        .seat = table->getSbSeat(), .amount = big_blind / 2, .is_big_blind = false});
+        .seat = seat_manager->getSbSeat(), .amount = big_blind / 2, .is_big_blind = false});
     // Big Blind
-    seat_idx_t bb_seat = table->getBbSeat();
+    seat_idx_t bb_seat = seat_manager->getBbSeat();
     takePlayerChipsToPot(bb_seat, big_blind);
     betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
-    event_bus->publish(
-        Event::BlindPosted{.seat = table->getBbSeat(), .amount = big_blind, .is_big_blind = true});
+    event_bus->publish(Event::BlindPosted{
+        .seat = seat_manager->getBbSeat(), .amount = big_blind, .is_big_blind = true});
 }
 
 void GameModel::enterPreflopStreet() {
@@ -139,27 +140,27 @@ void GameModel::advanceToNextStreet() {
 
 void GameModel::setupRoundStart() {
     seat_idx_t first_actor_seat = (current_stage == Stage::PREFLOP)
-                                      ? table->getPreflopFirstActorSeat()
-                                      : table->getPostflopFirstActorSeat();
+                                      ? seat_manager->getPreflopFirstActorSeat()
+                                      : seat_manager->getPostflopFirstActorSeat();
     betting_round->onRoundStarted(first_actor_seat);
 }
 
 void GameModel::awaitPlayerInput() {
     seat_idx_t actor_seat = betting_round->getActorSeat();
-    const Player& actor = table->getPlayerAtSeat(actor_seat);
+    const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
     event_bus->publish(Event::AwaitPlayerInput{actor_seat, context.player_chips, context.player_bet,
                                                context.round_bet, context.min_raise_delta});
 }
 
 void GameModel::advanceToNextActor() {
-    seat_idx_t next_actor_seat = table->nextPositionToAct(betting_round->getActorSeat());
+    seat_idx_t next_actor_seat = seat_manager->findNextSeatToAct(betting_round->getActorSeat());
     betting_round->advanceToNextActor(next_actor_seat);
 }
 
 void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
     seat_idx_t actor_seat = betting_round->getActorSeat();
-    const Player& actor = table->getPlayerAtSeat(actor_seat);
+    const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
     algo::BettingInput input = {event.target_bet, event.is_fold};
     algo::BettingResult result = algo::process_betting(context, input);
@@ -172,7 +173,7 @@ void GameModel::revealHoleCards() {
     Event::HoleCardsRevealed event;
     cards_7_t seven_cards;
     join_community_cards(seven_cards, community_cards);
-    for (const Player& player : table->getPlayerList()) {
+    for (const Player& player : seat_manager->getPlayerList()) {
         if (player.isActive()) {
             join_hole_cards(seven_cards, player.hole_cards);
             HandValue hand_value = algo::eval_hand(seven_cards);

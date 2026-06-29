@@ -8,8 +8,16 @@ namespace poker {
 
 /* 牌型 */
 enum class HandType {
-    HIGH_CARD, ONE_PAIR, TWO_PAIR, THREE_OF_A_KIND, STRAIGHT,
-    FLUSH, FULL_HOUSE, FOUR_OF_A_KIND, STRAIGHT_FLUSH, ROYAL_FLUSH
+    HIGH_CARD,
+    ONE_PAIR,
+    TWO_PAIR,
+    THREE_OF_A_KIND,
+    STRAIGHT,
+    FLUSH,
+    FULL_HOUSE,
+    FOUR_OF_A_KIND,
+    STRAIGHT_FLUSH,
+    ROYAL_FLUSH
 };
 
 std::string to_string(HandType hand_type);
@@ -34,14 +42,13 @@ private:
      * - 两对9和5: 0x295000 (2表示两对)
      */
     uint32_t raw_value = 0;
+
 public:
     HandValue() = default;
     explicit HandValue(int raw_value) : raw_value(raw_value) {}
 
     /* 获取此手牌分值对应的手牌类型 */
-    [[nodiscard]] HandType getHandType() const {
-        return static_cast<HandType>(raw_value >> 20);
-    }
+    [[nodiscard]] HandType getHandType() const { return static_cast<HandType>(raw_value >> 20); }
 
     /**
      * @brief 获取此手牌分值对应的主牌/次高牌/踢脚牌的点数,
@@ -53,17 +60,11 @@ public:
         return static_cast<Rank>((raw_value >> (16 - 4 * index)) & 0xF);
     }
 
-    bool operator==(const HandValue &other) const {
-        return raw_value == other.raw_value;
-    }
+    bool operator==(const HandValue& other) const { return raw_value == other.raw_value; }
 
-    bool operator>(const HandValue &other) const {
-        return raw_value > other.raw_value;
-    }
+    bool operator>(const HandValue& other) const { return raw_value > other.raw_value; }
 
-    bool operator<(const HandValue &other) const {
-        return raw_value < other.raw_value;
-    }
+    bool operator<(const HandValue& other) const { return raw_value < other.raw_value; }
 
     /**
      * 生成 HandValue 工厂方法

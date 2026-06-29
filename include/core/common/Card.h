@@ -1,8 +1,8 @@
 #pragma once
 
+#include <array>
 #include <cstdint>
 #include <string>
-#include <array>
 
 namespace poker {
 /**
@@ -20,8 +20,20 @@ enum class Suit : uint8_t {
  * @brief 扑克牌的点数 (2~10/Jack/Queen/King/Ace)
  */
 enum class Rank : uint8_t {
-    NONE = 0, TWO = 2, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN,
-    JACK, QUEEN, KING, ACE
+    NONE = 0,
+    TWO = 2,
+    THREE,
+    FOUR,
+    FIVE,
+    SIX,
+    SEVEN,
+    EIGHT,
+    NINE,
+    TEN,
+    JACK,
+    QUEEN,
+    KING,
+    ACE
 };
 
 constexpr int MIN_SUIT = static_cast<int>(Suit::CLUB);
@@ -45,9 +57,7 @@ struct Card {
         return rank < other.rank;
     }
 
-    bool operator==(const Card& other) const {
-        return suit == other.suit && rank == other.rank;
-    }
+    bool operator==(const Card& other) const { return suit == other.suit && rank == other.rank; }
 
     bool operator>(const Card& other) const {
         if (rank == other.rank) return suit > other.suit;

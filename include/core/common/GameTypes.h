@@ -6,9 +6,7 @@ namespace poker {
 using seat_idx_t = int; // 玩家座位
 using chips_t = int;    // 筹码数量
 
-enum class Stage {
-    IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT
-};
+enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 
 Stage next_stage(Stage stage);
 std::string to_string(Stage stage);

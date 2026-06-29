@@ -1,27 +1,28 @@
+#include <spdlog/spdlog.h>
+
 #include "BettingRound.h"
 #include "Deck.h"
 #include "Event.h"
 #include "EventBus.h"
 #include "GameController.h"
 #include "GameModel.h"
-#include "Pot.h"
-#include "Table.h"
-#include "spdlog/spdlog.h"
+#include "PotManager.h"
+#include "SeatManager.h"
 
 int main() {
     using namespace poker;
 
     auto event_bus = std::make_shared<EventBus>();
     auto deck = std::make_unique<Deck>();
-    auto table = std::make_shared<Table>();
-    auto pot_manager = std::make_shared<Pot>();
+    auto seat_manager = std::make_shared<SeatManager>();
+    auto pot_manager = std::make_shared<PotManager>();
     auto betting_round = std::make_unique<BettingRound>();
-    auto game_model = std::make_unique<GameModel>(event_bus, std::move(deck), pot_manager, table,
-                                                  std::move(betting_round));
+    auto game_model = std::make_unique<GameModel>(event_bus, std::move(deck), pot_manager,
+                                                  seat_manager, std::move(betting_round));
     GameController game_controller(event_bus, std::move(game_model));
 
-    table->addNewPlayer();
-    table->addNewPlayer();
+    seat_manager->addNewPlayer();
+    seat_manager->addNewPlayer();
 
     event_bus->subscribe<Event::GameStarted>(
         [](const Event::GameStarted& event) { spdlog::info(std::format("[Game] Game Started")); });

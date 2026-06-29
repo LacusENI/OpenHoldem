@@ -1,7 +1,7 @@
 #pragma once
 
-#include <random>
 #include <array>
+#include <random>
 
 #include "Card.h"
 
@@ -26,6 +26,7 @@ private:
     std::array<Card, CARDS_SIZE> cards;
     std::mt19937 rng;
     size_t next_card_index = 0;
+
 public:
     Deck();
 

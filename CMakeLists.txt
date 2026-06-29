@@ -12,38 +12,39 @@ find_package(spdlog CONFIG REQUIRED)
 add_library(poker_core
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
+        include/core/algo/round_state.h
+        include/core/client/ClientModel.h
+        include/core/client/ClientController.h
+        include/core/client/ClientView.h
+        include/core/common/Card.h
+        include/core/common/Deck.h
+        include/core/common/GameTypes.h
         include/core/event/Event.h
         include/core/event/EventBus.h
-        include/core/interface/ILogger.h
-        include/core/types/Card.h
-        include/core/types/Deck.h
-        include/core/types/GameTypes.h
-        include/core/BettingRound.h
-        include/core/GameController.h
-        include/core/GameModel.h
-        include/core/Pot.h
-        include/core/Table.h
-        include/core/ShowdownHandler.h
+        include/core/server/BettingRound.h
+        include/core/server/GameController.h
+        include/core/server/GameModel.h
+        include/core/server/PotManager.h
+        include/core/server/SeatManager.h
 
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
-        src/core/types/Card.cpp
-        src/core/types/Deck.cpp
-        src/core/types/GameTypes.cpp
-        src/core/types/HandValue.cpp
-        src/core/BettingRound.cpp
-        src/core/GameController.cpp
-        src/core/GameModel.cpp
-        src/core/ShowdownHandler.cpp
-        include/core/algo/round_state.h
         src/core/algo/round_state.cpp
+        src/core/common/Card.cpp
+        src/core/common/Deck.cpp
+        src/core/common/GameTypes.cpp
+        src/core/common/HandValue.cpp
+        src/core/server/BettingRound.cpp
+        src/core/server/GameController.cpp
+        src/core/server/GameModel.cpp
 )
 
 target_include_directories(poker_core PUBLIC
         include/core/event
         include/core/algo
-        include/core/types
-        include/core
+        include/core/client
+        include/core/common
+        include/core/server
 )
 
 

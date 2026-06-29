@@ -11,9 +11,9 @@
 namespace poker {
 class EventBus;
 class IDeck;
-class Table;
+class SeatManager;
 class BettingRound;
-class Pot;
+class PotManager;
 
 /**
  * @brief 游戏领域模型
@@ -22,9 +22,9 @@ class GameModel {
 private:
     std::shared_ptr<EventBus> event_bus;
     std::unique_ptr<IDeck> deck;
-    std::shared_ptr<Pot> pot_manager;
-    std::shared_ptr<Table> table;
     std::shared_ptr<BettingRound> betting_round;
+    std::shared_ptr<PotManager> pot_manager;
+    std::shared_ptr<SeatManager> seat_manager;
 
     Stage current_stage = Stage::IDLE; // 游戏状态机
     chips_t big_blind = 10;            // 大盲注额
@@ -36,7 +36,7 @@ private:
 
 public:
     GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
-              std::shared_ptr<Pot> pot_manager, std::shared_ptr<Table> players,
+              std::shared_ptr<PotManager> pot_manager, std::shared_ptr<SeatManager> seat_manager,
               std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 

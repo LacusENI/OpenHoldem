@@ -7,8 +7,8 @@
 #include "round_state.h"
 
 namespace poker {
-class Table;
-class Pot;
+class SeatManager;
+class PotManager;
 class RoundTracker;
 
 /**
