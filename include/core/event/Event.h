@@ -23,6 +23,9 @@ struct BlindPosted {
     seat_idx_t seat;
     chips_t amount;
     bool is_big_blind;
+    chips_t pot;
+    chips_t player_chips;
+    chips_t player_bet;
 };
 
 struct CommunityCardsDealt {
@@ -49,6 +52,9 @@ struct PlayerInputSubmitted {
 struct PlayerActed {
     seat_idx_t actor_seat;
     Action action;
+    chips_t pot;
+    chips_t player_chips;
+    chips_t player_bet;
 };
 
 struct HoleCardsRevealed {
@@ -62,9 +68,7 @@ struct WinnerDeclared {
     std::vector<chips_t> awards;
 };
 
-struct GameEnded {
-    chips_t pot;
-};
+struct GameEnded {};
 
 struct PlayerChipsUpdated {
     seat_idx_t player_seat;

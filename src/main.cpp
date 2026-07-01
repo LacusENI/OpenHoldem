@@ -41,8 +41,9 @@ int main() {
     });
     event_bus->subscribe<Event::BlindPosted>([](const Event::BlindPosted& event) {
         std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
-        spdlog::info(std::format("[Game] Blind Posted({}) | seat={} amount={} ", blind_type,
-                                 event.seat, event.amount));
+        spdlog::info(std::format(
+            "[Game] Blind Posted({}) | seat={} amount={} pot={} player_chips={} player_bet={}",
+            blind_type, event.seat, event.amount, event.pot, event.player_chips, event.player_bet));
     });
     event_bus->subscribe<Event::BettingRoundStarted>([](const Event::BettingRoundStarted& event) {
         spdlog::info(std::format("[Game] Betting Round Started"));
@@ -51,11 +52,18 @@ int main() {
         spdlog::info(std::format("[Game] Betting Round Ended"));
     });
     event_bus->subscribe<Event::AwaitPlayerInput>([](const Event::AwaitPlayerInput& event) {
-        spdlog::info(std::format("[Game] Await Player Input | actor_seat={}", event.actor_seat));
+        spdlog::info(
+            std::format("[Game] Await Player Input | actor_seat={} player_chips={} player_bet={} "
+                        "round_bet={} min_raise_delta={}",
+                        event.actor_seat, event.player_chips, event.player_bet, event.round_bet,
+                        event.min_raise_delta));
     });
     event_bus->subscribe<Event::PlayerActed>([](const Event::PlayerActed& event) {
-        spdlog::info(std::format("[Game] Player Acted | actor_seat={} action={}", event.actor_seat,
-                                 to_string(event.action)));
+        spdlog::info(
+            std::format("[Game] Player Acted | actor_seat={} action={} pot={} player_chips={} "
+                        "player_bet={}",
+                        event.actor_seat, to_string(event.action), event.pot, event.player_chips,
+                        event.player_bet));
     });
     event_bus->subscribe<Event::HoleCardsRevealed>([](const Event::HoleCardsRevealed& event) {
         spdlog::info("[Game] Hole Cards Revealed | ...");

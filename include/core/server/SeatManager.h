@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 #include "Player.h"
@@ -30,7 +31,7 @@ public:
     seat_idx_t nextSeat(seat_idx_t position) const {
         return (position + 1) % static_cast<int>(players.size());
     }
-    seat_idx_t findNextSeatToAct(seat_idx_t position) const {
+    seat_idx_t findNextActorSeat(seat_idx_t position) const {
         seat_idx_t next_pos = nextSeat(position);
         while (players[next_pos].is_folded && next_pos != position) {
             next_pos = nextSeat(next_pos);
@@ -40,7 +41,14 @@ public:
     seat_idx_t getSbSeat() const { return (btn_seat + 1) % static_cast<int>(players.size()); }
     seat_idx_t getBbSeat() const { return (btn_seat + 2) % static_cast<int>(players.size()); }
     seat_idx_t getUtgSeat() const { return (btn_seat + 3) % static_cast<int>(players.size()); }
-    seat_idx_t getPostflopFirstActorSeat() const { return findNextSeatToAct(btn_seat); }
+    seat_idx_t getPostflopFirstActorSeat() const { return findNextActorSeat(btn_seat); }
     seat_idx_t getPreflopFirstActorSeat() const { return getUtgSeat(); }
+    int getActivePlayerCount() const {
+        return std::ranges::count_if(players,
+                                     [](const Player& player) { return player.isActive(); });
+    }
+    int getPlayerCanActCount() const {
+        return std::ranges::count_if(players, [](const Player& player) { return player.canAct(); });
+    }
 };
 } // namespace poker

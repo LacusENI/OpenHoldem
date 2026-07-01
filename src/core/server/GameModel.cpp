@@ -111,14 +111,26 @@ void GameModel::postForcedBlind() {
     // Small Blind
     seat_idx_t sb_seat = seat_manager->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
-    event_bus->publish(Event::BlindPosted{
-        .seat = seat_manager->getSbSeat(), .amount = big_blind / 2, .is_big_blind = false});
+    const Player& sb_player = seat_manager->getPlayerAtSeat(sb_seat);
+    event_bus->publish(
+        Event::BlindPosted{.seat = sb_seat,
+                           .amount = big_blind / 2,
+                           .is_big_blind = false,
+                           .pot = pot_manager->getPot(),
+                           .player_chips = sb_player.chips,
+                           .player_bet = betting_round->getPlayerBetAtSeat(sb_seat)});
     // Big Blind
     seat_idx_t bb_seat = seat_manager->getBbSeat();
+    const Player& bb_player = seat_manager->getPlayerAtSeat(bb_seat);
     takePlayerChipsToPot(bb_seat, big_blind);
     betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
-    event_bus->publish(Event::BlindPosted{
-        .seat = seat_manager->getBbSeat(), .amount = big_blind, .is_big_blind = true});
+    event_bus->publish(
+        Event::BlindPosted{.seat = bb_seat,
+                           .amount = big_blind,
+                           .is_big_blind = true,
+                           .pot = pot_manager->getPot(),
+                           .player_chips = bb_player.chips,
+                           .player_bet = betting_round->getPlayerBetAtSeat(bb_seat)});
 }
 
 void GameModel::enterPreflopStreet() {
@@ -154,7 +166,7 @@ void GameModel::awaitPlayerInput() {
 }
 
 void GameModel::advanceToNextActor() {
-    seat_idx_t next_actor_seat = seat_manager->findNextSeatToAct(betting_round->getActorSeat());
+    seat_idx_t next_actor_seat = seat_manager->findNextActorSeat(betting_round->getActorSeat());
     betting_round->advanceToNextActor(next_actor_seat);
 }
 
@@ -166,7 +178,12 @@ void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
     algo::BettingResult result = algo::process_betting(context, input);
     takePlayerChipsToPot(getActorSeat(), result.bet_delta);
     betting_round->applyBettingResult(result);
-    event_bus->publish(Event::PlayerActed{.actor_seat = actor_seat, .action = result.action});
+    event_bus->publish(
+        Event::PlayerActed{.actor_seat = actor_seat,
+                           .action = result.action,
+                           .pot = pot_manager->getPot(),
+                           .player_chips = seat_manager->getPlayerAtSeat(actor_seat).chips,
+                           .player_bet = result.player_bet});
 }
 
 void GameModel::revealHoleCards() {

@@ -28,6 +28,9 @@ void GameController::startGame() {
 void GameController::startBettingRound() {
     game_model->setupRoundStart();
     event_bus->publish(Event::BettingRoundStarted{});
+    if (game_model->getCurrentStage() == Stage::PREFLOP) {
+        game_model->postForcedBlind();
+    }
     awaitPlayerInput();
 }
 
@@ -67,7 +70,6 @@ void GameController::enterStage(Stage stage) {
     if (stage == Stage::IDLE) {
     } else if (stage == Stage::PREFLOP) {
         game_model->dealHoleCards();
-        game_model->postForcedBlind();
         startBettingRound();
     } else if (stage == Stage::SHOWDOWN) {
         processShowdown();
