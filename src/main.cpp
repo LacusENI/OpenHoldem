@@ -1,6 +1,9 @@
 #include <spdlog/spdlog.h>
 
 #include "BettingRound.h"
+#include "ClientModel.h"
+#include "ClientView.h"
+#include "ConsoleView.h"
 #include "Deck.h"
 #include "Event.h"
 #include "EventBus.h"
@@ -71,5 +74,14 @@ int main() {
     game_controller.subscribeEvents();
     game_controller.startGame();
 
+    ClientModel client_model;
+    client_model.players = {Player{.position = 0, .hole_cards = {Card("C8"), Card("CA")}, .chips = 50},Player{.position = 1, .chips = 20}};
+    client_model.this_player_seat = 0;
+    client_model.pot = 20;
+    client_model.player_bets = {5, 15};
+    client_model.player_states = {PlayerState::BET, PlayerState::RAISED};
+    client_model.community_cards = {Card("DT"), Card("DA"), Card("HT")};
+    ui::ConsoleView console_view;
+    console_view.render(client_model);
     return 0;
 }

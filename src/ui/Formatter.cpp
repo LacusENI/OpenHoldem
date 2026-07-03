@@ -5,6 +5,7 @@
 #include "Card.h"
 #include "GameTypes.h"
 #include "HandValue.h"
+#include "Player.h"
 
 namespace poker::ui::formatter {
 std::string format(Rank rank) {
@@ -150,7 +151,28 @@ std::string format(const Stage& stage) {
     }
 }
 
-std::string format(const seat_idx_t& position) {
-    return std::format("[@P{}]", position + 1);
+std::string format(const PlayerState& player_state) {
+    switch (player_state) {
+    case PlayerState::IDLE:
+        return "Idle";
+    case PlayerState::BET:
+        return "Bet";
+    case PlayerState::RAISED:
+        return "Raised";
+    case PlayerState::CALLED:
+        return "Called";
+    case PlayerState::CHECKED:
+        return "Checked";
+        case PlayerState::ALL_IN:
+        return "All-in";
+        case PlayerState::FOLDED:
+        return "Folded";
+    case PlayerState::SMALL_BLIND:
+        return "Small Blind";
+    case PlayerState::BIG_BLIND:
+        return "Big Blind";
+    default:
+        return "???";
+    }
 }
 } // namespace poker::ui::formatter

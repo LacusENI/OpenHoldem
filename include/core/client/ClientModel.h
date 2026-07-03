@@ -9,8 +9,10 @@
 namespace poker {
 class ClientModel {
 public:
+    seat_idx_t this_player_seat;
     chips_t pot{};
     std::vector<Player> players;
+    std::vector<PlayerState> player_states;
     seat_idx_t btn_seat{};
     Stage current_stage{};
     chips_t big_blind{};

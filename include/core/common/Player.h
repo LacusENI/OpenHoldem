@@ -4,6 +4,8 @@
 #include "GameTypes.h"
 
 namespace poker {
+enum class PlayerState { IDLE, BET, RAISED, CALLED, CHECKED, ALL_IN, FOLDED, SMALL_BLIND, BIG_BLIND };
+
 /**
  * @brief 玩家实体类
  */
@@ -14,9 +16,6 @@ struct Player {
     chips_t chips = 0;      // 玩家拥有的筹码
     bool is_folded = false; // 玩家是否已弃牌
     bool is_allin = false;  // 玩家是否已 all-in
-
-    Player() = default;
-    explicit Player(seat_idx_t position) : position(position) {}
 
     void win(chips_t delta) { chips += delta; }
     void bet(chips_t delta) { chips -= delta; }

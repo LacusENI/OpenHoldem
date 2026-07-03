@@ -50,8 +50,10 @@ target_include_directories(poker_core PUBLIC
 
 # 程序 UI
 add_library(poker_ui
+        include/ui/ConsoleView.h
         include/ui/Formatter.h
 
+        src/ui/ConsoleView.cpp
         src/ui/Formatter.cpp
 )
 
