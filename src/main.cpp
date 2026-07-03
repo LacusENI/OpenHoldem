@@ -1,8 +1,8 @@
 #include <spdlog/spdlog.h>
 
 #include "BettingRound.h"
+#include "ClientController.h"
 #include "ClientModel.h"
-#include "ClientView.h"
 #include "ConsoleView.h"
 #include "Deck.h"
 #include "Event.h"
@@ -22,13 +22,18 @@ int main() {
     auto betting_round = std::make_unique<BettingRound>();
     auto game_model = std::make_unique<GameModel>(event_bus, std::move(deck), pot_manager,
                                                   seat_manager, std::move(betting_round));
-    GameController game_controller(event_bus, std::move(game_model));
+    auto game_controller = std::make_unique<GameController>(event_bus, std::move(game_model));
+    auto client_model = std::make_unique<ClientModel>();
+    auto console_view = std::make_unique<ui::ConsoleView>();
+    auto client_controller = std::make_unique<ClientController>(event_bus, std::move(client_model), std::move(console_view));
 
     seat_manager->addNewPlayer();
     seat_manager->addNewPlayer();
 
-    event_bus->subscribe<Event::GameStarted>(
-        [](const Event::GameStarted& event) { spdlog::info(std::format("[Game] Game Started")); });
+    event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
+        spdlog::info(std::format("[Game] Game Started | btn_seat={} big_blind={}", event.btn_seat,
+                                 event.big_blind));
+    });
     event_bus->subscribe<Event::GameEnded>(
         [](const Event::GameEnded&) { spdlog::info("[Game] Game Ended"); });
     event_bus->subscribe<Event::StageChanged>([](const Event::StageChanged& event) {
@@ -71,17 +76,10 @@ int main() {
     event_bus->subscribe<Event::HoleCardsRevealed>([](const Event::HoleCardsRevealed& event) {
         spdlog::info("[Game] Hole Cards Revealed | ...");
     });
-    game_controller.subscribeEvents();
-    game_controller.startGame();
+    game_controller->subscribeEvents();
 
-    ClientModel client_model;
-    client_model.players = {Player{.position = 0, .hole_cards = {Card("C8"), Card("CA")}, .chips = 50},Player{.position = 1, .chips = 20}};
-    client_model.this_player_seat = 0;
-    client_model.pot = 20;
-    client_model.player_bets = {5, 15};
-    client_model.player_states = {PlayerState::BET, PlayerState::RAISED};
-    client_model.community_cards = {Card("DT"), Card("DA"), Card("HT")};
-    ui::ConsoleView console_view;
-    console_view.render(client_model);
+    client_controller->subscribeEvent();
+
+    game_controller->startGame();
     return 0;
 }

@@ -40,6 +40,7 @@ public:
               std::unique_ptr<BettingRound> betting_round);
     ~GameModel();
 
+    seat_idx_t getBtnSeat() const;
     Stage getCurrentStage() const;
     void setCurrentStage(Stage next_street);
     chips_t getBigBlind() const;

@@ -30,6 +30,7 @@ add_library(poker_core
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
         src/core/algo/round_state.cpp
+        src/core/client/ClientController.cpp
         src/core/common/Card.cpp
         src/core/common/Deck.cpp
         src/core/common/GameTypes.cpp

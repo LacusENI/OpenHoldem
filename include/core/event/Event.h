@@ -1,5 +1,4 @@
 #pragma once
-#include <variant>
 #include <vector>
 
 #include "Card.h"
@@ -8,7 +7,11 @@
 
 namespace poker {
 namespace Event {
-struct GameStarted {};
+struct GameStarted {
+    seat_idx_t btn_seat;
+    chips_t big_blind;
+    int player_count;
+};
 
 struct HoleCardsDealt {
     seat_idx_t player_seat;
@@ -93,5 +96,5 @@ struct MinRaiseDeltaUpdated {
 };
 
 } // namespace Event
-using GameEvent = std::variant<Event::GameStarted, Event::GameEnded>;
+
 } // namespace poker

@@ -45,6 +45,9 @@ GameModel::GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck>
       betting_round(std::move(betting_round)) {}
 
 GameModel::~GameModel() = default;
+seat_idx_t GameModel::getBtnSeat() const {
+    return seat_manager->getBtnSeat();
+}
 
 Stage GameModel::getCurrentStage() const {
     return current_stage;
@@ -75,6 +78,9 @@ void GameModel::startGame() {
     deck->shuffle();
     pot_manager->clearPot();
     betting_round->onGameStarted(seat_manager->getPlayerCount());
+    event_bus->publish(Event::GameStarted{.btn_seat = getBtnSeat(),
+                                          .big_blind = big_blind,
+                                          .player_count = seat_manager->getPlayerCount()});
 }
 
 void GameModel::dealHoleCards() {

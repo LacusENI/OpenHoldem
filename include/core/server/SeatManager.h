@@ -16,7 +16,7 @@ private:
 
 public:
     SeatManager() = default;
-    size_t getPlayerCount() const { return players.size(); }
+    int getPlayerCount() const { return players.size(); }
     const std::vector<Player>& getPlayerList() const { return players; }
     std::vector<Player>& getPlayerList() { return players; }
     void addNewPlayer() {

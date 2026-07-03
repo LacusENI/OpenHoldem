@@ -21,7 +21,6 @@ void GameController::subscribeEvents() {
 
 void GameController::startGame() {
     game_model->startGame();
-    event_bus->publish(Event::GameStarted{});
     enterStage(Stage::PREFLOP);
 }
 
