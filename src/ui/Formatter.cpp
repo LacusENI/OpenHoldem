@@ -154,7 +154,7 @@ std::string format(const Stage& stage) {
 std::string format(const PlayerState& player_state) {
     switch (player_state) {
     case PlayerState::IDLE:
-        return "Idle";
+        return " ";
     case PlayerState::BET:
         return "Bet";
     case PlayerState::RAISED:

@@ -27,9 +27,12 @@ void ClientController::subscribeEvent() {
         [this](const auto& event) { this->onBettingRoundEnded(event); });
     event_bus->subscribe<Event::PlayerActed>(
         [this](const auto& event) { this->onPlayerActed(event); });
+    event_bus->subscribe<Event::AwaitPlayerInput>(
+        [this](const auto& event) { this->onAwaitPlayerInput(event); });
 }
 void ClientController::onGameStarted(const Event::GameStarted& event) {
     client_model->btn_seat = event.btn_seat;
+    client_model->big_blind = event.big_blind;
     client_model->players.resize(event.player_count);
     for (seat_idx_t seat = 0; seat < client_model->players.size(); ++seat) {
         client_model->players[seat].position = seat;
@@ -69,7 +72,14 @@ void ClientController::onBettingRoundEnded(const Event::BettingRoundEnded& event
     }
     client_view->render(*client_model);
 }
-void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {}
+
+void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {
+    if (event.actor_seat == client_model->this_player_seat) {
+        event_bus->publish(
+            Event::PlayerInputSubmitted{.target_bet = client_model->big_blind, .is_fold = false});
+    }
+}
+
 void ClientController::onPlayerActed(const Event::PlayerActed& event) {
     PlayerState player_state;
     switch (event.action) {

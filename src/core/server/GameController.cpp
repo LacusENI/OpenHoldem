@@ -12,9 +12,7 @@ GameController::GameController(std::shared_ptr<EventBus> event_bus,
 
 GameController::~GameController() = default;
 
-void GameController::subscribeEvents() {
-    event_bus->subscribe<Event::AwaitPlayerInput>(
-        [this](const auto& event) { this->onAwaitPlayerInput(event); });
+void GameController::subscribeEvent() {
     event_bus->subscribe<Event::PlayerInputSubmitted>(
         [this](const auto& event) { this->handlePlayerInput(event); });
 }
@@ -37,9 +35,6 @@ void GameController::awaitPlayerInput() {
     game_model->awaitPlayerInput();
 }
 
-void GameController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {
-    event_bus->publish(Event::PlayerInputSubmitted{game_model->getBigBlind(), false});
-}
 
 void GameController::handlePlayerInput(const Event::PlayerInputSubmitted& event) {
     game_model->processPlayerInput(event);

@@ -13,10 +13,10 @@ void ConsoleView::render(const ClientModel& client_model) {
                              client_model.pot, format(client_model.community_cards));
     for (const Player& player : client_model.players) {
         std::string flag = player.position == client_model.this_player_seat ? "(You)" : "";
-        std::cout << std::format("[@P{}] {:5} ${}, {}\n", player.position + 1, flag,
+        std::cout << std::format("[@P{}] {:5} ${} {}\n", player.position + 1, flag,
                                  client_model.player_bets[player.position],
                                  format(client_model.player_states[player.position]));
-        std::cout << std::format("${}, {} | \n", player.chips, format(player.hole_cards));
+        std::cout << std::format("${:3}, {} | \n", player.chips, format(player.hole_cards));
     }
 }
 

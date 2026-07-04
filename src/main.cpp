@@ -23,9 +23,15 @@ int main() {
     auto game_model = std::make_unique<GameModel>(event_bus, std::move(deck), pot_manager,
                                                   seat_manager, std::move(betting_round));
     auto game_controller = std::make_unique<GameController>(event_bus, std::move(game_model));
-    auto client_model = std::make_unique<ClientModel>();
-    auto console_view = std::make_unique<ui::ConsoleView>();
-    auto client_controller = std::make_unique<ClientController>(event_bus, std::move(client_model), std::move(console_view));
+    auto client_model_0 = std::make_unique<ClientModel>();
+    client_model_0->this_player_seat = 0;
+    auto console_view_0 = std::make_unique<ui::ConsoleView>();
+    auto client_controller_0 = std::make_unique<ClientController>(event_bus, std::move(client_model_0), std::move(console_view_0));
+
+    auto client_model_1 = std::make_unique<ClientModel>();
+    client_model_1->this_player_seat = 1;
+    auto console_view_1 = std::make_unique<ui::ConsoleView>();
+    auto client_controller_1 = std::make_unique<ClientController>(event_bus, std::move(client_model_1), std::move(console_view_1));
 
     seat_manager->addNewPlayer();
     seat_manager->addNewPlayer();
@@ -76,9 +82,10 @@ int main() {
     event_bus->subscribe<Event::HoleCardsRevealed>([](const Event::HoleCardsRevealed& event) {
         spdlog::info("[Game] Hole Cards Revealed | ...");
     });
-    game_controller->subscribeEvents();
 
-    client_controller->subscribeEvent();
+    game_controller->subscribeEvent();
+    client_controller_0->subscribeEvent();
+    client_controller_1->subscribeEvent();
 
     game_controller->startGame();
     return 0;

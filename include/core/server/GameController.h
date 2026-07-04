@@ -20,7 +20,7 @@ public:
     ~GameController();
 
     /* 订阅事件 */
-    void subscribeEvents();
+    void subscribeEvent();
 
     /* 开始一局游戏 */
     void startGame();
@@ -30,8 +30,6 @@ public:
     void startBettingRound();
     /* 等待玩家输入 */
     void awaitPlayerInput();
-    /* 询问玩家行动 */
-    void onAwaitPlayerInput(const Event::AwaitPlayerInput& event);
     /* 处理玩家输入 */
     void handlePlayerInput(const Event::PlayerInputSubmitted& event);
     /* 完成下注轮 */
