@@ -20,6 +20,9 @@ public:
     ~ClientController();
 
     void subscribeEvent();
+    void joinGame();
+    void onPlayerJoinSucceeded(const Event::PlayerJoinSucceeded& event);
+    void onGameJoined(const Event::PlayerJoined& event);
     void onGameStarted(const Event::GameStarted& event);
     void onHoleCardsDealt(const Event::HoleCardsDealt& event);
     void onBlindPosted(const Event::BlindPosted& event);

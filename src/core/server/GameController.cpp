@@ -13,8 +13,13 @@ GameController::GameController(std::shared_ptr<EventBus> event_bus,
 GameController::~GameController() = default;
 
 void GameController::subscribeEvent() {
+    event_bus->subscribe<Event::PlayerJoining>(
+        [this](const Event::PlayerJoining& event) { this->handlePlayerJoining(event); });
     event_bus->subscribe<Event::PlayerInputSubmitted>(
         [this](const auto& event) { this->handlePlayerInput(event); });
+}
+void GameController::handlePlayerJoining(const Event::PlayerJoining& event) {
+    game_model->joinNewPlayer();
 }
 
 void GameController::startGame() {

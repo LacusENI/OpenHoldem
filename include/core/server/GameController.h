@@ -22,6 +22,7 @@ public:
     /* 订阅事件 */
     void subscribeEvent();
 
+    void handlePlayerJoining(const Event::PlayerJoining& event);
     /* 开始一局游戏 */
     void startGame();
     /* 进入指定阶段 */

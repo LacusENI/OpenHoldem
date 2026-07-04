@@ -16,6 +16,8 @@ public:
     ~Client() = default;
 
     void subscribeEvent() {
+        client_event_bus->subscribe<Event::PlayerJoining>(
+            [this](const Event::PlayerJoining& event) { sendToServer(event); });
         client_event_bus->subscribe<Event::PlayerInputSubmitted>(
             [this](const Event::PlayerInputSubmitted& event) { sendToServer(event); });
     }

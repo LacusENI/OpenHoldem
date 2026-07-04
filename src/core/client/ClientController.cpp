@@ -13,6 +13,8 @@ ClientController::ClientController(std::shared_ptr<EventBus> event_bus,
       client_view(std::move(client_view)) {}
 ClientController::~ClientController() = default;
 void ClientController::subscribeEvent() {
+    event_bus->subscribe<Event::PlayerJoinSucceeded>(
+        [this](const auto& event) { this->onPlayerJoinSucceeded(event); });
     event_bus->subscribe<Event::GameStarted>(
         [this](const auto& event) { this->onGameStarted(event); });
     event_bus->subscribe<Event::HoleCardsDealt>(
@@ -30,6 +32,13 @@ void ClientController::subscribeEvent() {
     event_bus->subscribe<Event::AwaitPlayerInput>(
         [this](const auto& event) { this->onAwaitPlayerInput(event); });
 }
+void ClientController::joinGame() {
+    event_bus->publish(Event::PlayerJoining{});
+}
+void ClientController::onPlayerJoinSucceeded(const Event::PlayerJoinSucceeded& event) {
+    client_model->this_player_seat = event.player_seat;
+}
+void ClientController::onGameJoined(const Event::PlayerJoined& event) {}
 void ClientController::onGameStarted(const Event::GameStarted& event) {
     client_model->btn_seat = event.btn_seat;
     client_model->big_blind = event.big_blind;

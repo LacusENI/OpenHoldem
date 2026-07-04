@@ -30,14 +30,12 @@ int main() {
     // Client 0
     auto client_event_bus_0 = std::make_shared<EventBus>();
     auto client_model_0 = std::make_unique<ClientModel>();
-    client_model_0->this_player_seat = 0;
     auto console_view_0 = std::make_unique<ui::ConsoleView>();
     auto client_controller_0 = std::make_unique<ClientController>(client_event_bus_0, std::move(client_model_0), std::move(console_view_0));
 
     // Client 1
     auto client_event_bus_1 = std::make_shared<EventBus>();
     auto client_model_1 = std::make_unique<ClientModel>();
-    client_model_1->this_player_seat = 1;
     auto console_view_1 = std::make_unique<ui::ConsoleView>();
     auto client_controller_1 = std::make_unique<ClientController>(client_event_bus_1, std::move(client_model_1), std::move(console_view_1));
 
@@ -47,9 +45,9 @@ int main() {
     auto client_0 = std::make_unique<Client>(client_event_bus_0, server_event_bus);
     auto client_1 = std::make_unique<Client>(client_event_bus_1, server_event_bus);
 
-    seat_manager->addNewPlayer();
-    seat_manager->addNewPlayer();
-
+    server_event_bus->subscribe<Event::PlayerJoined>([](const Event::PlayerJoined& event) {
+        spdlog::info(std::format("[Game] Player Joined | new_seat={}", event.new_seat));
+    });
     server_event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
         spdlog::info(std::format("[Game] Game Started | btn_seat={} big_blind={}", event.btn_seat,
                                  event.big_blind));
@@ -105,6 +103,8 @@ int main() {
     client_0->subscribeEvent();
     client_1->subscribeEvent();
 
+    client_controller_0->joinGame();
+    client_controller_1->joinGame();
     game_controller->startGame();
     return 0;
 }

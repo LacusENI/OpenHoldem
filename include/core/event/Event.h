@@ -7,6 +7,18 @@
 
 namespace poker {
 namespace Event {
+
+struct PlayerJoining {};
+
+struct PlayerJoined {
+    seat_idx_t new_seat;
+    int player_count;
+};
+
+struct PlayerJoinSucceeded {
+    seat_idx_t player_seat;
+};
+
 struct GameStarted {
     seat_idx_t btn_seat;
     chips_t big_blind;

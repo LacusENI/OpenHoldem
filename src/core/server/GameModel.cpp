@@ -73,6 +73,14 @@ bool GameModel::isRoundFinished() const {
     return betting_round->isRoundFinished();
 }
 
+void GameModel::joinNewPlayer() {
+    seat_manager->addNewPlayer();
+    const Player& player = seat_manager->getPlayerList().back();
+    event_bus->publish(Event::PlayerJoined{.new_seat = player.position,
+                                           .player_count = seat_manager->getPlayerCount()});
+    event_bus->publish(Event::PlayerJoinSucceeded{.player_seat = player.position});
+}
+
 void GameModel::startGame() {
     current_stage = Stage::IDLE;
     deck->shuffle();

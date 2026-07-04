@@ -48,6 +48,8 @@ public:
     seat_idx_t getActorSeat() const;
     bool isRoundFinished() const;
 
+    /* 加入新玩家 */
+    void joinNewPlayer();
     /* 开始一局游戏 */
     void startGame();
     /* 向所有玩家发放底牌 */
