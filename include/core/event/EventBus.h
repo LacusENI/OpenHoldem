@@ -10,20 +10,20 @@ using Handler = std::function<void(const void*)>;
  */
 class EventBus {
 private:
-    static std::unordered_map<std::type_index, std::vector<Handler>>& getHandlers() {
-        static std::unordered_map<std::type_index, std::vector<Handler>> handlers;
-        return handlers;
-    }
+    std::unordered_map<std::type_index, std::vector<Handler>> handlers_map;
 
 public:
+    EventBus() = default;
+    ~EventBus() = default;
+
     /**
      * 订阅事件
      * @tparam T 事件类型
      * @param callback 回调函数
      */
     template <typename T>
-    static void subscribe(std::function<void(const T&)> callback) {
-        getHandlers()[typeid(T)].push_back(
+    void subscribe(std::function<void(const T&)> callback) {
+        handlers_map[typeid(T)].push_back(
             [callback](const void* eventPtr) { callback(*static_cast<const T*>(eventPtr)); });
     }
 
@@ -33,9 +33,8 @@ public:
      * @param event 事件
      */
     template <typename T>
-    static void publish(const T& event) {
-        auto& handlers = getHandlers()[typeid(T)];
-        for (auto& handler : handlers) {
+    void publish(const T& event) {
+        for (auto& handler : handlers_map[typeid(T)]) {
             handler(&event);
         }
     }

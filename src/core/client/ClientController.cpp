@@ -74,7 +74,7 @@ void ClientController::onBettingRoundEnded(const Event::BettingRoundEnded& event
 }
 
 void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {
-    if (event.actor_seat == client_model->this_player_seat) {
+    if (event.player_seat == client_model->this_player_seat) {
         event_bus->publish(
             Event::PlayerInputSubmitted{.target_bet = client_model->big_blind, .is_fold = false});
     }

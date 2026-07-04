@@ -40,7 +40,7 @@ struct BettingRoundStarted {};
 struct BettingRoundEnded {};
 
 struct AwaitPlayerInput {
-    seat_idx_t actor_seat;
+    seat_idx_t player_seat;
     chips_t player_chips;
     chips_t player_bet;
     chips_t round_bet;

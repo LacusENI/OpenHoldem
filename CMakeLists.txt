@@ -38,6 +38,8 @@ add_library(poker_core
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
+        include/core/server/Server.h
+        include/core/client/Client.h
 )
 
 target_include_directories(poker_core PUBLIC

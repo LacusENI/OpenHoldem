@@ -35,7 +35,6 @@ void GameController::awaitPlayerInput() {
     game_model->awaitPlayerInput();
 }
 
-
 void GameController::handlePlayerInput(const Event::PlayerInputSubmitted& event) {
     game_model->processPlayerInput(event);
     if (game_model->isRoundFinished()) {

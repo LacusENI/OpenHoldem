@@ -118,6 +118,11 @@ void GameModel::postForcedBlind() {
     seat_idx_t sb_seat = seat_manager->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
     const Player& sb_player = seat_manager->getPlayerAtSeat(sb_seat);
+    // Big Blind
+    seat_idx_t bb_seat = seat_manager->getBbSeat();
+    const Player& bb_player = seat_manager->getPlayerAtSeat(bb_seat);
+    takePlayerChipsToPot(bb_seat, big_blind);
+    betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
     event_bus->publish(
         Event::BlindPosted{.seat = sb_seat,
                            .amount = big_blind / 2,
@@ -125,11 +130,6 @@ void GameModel::postForcedBlind() {
                            .pot = pot_manager->getPot(),
                            .player_chips = sb_player.chips,
                            .player_bet = betting_round->getPlayerBetAtSeat(sb_seat)});
-    // Big Blind
-    seat_idx_t bb_seat = seat_manager->getBbSeat();
-    const Player& bb_player = seat_manager->getPlayerAtSeat(bb_seat);
-    takePlayerChipsToPot(bb_seat, big_blind);
-    betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
     event_bus->publish(
         Event::BlindPosted{.seat = bb_seat,
                            .amount = big_blind,

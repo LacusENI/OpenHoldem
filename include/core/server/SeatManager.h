@@ -21,7 +21,7 @@ public:
     std::vector<Player>& getPlayerList() { return players; }
     void addNewPlayer() {
         players.emplace_back();
-        players.back().position = players.size();
+        players.back().position = players.size() - 1;
     }
     void setBtnSeat(seat_idx_t new_btn_position) { btn_seat = new_btn_position; }
     seat_idx_t getBtnSeat() const { return btn_seat; }
