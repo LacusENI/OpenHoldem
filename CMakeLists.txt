@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED COMPONENTS Network)
+find_package(nlohmann_json CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
@@ -79,6 +80,7 @@ add_executable(poker_client
 target_link_libraries(poker_client PRIVATE
         poker_core
         SFML::Network
+        nlohmann_json::nlohmann_json
 )
 
 
@@ -90,6 +92,7 @@ add_executable(poker_server
 target_link_libraries(poker_server PRIVATE
         poker_core
         SFML::Network
+        nlohmann_json::nlohmann_json
 )
 
 
