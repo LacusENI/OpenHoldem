@@ -5,5 +5,13 @@
     "name" : "gtest"
   }, {
     "name" : "spdlog"
+  }, {
+    "name": "sfml",
+    "features": [
+      "network",
+      "graphics",
+      "window",
+      "audio"
+    ]
   } ]
 }

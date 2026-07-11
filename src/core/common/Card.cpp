@@ -1,7 +1,6 @@
 #include "Card.h"
 
 #include <format>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -24,7 +23,7 @@ Card::Card(const char* str) {
         suit = Suit::SPADE;
         break;
     default:
-        throw std::invalid_argument("invalid card string: " + std::string(str));
+        suit = Suit::NONE;
     }
     switch (str[1]) {
     case '_':
@@ -49,7 +48,7 @@ Card::Card(const char* str) {
         if (str[1] >= '2' && str[1] <= '9') {
             rank = static_cast<Rank>(str[1] - '0');
         } else {
-            throw std::invalid_argument("invalid card string: " + std::string(str));
+            rank = Rank::NONE;
         }
     }
 }

@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 20)
 
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(SFML CONFIG REQUIRED COMPONENTS Network)
 
 # 业务核心
 add_library(poker_core
@@ -70,14 +71,25 @@ target_link_libraries(poker_ui PUBLIC
 )
 
 
-# 主程序
-add_executable(open_holdem
-        src/main.cpp
+# 客户端程序
+add_executable(poker_client
+        src/client.cpp
 )
 
-target_link_libraries(open_holdem PRIVATE
+target_link_libraries(poker_client PRIVATE
         poker_core
-        poker_ui
+        SFML::Network
+)
+
+
+# 服务器程序
+add_executable(poker_server
+        src/server.cpp
+)
+
+target_link_libraries(poker_server PRIVATE
+        poker_core
+        SFML::Network
 )
 
 
