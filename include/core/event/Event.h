@@ -1,4 +1,5 @@
 #pragma once
+#include <variant>
 #include <vector>
 
 #include "Card.h"
@@ -108,5 +109,5 @@ struct MinRaiseDeltaUpdated {
 };
 
 } // namespace Event
-
+using PokerEvent = std::variant<Event::PotUpdated, Event::RoundBetUpdated>;
 } // namespace poker
