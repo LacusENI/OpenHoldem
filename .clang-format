@@ -45,10 +45,32 @@ SpacesInContainerLiterals: false     # 初始化列表内部不加空格 {1, 2, 
 SpacesBeforeTrailingComments: 1      # 右括号和注释之间只留 1 个空格
 
 # --- 自动对齐与排序 ---
-# 自动按字母顺序对 #include 进行排序
 AllowShortEnumsOnASingleLine: true      # 允许短 enum 写在一行内
 AllowShortCaseLabelsOnASingleLine: true # 允许短 case 写在一行内
-SortIncludes: true
+IncludeBlocks: Regroup
+SortIncludes: CaseSensitive
+IncludeCategories: # include 分类与顺序
+  # 1. 当前文件对应的头文件/主头文件
+
+  # 2. C 系统头文件，例如 <sys/types.h>, <unistd.h>
+  # 匹配以 .h 结尾且不是双引号的系统头文件
+  - Regex:           '^<[^>]+\.h>$'
+    Priority:        2
+
+  # 3. C++ 标准库头文件，不带 .h 后缀
+  # 匹配所有不带任何点或斜杠的标准库头文件（如 <vector>, <iostream>, <variant>）
+  - Regex:           '^<[^./]+>$'
+    Priority:        3
+
+  # 4. 第三方库头文件
+  # 匹配带斜杠或带后缀、但又是尖括号引入的第三方库
+  - Regex:           '^<[^>]+>$'
+    Priority:        4
+
+  # 5. 项目的头文件
+  # 匹配用双引号引入的非主头文件的其他本地头文件
+  - Regex:           '^"[^"]+"$'
+    Priority:        5
 
 # 允许短的单行函数写在一行
 AllowShortFunctionsOnASingleLine: Inline

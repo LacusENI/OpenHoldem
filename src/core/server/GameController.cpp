@@ -1,8 +1,8 @@
 #include "GameController.h"
 
 #include "BettingRound.h"
-#include "Event.h"
-#include "EventBus.h"
+#include "Event.hpp"
+#include "EventBus.hpp"
 #include "GameModel.h"
 
 namespace poker {

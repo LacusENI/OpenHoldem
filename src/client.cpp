@@ -1,49 +1,18 @@
-#include <SFML/Network.hpp>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include <string>
 
+#include <SFML/Network.hpp>
+#include <nlohmann/json.hpp>
+
 #include "Card.hpp"
-#include "Event.h"
-#include "EventBus.h"
+#include "Event.hpp"
+#include "EventBus.hpp"
+#include "GeneralSerializer.hpp"
 
-namespace poker {
-NLOHMANN_JSON_SERIALIZE_ENUM(Suit, {{Suit::HEART, "Heart"},
-                                    {Suit::DIAMOND, "Diamond"},
-                                    {Suit::CLUB, "Club"},
-                                    {Suit::SPADE, "Spade"}});
-
-NLOHMANN_JSON_SERIALIZE_ENUM(Rank, {{Rank::TWO, "Two"},
-                                    {Rank::THREE, "Three"},
-                                    {Rank::FOUR, "Four"},
-                                    {Rank::FIVE, "Five"},
-                                    {Rank::SIX, "Six"},
-                                    {Rank::SEVEN, "Seven"},
-                                    {Rank::EIGHT, "Eight"},
-                                    {Rank::NINE, "Nine"},
-                                    {Rank::TEN, "Ten"},
-                                    {Rank::JACK, "Jack"},
-                                    {Rank::QUEEN, "Queen"},
-                                    {Rank::KING, "King"},
-                                    {Rank::ACE, "Ace"}});
-
-void to_json(nlohmann::json& j, const Card& card) {
-    j = to_string(card);
-}
-
-void from_json(const nlohmann::json& j, Card& card) {
-    if (j.is_string()) {
-        card = Card(j.get<std::string>().c_str());
-    } else {
-        throw nlohmann::json::type_error::create(302, "Expected string for Card", &j);
-    }
-}
-
-namespace Event {
+namespace poker::Event {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PotUpdated, pot);
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RoundBetUpdated, round_bet);
-} // namespace Event
-} // namespace poker
+}
 
 template <>
 struct nlohmann::adl_serializer<poker::PokerEvent> {

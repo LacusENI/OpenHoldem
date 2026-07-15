@@ -1,8 +1,8 @@
 #pragma once
 #include <memory>
 
-#include "Event.h"
-#include "EventBus.h"
+#include "Event.hpp"
+#include "EventBus.hpp"
 
 namespace poker {
 class Client {

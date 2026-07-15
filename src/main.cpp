@@ -1,6 +1,6 @@
 #include <spdlog/spdlog.h>
 
-#include "Event.h"
+#include "Event.hpp"
 #include "EventBus.h"
 
 int main() {

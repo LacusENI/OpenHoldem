@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "Card.hpp"
-#include "Event.h"
+#include "Event.hpp"
 #include "GameTypes.hpp"
 #include "chips_calc.h"
 

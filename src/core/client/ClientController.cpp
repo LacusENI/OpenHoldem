@@ -2,7 +2,7 @@
 
 #include "ClientModel.h"
 #include "ClientView.h"
-#include "EventBus.h"
+#include "EventBus.hpp"
 
 namespace poker {
 ClientController::ClientController(std::shared_ptr<EventBus> event_bus,
@@ -92,26 +92,13 @@ void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) 
 void ClientController::onPlayerActed(const Event::PlayerActed& event) {
     PlayerState player_state;
     switch (event.action) {
-    case Action::CALL:
-        player_state = PlayerState::CALLED;
-        break;
-    case Action::CHECK:
-        player_state = PlayerState::CHECKED;
-        break;
-    case Action::RAISE:
-        player_state = PlayerState::RAISED;
-        break;
-    case Action::BET:
-        player_state = PlayerState::BET;
-        break;
-    case Action::FOLD:
-        player_state = PlayerState::FOLDED;
-        break;
-    case Action::ALL_IN:
-        player_state = PlayerState::ALL_IN;
-        break;
-    default:
-        player_state = PlayerState::IDLE;
+    case Action::CALL: player_state = PlayerState::CALLED; break;
+    case Action::CHECK: player_state = PlayerState::CHECKED; break;
+    case Action::RAISE: player_state = PlayerState::RAISED; break;
+    case Action::BET: player_state = PlayerState::BET; break;
+    case Action::FOLD: player_state = PlayerState::FOLDED; break;
+    case Action::ALL_IN: player_state = PlayerState::ALL_IN; break;
+    default: player_state = PlayerState::IDLE;
     }
     client_model->player_states[event.actor_seat] = player_state;
     client_model->pot = event.pot;

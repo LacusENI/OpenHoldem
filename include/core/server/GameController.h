@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include "Event.h"
+#include "Event.hpp"
 
 namespace poker {
 class EventBus;

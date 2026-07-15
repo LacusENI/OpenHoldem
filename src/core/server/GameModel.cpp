@@ -2,8 +2,8 @@
 
 #include "BettingRound.h"
 #include "Deck.hpp"
-#include "Event.h"
-#include "EventBus.h"
+#include "Event.hpp"
+#include "EventBus.hpp"
 #include "PotManager.h"
 #include "SeatManager.h"
 #include "eval_hand.h"

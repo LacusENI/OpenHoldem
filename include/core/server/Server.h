@@ -2,8 +2,8 @@
 #include <memory>
 #include <vector>
 
-#include "Event.h"
-#include "EventBus.h"
+#include "Event.hpp"
+#include "EventBus.hpp"
 
 namespace poker {
 class Server {

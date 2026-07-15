@@ -13,32 +13,35 @@ find_package(magic_enum CONFIG REQUIRED)
 
 # 业务核心
 add_library(poker_core
+        include/core/common/Card.hpp
+        include/core/common/Deck.hpp
+        include/core/common/GameTypes.hpp
+        include/core/common/HandValue.hpp
+        include/core/common/Player.hpp
+
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
         include/core/algo/round_state.h
+        src/core/algo/chips_calc.cpp
+        src/core/algo/eval_hand.cpp
+        src/core/algo/round_state.cpp
+
         include/core/client/ClientModel.h
         include/core/client/ClientController.h
         include/core/client/ClientView.h
-        include/core/common/Card.h
-        include/core/common/Deck.h
-        include/core/common/GameTypes.h
-        include/core/event/Event.h
-        include/core/event/EventBus.h
+        src/core/client/ClientController.cpp
+
+        include/core/event/Event.hpp
+        include/core/event/EventBus.hpp
+
         include/core/server/BettingRound.h
         include/core/server/GameController.h
         include/core/server/GameModel.h
         include/core/server/PotManager.h
         include/core/server/SeatManager.h
-
-        src/core/algo/chips_calc.cpp
-        src/core/algo/eval_hand.cpp
-        src/core/algo/round_state.cpp
-        src/core/client/ClientController.cpp
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
-        include/core/server/Server.h
-        include/core/client/Client.h
 )
 
 target_include_directories(poker_core PUBLIC
@@ -54,20 +57,46 @@ target_link_libraries(poker_core PUBLIC
 )
 
 
-# 程序 UI
-add_library(poker_ui
-        include/ui/ConsoleView.h
-        include/ui/Formatter.h
+# 应用层
+add_library(application
+        include/logging/Logger.hpp
 
-        src/ui/ConsoleView.cpp
-        src/ui/Formatter.cpp
+        include/network/ClientNetwork.h
+        include/network/ServerNetwork.h
+
+        include/serialization/EventSerializer.hpp
+        include/serialization/GeneralSerializer.hpp
 )
 
-target_include_directories(poker_ui PUBLIC
-        include/ui
+target_include_directories(application PUBLIC
+        include/logging
+        include/network
+        include/serialization
 )
 
-target_link_libraries(poker_ui PUBLIC
+target_link_libraries(application PUBLIC
+        poker_core
+        magic_enum::magic_enum
+        spdlog::spdlog_header_only
+        nlohmann_json::nlohmann_json
+        SFML::Network
+)
+
+
+# 表现层
+add_library(presentation
+        include/presentation/ConsoleView.h
+        include/presentation/Formatter.h
+
+        src/presentation/ConsoleView.cpp
+        src/presentation/Formatter.cpp
+)
+
+target_include_directories(presentation PUBLIC
+        include/presentation
+)
+
+target_link_libraries(presentation PUBLIC
         poker_core
         spdlog::spdlog_header_only
 )
@@ -80,8 +109,8 @@ add_executable(poker_client
 
 target_link_libraries(poker_client PRIVATE
         poker_core
-        SFML::Network
-        nlohmann_json::nlohmann_json
+        application
+        presentation
 )
 
 
@@ -92,8 +121,7 @@ add_executable(poker_server
 
 target_link_libraries(poker_server PRIVATE
         poker_core
-        SFML::Network
-        nlohmann_json::nlohmann_json
+        application
 )
 
 
