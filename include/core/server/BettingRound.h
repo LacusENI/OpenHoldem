@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "GameTypes.h"
+#include "GameTypes.hpp"
 #include "chips_calc.h"
 #include "round_state.h"
 

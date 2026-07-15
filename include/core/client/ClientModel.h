@@ -2,9 +2,9 @@
 
 #include <vector>
 
-#include "Card.h"
-#include "GameTypes.h"
-#include "Player.h"
+#include "Card.hpp"
+#include "GameTypes.hpp"
+#include "Player.hpp"
 
 namespace poker {
 class ClientModel {

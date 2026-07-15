@@ -6,14 +6,11 @@
   }, {
     "name" : "spdlog"
   }, {
-    "name": "sfml",
-    "features": [
-      "network",
-      "graphics",
-      "window",
-      "audio"
-    ]
+    "name" : "sfml",
+    "features" : [ "network", "graphics", "window", "audio" ]
   }, {
-    "name": "nlohmann-json"
+    "name" : "nlohmann-json"
+  }, {
+    "name" : "magic-enum"
   } ]
 }

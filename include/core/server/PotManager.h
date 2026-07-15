@@ -1,5 +1,5 @@
 #pragma once
-#include "GameTypes.h"
+#include "GameTypes.hpp"
 
 namespace poker {
 /**

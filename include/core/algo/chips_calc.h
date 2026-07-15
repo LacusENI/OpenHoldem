@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "GameTypes.h"
+#include "GameTypes.hpp"
 
 namespace poker::algo {
 

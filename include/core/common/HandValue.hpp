@@ -1,8 +1,10 @@
 #pragma once
 
+#include <format>
+#include <magic_enum/magic_enum.hpp>
 #include <vector>
 
-#include "Card.h"
+#include "Card.hpp"
 
 namespace poker {
 
@@ -19,8 +21,6 @@ enum class HandType {
     STRAIGHT_FLUSH,
     ROYAL_FLUSH
 };
-
-std::string to_string(HandType hand_type);
 
 /**
  * @brief 表示一手牌的强度和比较逻辑的类型
@@ -47,6 +47,8 @@ public:
     HandValue() = default;
     explicit HandValue(int raw_value) : raw_value(raw_value) {}
 
+    uint32_t get() const { return raw_value; }
+
     /* 获取此手牌分值对应的手牌类型 */
     [[nodiscard]] HandType getHandType() const { return static_cast<HandType>(raw_value >> 20); }
 
@@ -72,9 +74,42 @@ public:
      * @param ranks 按比较优先级排列的点数 (不重复)
      * @return HandValue
      */
-    HandValue static build(HandType hand_type, std::vector<Rank> ranks);
+    static HandValue build(HandType hand_type, std::vector<Rank> ranks) {
+        int handValue = static_cast<int>(hand_type);
+        int i = 0;
+        for (; i < ranks.size(); i++) {
+            handValue = (handValue << 4) + static_cast<int>(ranks[i]);
+        }
+        for (; i < 5; i++) handValue = handValue << 4;
+        return HandValue(handValue);
+    }
 };
 
-std::string to_string(HandValue hand_value);
-std::ostream& operator<<(std::ostream& os, const HandValue& hand_value);
+inline std::string to_string(HandType hand_type) {
+    return std::string{magic_enum::enum_name(hand_type)};
+}
+
+inline std::string to_string(HandValue hand_value) {
+    return std::format("{:x}", hand_value.get());
+}
+
+template <typename T>
+std::optional<T> from_string(std::string_view str);
+
+template <>
+inline std::optional<HandType> from_string(std::string_view str) {
+    return magic_enum::enum_cast<HandType>(str);
+}
+
+template <>
+inline std::optional<HandValue> from_string(std::string_view str) {
+    try {
+        unsigned long value = std::stoul(std::string{str}, nullptr, 16);
+        return HandValue(static_cast<int>(value));
+    } catch (const std::invalid_argument& e) {
+        return std::nullopt;
+    } catch (const std::out_of_range& e) {
+        return std::nullopt;
+    }
+}
 } // namespace poker

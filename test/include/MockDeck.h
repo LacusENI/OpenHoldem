@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "Deck.h"
+#include "Deck.hpp"
 
 class MockDeck : public poker::IDeck {
 public:

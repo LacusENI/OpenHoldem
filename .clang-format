@@ -46,6 +46,8 @@ SpacesBeforeTrailingComments: 1      # 右括号和注释之间只留 1 个空�
 
 # --- 自动对齐与排序 ---
 # 自动按字母顺序对 #include 进行排序
+AllowShortEnumsOnASingleLine: true      # 允许短 enum 写在一行内
+AllowShortCaseLabelsOnASingleLine: true # 允许短 case 写在一行内
 SortIncludes: true
 
 # 允许短的单行函数写在一行

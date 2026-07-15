@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Card.h"
-#include "HandValue.h"
+#include "Card.hpp"
+#include "HandValue.hpp"
 
 namespace poker::algo {
 /**

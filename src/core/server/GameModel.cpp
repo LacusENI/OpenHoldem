@@ -1,7 +1,7 @@
 #include "GameModel.h"
 
 #include "BettingRound.h"
-#include "Deck.h"
+#include "Deck.hpp"
 #include "Event.h"
 #include "EventBus.h"
 #include "PotManager.h"

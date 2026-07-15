@@ -1,10 +1,35 @@
 #pragma once
 
-#include "Card.h"
-#include "GameTypes.h"
+#include <magic_enum/magic_enum.hpp>
+#include <string>
+
+#include "Card.hpp"
+#include "GameTypes.hpp"
 
 namespace poker {
-enum class PlayerState { IDLE, BET, RAISED, CALLED, CHECKED, ALL_IN, FOLDED, SMALL_BLIND, BIG_BLIND };
+enum class PlayerState {
+    IDLE,
+    BET,
+    RAISED,
+    CALLED,
+    CHECKED,
+    ALL_IN,
+    FOLDED,
+    SMALL_BLIND,
+    BIG_BLIND
+};
+
+inline std::string to_string(PlayerState state) {
+    return std::string{magic_enum::enum_name(state)};
+}
+
+template <typename T>
+std::optional<T> from_string(std::string_view str);
+
+template <>
+inline std::optional<PlayerState> from_string(std::string_view str) {
+    return magic_enum::enum_cast<PlayerState>(str);
+}
 
 /**
  * @brief 玩家实体类

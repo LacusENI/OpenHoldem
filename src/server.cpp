@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "Card.h"
+#include "Card.hpp"
 #include "Event.h"
 #include "EventBus.h"
 

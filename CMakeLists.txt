@@ -4,11 +4,12 @@ project(OpenHoldem)
 set(CMAKE_CXX_STANDARD 20)
 
 # 项目依赖
-
 find_package(GTest CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(SFML CONFIG REQUIRED COMPONENTS Network)
 find_package(nlohmann_json CONFIG REQUIRED)
+find_package(magic_enum CONFIG REQUIRED)
+
 
 # 业务核心
 add_library(poker_core
@@ -33,10 +34,6 @@ add_library(poker_core
         src/core/algo/eval_hand.cpp
         src/core/algo/round_state.cpp
         src/core/client/ClientController.cpp
-        src/core/common/Card.cpp
-        src/core/common/Deck.cpp
-        src/core/common/GameTypes.cpp
-        src/core/common/HandValue.cpp
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
@@ -50,6 +47,10 @@ target_include_directories(poker_core PUBLIC
         include/core/client
         include/core/common
         include/core/server
+)
+
+target_link_libraries(poker_core PUBLIC
+        magic_enum::magic_enum
 )
 
 

@@ -3,9 +3,9 @@
 #include <memory>
 #include <vector>
 
-#include "Card.h"
+#include "Card.hpp"
 #include "Event.h"
-#include "GameTypes.h"
+#include "GameTypes.hpp"
 #include "chips_calc.h"
 
 namespace poker {

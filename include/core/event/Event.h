@@ -2,9 +2,9 @@
 #include <variant>
 #include <vector>
 
-#include "Card.h"
-#include "GameTypes.h"
-#include "HandValue.h"
+#include "Card.hpp"
+#include "GameTypes.hpp"
+#include "HandValue.hpp"
 
 namespace poker {
 namespace Event {

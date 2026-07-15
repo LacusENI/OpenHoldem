@@ -3,7 +3,7 @@
 #include <sstream>
 #include <string>
 
-#include "GameTypes.h"
+#include "GameTypes.hpp"
 
 namespace poker {
 enum class Rank : uint8_t;

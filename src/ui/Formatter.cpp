@@ -2,10 +2,10 @@
 
 #include <format>
 
-#include "Card.h"
-#include "GameTypes.h"
-#include "HandValue.h"
-#include "Player.h"
+#include "Card.hpp"
+#include "GameTypes.hpp"
+#include "HandValue.hpp"
+#include "Player.hpp"
 
 namespace poker::ui::formatter {
 std::string format(Rank rank) {

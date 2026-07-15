@@ -3,7 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <string>
 
-#include "Card.h"
+#include "Card.hpp"
 #include "Event.h"
 #include "EventBus.h"
 
@@ -80,7 +80,7 @@ int main() {
     poker::EventBus event_bus;
 
     event_bus.subscribe<poker::Event::PotUpdated>([](const poker::Event::PotUpdated& event) {
-        std::cout << "[Client] 事件发布: PotUpdated | pot=" << event.pot;
+        std::cout << "[Client] 事件发布: PotUpdated | pot=" << event.pot << "\n";
     });
 
     // 1. 连接本地服务端

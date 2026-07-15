@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <vector>
 
-#include "Player.h"
+#include "Player.hpp"
 
 namespace poker {
 /**
