@@ -22,7 +22,7 @@ public:
     /* 订阅事件 */
     void subscribeEvent();
 
-    void handlePlayerJoining(const Event::PlayerJoining& event);
+    void handlePlayerJoining(const Event::PlayerJoinRequest& event);
     /* 开始一局游戏 */
     void startGame();
     /* 进入指定阶段 */
@@ -32,7 +32,7 @@ public:
     /* 等待玩家输入 */
     void awaitPlayerInput();
     /* 处理玩家输入 */
-    void handlePlayerInput(const Event::PlayerInputSubmitted& event);
+    void handlePlayerInput(const Event::PlayerActionSubmitted& event);
     /* 完成下注轮 */
     void handleRoundEnded();
     /* 执行摊牌阶段 */

@@ -13,12 +13,12 @@ GameController::GameController(std::shared_ptr<EventBus> event_bus,
 GameController::~GameController() = default;
 
 void GameController::subscribeEvent() {
-    event_bus->subscribe<Event::PlayerJoining>(
-        [this](const Event::PlayerJoining& event) { this->handlePlayerJoining(event); });
-    event_bus->subscribe<Event::PlayerInputSubmitted>(
+    event_bus->subscribe<Event::PlayerJoinRequest>(
+        [this](const Event::PlayerJoinRequest& event) { this->handlePlayerJoining(event); });
+    event_bus->subscribe<Event::PlayerActionSubmitted>(
         [this](const auto& event) { this->handlePlayerInput(event); });
 }
-void GameController::handlePlayerJoining(const Event::PlayerJoining& event) {
+void GameController::handlePlayerJoining(const Event::PlayerJoinRequest& event) {
     game_model->joinNewPlayer();
 }
 
@@ -40,7 +40,7 @@ void GameController::awaitPlayerInput() {
     game_model->awaitPlayerInput();
 }
 
-void GameController::handlePlayerInput(const Event::PlayerInputSubmitted& event) {
+void GameController::handlePlayerInput(const Event::PlayerActionSubmitted& event) {
     game_model->processPlayerInput(event);
     if (game_model->isRoundFinished()) {
         handleRoundEnded();

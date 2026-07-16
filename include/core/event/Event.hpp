@@ -7,28 +7,28 @@
 #include "HandValue.hpp"
 
 #define GET_EVENT_NAME(Type)                                              \
-constexpr std::string_view get_event_name(std::type_identity<Type>) { \
-return #Type;                                                     \
-}
+    constexpr std::string_view get_event_name(std::type_identity<Type>) { \
+        return #Type;                                                     \
+    }
 
 namespace poker {
 namespace Event {
-struct PlayerJoining {};
+struct PlayerJoinRequest {};
 
-GET_EVENT_NAME(PlayerJoining)
+GET_EVENT_NAME(PlayerJoinRequest)
 
-struct PlayerJoined {
+struct NewPlayerJoined {
     seat_idx_t new_seat;
     int player_count;
 };
 
-GET_EVENT_NAME(PlayerJoined)
+GET_EVENT_NAME(NewPlayerJoined)
 
-struct PlayerJoinSucceeded {
+struct PlayerJoinResponse {
     seat_idx_t player_seat;
 };
 
-GET_EVENT_NAME(PlayerJoinSucceeded)
+GET_EVENT_NAME(PlayerJoinResponse)
 
 struct GameStarted {
     seat_idx_t btn_seat;
@@ -76,7 +76,7 @@ struct BettingRoundEnded {};
 
 GET_EVENT_NAME(BettingRoundEnded)
 
-struct AwaitPlayerInput {
+struct AwaitPlayerAction {
     seat_idx_t player_seat;
     chips_t player_chips;
     chips_t player_bet;
@@ -84,14 +84,14 @@ struct AwaitPlayerInput {
     chips_t min_raise_delta;
 };
 
-GET_EVENT_NAME(AwaitPlayerInput)
+GET_EVENT_NAME(AwaitPlayerAction)
 
-struct PlayerInputSubmitted {
+struct PlayerActionSubmitted {
     chips_t target_bet;
     bool is_fold;
 };
 
-GET_EVENT_NAME(PlayerInputSubmitted)
+GET_EVENT_NAME(PlayerActionSubmitted)
 
 struct PlayerActed {
     seat_idx_t actor_seat;
@@ -106,7 +106,6 @@ GET_EVENT_NAME(PlayerActed)
 struct HoleCardsRevealed {
     std::vector<seat_idx_t> active_players;
     std::vector<cards_2_t> hole_cards;
-    std::vector<HandValue> hand_values;
 };
 
 GET_EVENT_NAME(HoleCardsRevealed)
@@ -156,11 +155,13 @@ GET_EVENT_NAME(MinRaiseDeltaUpdated)
 
 } // namespace Event
 using PokerEvent =
-    std::variant<Event::PlayerJoining, Event::PlayerJoined, Event::PlayerJoinSucceeded,
+    std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
                  Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
                  Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
-                 Event::AwaitPlayerInput, Event::PlayerInputSubmitted, Event::PlayerActed,
+                 Event::AwaitPlayerAction, Event::PlayerActionSubmitted, Event::PlayerActed,
                  Event::HoleCardsRevealed, Event::WinnerDeclared, Event::GameEnded,
                  Event::PlayerChipsUpdated, Event::PotUpdated, Event::PlayerBetUpdated,
                  Event::RoundBetUpdated, Event::MinRaiseDeltaUpdated>;
 } // namespace poker
+
+#undef GET_EVENT_NAME

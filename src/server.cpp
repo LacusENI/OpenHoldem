@@ -1,90 +1,41 @@
+#include <ServerNetwork.h>
+
 #include <iostream>
-#include <string>
+#include <thread>
 
 #include <SFML/Network.hpp>
 #include <nlohmann/json.hpp>
 
-#include "Card.hpp"
-#include "Event.hpp"
-#include "EventBus.hpp"
-#include "GeneralSerializer.hpp"
-
-namespace poker::Event {
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PotUpdated, pot);
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RoundBetUpdated, round_bet);
-} // namespace poker::Event
-
-namespace nlohmann {
-template <>
-struct adl_serializer<poker::PokerEvent> {
-    static void to_json(json& j, const poker::PokerEvent& event) {
-        std::visit(
-            [&j]<typename T>(const T& e) {
-                if constexpr (std::is_same_v<T, poker::Event::PotUpdated>) {
-                    j = json{{"type", "PotUpdated"}, {"data", e}};
-                } else if constexpr (std::is_same_v<T, poker::Event::RoundBetUpdated>) {
-                    j = json{{"type", "RoundBetUpdated"}, {"data", e}};
-                }
-            },
-            event);
-    }
-
-    static void from_json(const json& j, poker::PokerEvent& event) {
-        std::string type_str = j.at("type").get<std::string>();
-        const auto& data_json = j.at("data");
-
-        if (type_str == "PotUpdated") {
-            event = data_json.get<poker::Event::PotUpdated>();
-        } else if (type_str == "RoundBetUpdated") {
-            event = data_json.get<poker::Event::RoundBetUpdated>();
-        } else {
-            throw std::runtime_error("Unknown PokerEvent type: " + type_str);
-        }
-    }
-};
-} // namespace nlohmann
+const sf::IpAddress host = sf::IpAddress::LocalHost;
+constexpr unsigned short port = 8088;
 
 int main() {
-    using json = nlohmann::json;
+    using namespace poker;
+    network::ServerNetwork network;
 
-    sf::TcpListener listener;
-    unsigned short port = 53000;
-
-    // 1. 绑定并监听端口
-    if (listener.listen(port) != sf::Socket::Status::Done) {
+    if (network.start(port)) {
+        std::cout << "[Server] 服务端已启动，正在等待客户端连接 (端口 " << port << ")...\n";
+    } else {
         std::cerr << "[Server] 端口 " << port << " 监听失败！\n";
         return -1;
     }
-    std::cout << "[Server] 服务端已启动，正在等待客户端连接 (端口 " << port << ")...\n";
 
-    // 2. 等待并接受客户端连接
-    sf::TcpSocket client;
-    if (listener.accept(client) != sf::Socket::Status::Done) {
-        std::cerr << "[Server] 接受连接失败！\n";
-        return -1;
+    bool running = true;
+    network.setDisconnectionHandler([&running]() { running = false; });
+    while (running) {
+        network.update();
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        while (network.hasPackets()) {
+            std::string message;
+            sf::Packet packet = network.popPacket();
+            packet >> message;
+            if (message == "finish") {
+                running = false;
+            } else {
+                std::cout << message << "\n";
+            }
+        }
     }
-
-    std::cout << "[Server] 客户端已连接！IP: " << client.getRemoteAddress()->toString() << "\n";
-
-    // 3. 接收客户端发来的数据包
-    sf::Packet receivePacket;
-    if (client.receive(receivePacket) == sf::Socket::Status::Done) {
-        std::string jsonString;
-        receivePacket >> jsonString; // 提取 JSON 文本
-        json j = json::parse(jsonString);
-        poker::Card card = j.get<poker::Card>();
-        std::cout << "[Server] 收到客户端消息: \"" << jsonString << "\"\n";
-        std::cout << "[Server] 解析出的牌: " << poker::to_string(card) << "\n";
-    }
-
-    // 4. 给客户端回复一个事件
-    sf::Packet sendPacket;
-    poker::PokerEvent event = poker::Event::PotUpdated{.pot = 30};
-    nlohmann::json j = event;
-    sendPacket << j.dump();
-    if (client.send(sendPacket) == sf::Socket::Status::Done) {
-        std::cout << "[Server] 已向客户端发送回复！\n";
-    }
-
     return 0;
 }

@@ -6,9 +6,9 @@
 #include "GeneralSerializer.hpp"
 
 namespace poker::Event {
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerJoined, new_seat, player_count)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NewPlayerJoined, new_seat, player_count)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerJoinSucceeded, player_seat)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerJoinResponse, player_seat)
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameStarted, btn_seat, big_blind, player_count)
 
@@ -21,10 +21,10 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BlindPosted, seat, amount, is_big_blind, pot,
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CommunityCardsDealt, community_cards)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AwaitPlayerInput, player_seat, player_chips, player_bet,
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AwaitPlayerAction, player_seat, player_chips, player_bet,
                                    round_bet, min_raise_delta)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerInputSubmitted, target_bet, is_fold)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerActionSubmitted, target_bet, is_fold)
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerActed, actor_seat, action, pot, player_chips, player_bet)
 

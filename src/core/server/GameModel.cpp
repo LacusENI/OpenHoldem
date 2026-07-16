@@ -6,7 +6,6 @@
 #include "EventBus.hpp"
 #include "PotManager.h"
 #include "SeatManager.h"
-#include "eval_hand.h"
 
 namespace poker {
 void join_community_cards(cards_7_t& cards7, const cards_5_t& cards5) {
@@ -76,9 +75,9 @@ bool GameModel::isRoundFinished() const {
 void GameModel::joinNewPlayer() {
     seat_manager->addNewPlayer();
     const Player& player = seat_manager->getPlayerList().back();
-    event_bus->publish(Event::PlayerJoined{.new_seat = player.position,
+    event_bus->publish(Event::NewPlayerJoined{.new_seat = player.position,
                                            .player_count = seat_manager->getPlayerCount()});
-    event_bus->publish(Event::PlayerJoinSucceeded{.player_seat = player.position});
+    event_bus->publish(Event::PlayerJoinResponse{.player_seat = player.position});
 }
 
 void GameModel::startGame() {
@@ -175,7 +174,7 @@ void GameModel::awaitPlayerInput() {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    event_bus->publish(Event::AwaitPlayerInput{actor_seat, context.player_chips, context.player_bet,
+    event_bus->publish(Event::AwaitPlayerAction{actor_seat, context.player_chips, context.player_bet,
                                                context.round_bet, context.min_raise_delta});
 }
 
@@ -184,7 +183,7 @@ void GameModel::advanceToNextActor() {
     betting_round->advanceToNextActor(next_actor_seat);
 }
 
-void GameModel::processPlayerInput(const Event::PlayerInputSubmitted& event) {
+void GameModel::processPlayerInput(const Event::PlayerActionSubmitted& event) {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
@@ -207,8 +206,6 @@ void GameModel::revealHoleCards() {
     for (const Player& player : seat_manager->getPlayerList()) {
         if (player.isActive()) {
             join_hole_cards(seven_cards, player.hole_cards);
-            HandValue hand_value = algo::eval_hand(seven_cards);
-            event.hand_values.push_back(hand_value);
             event.active_players.push_back(player.position);
             event.hole_cards.push_back(player.hole_cards);
         }

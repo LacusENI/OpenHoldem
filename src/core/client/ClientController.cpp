@@ -13,7 +13,7 @@ ClientController::ClientController(std::shared_ptr<EventBus> event_bus,
       client_view(std::move(client_view)) {}
 ClientController::~ClientController() = default;
 void ClientController::subscribeEvent() {
-    event_bus->subscribe<Event::PlayerJoinSucceeded>(
+    event_bus->subscribe<Event::PlayerJoinResponse>(
         [this](const auto& event) { this->onPlayerJoinSucceeded(event); });
     event_bus->subscribe<Event::GameStarted>(
         [this](const auto& event) { this->onGameStarted(event); });
@@ -29,16 +29,16 @@ void ClientController::subscribeEvent() {
         [this](const auto& event) { this->onBettingRoundEnded(event); });
     event_bus->subscribe<Event::PlayerActed>(
         [this](const auto& event) { this->onPlayerActed(event); });
-    event_bus->subscribe<Event::AwaitPlayerInput>(
+    event_bus->subscribe<Event::AwaitPlayerAction>(
         [this](const auto& event) { this->onAwaitPlayerInput(event); });
 }
 void ClientController::joinGame() {
-    event_bus->publish(Event::PlayerJoining{});
+    event_bus->publish(Event::PlayerJoinRequest{});
 }
-void ClientController::onPlayerJoinSucceeded(const Event::PlayerJoinSucceeded& event) {
+void ClientController::onPlayerJoinSucceeded(const Event::PlayerJoinResponse& event) {
     client_model->this_player_seat = event.player_seat;
 }
-void ClientController::onGameJoined(const Event::PlayerJoined& event) {}
+void ClientController::onGameJoined(const Event::NewPlayerJoined& event) {}
 void ClientController::onGameStarted(const Event::GameStarted& event) {
     client_model->btn_seat = event.btn_seat;
     client_model->big_blind = event.big_blind;
@@ -82,10 +82,10 @@ void ClientController::onBettingRoundEnded(const Event::BettingRoundEnded& event
     client_view->render(*client_model);
 }
 
-void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerInput& event) {
+void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerAction& event) {
     if (event.player_seat == client_model->this_player_seat) {
         event_bus->publish(
-            Event::PlayerInputSubmitted{.target_bet = client_model->big_blind, .is_fold = false});
+            Event::PlayerActionSubmitted{.target_bet = client_model->big_blind, .is_fold = false});
     }
 }
 
