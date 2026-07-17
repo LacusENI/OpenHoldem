@@ -4,7 +4,6 @@
 
 #include "Card.hpp"
 #include "GameTypes.hpp"
-#include "HandValue.hpp"
 
 #define GET_EVENT_NAME(Type)                                              \
     constexpr std::string_view get_event_name(std::type_identity<Type>) { \
@@ -13,7 +12,9 @@
 
 namespace poker {
 namespace Event {
-struct PlayerJoinRequest {};
+struct PlayerJoinRequest {
+    std::string player_name;
+};
 
 GET_EVENT_NAME(PlayerJoinRequest)
 
@@ -68,11 +69,15 @@ struct CommunityCardsDealt {
 
 GET_EVENT_NAME(CommunityCardsDealt)
 
-struct BettingRoundStarted {};
+struct BettingRoundStarted {
+    Stage stage;
+};
 
 GET_EVENT_NAME(BettingRoundStarted)
 
-struct BettingRoundEnded {};
+struct BettingRoundEnded {
+    Stage stage;
+};
 
 GET_EVENT_NAME(BettingRoundEnded)
 
@@ -110,14 +115,10 @@ struct HoleCardsRevealed {
 
 GET_EVENT_NAME(HoleCardsRevealed)
 
-struct WinnerDeclared {
+struct GameEnded {
     std::vector<seat_idx_t> winners;
     std::vector<chips_t> awards;
 };
-
-GET_EVENT_NAME(WinnerDeclared)
-
-struct GameEnded {};
 
 GET_EVENT_NAME(GameEnded)
 
@@ -154,14 +155,12 @@ struct MinRaiseDeltaUpdated {
 GET_EVENT_NAME(MinRaiseDeltaUpdated)
 
 } // namespace Event
-using PokerEvent =
+using GameEvent =
     std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
                  Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
                  Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
                  Event::AwaitPlayerAction, Event::PlayerActionSubmitted, Event::PlayerActed,
-                 Event::HoleCardsRevealed, Event::WinnerDeclared, Event::GameEnded,
-                 Event::PlayerChipsUpdated, Event::PotUpdated, Event::PlayerBetUpdated,
-                 Event::RoundBetUpdated, Event::MinRaiseDeltaUpdated>;
+                 Event::HoleCardsRevealed, Event::GameEnded>;
 } // namespace poker
 
 #undef GET_EVENT_NAME

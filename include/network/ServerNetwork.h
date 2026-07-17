@@ -15,7 +15,9 @@ private:
 
 public:
     bool start(const unsigned short port) {
-        return listener.listen(port) == sf::Socket::Status::Done;
+        if (listener.listen(port) != sf::Socket::Status::Done) return false;
+        listener.setBlocking(false);
+        return true;
     }
     void update() {
         auto new_client = std::make_unique<sf::TcpSocket>();
