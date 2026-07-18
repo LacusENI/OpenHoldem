@@ -3,6 +3,7 @@
 #include "ClientModel.h"
 #include "ClientView.h"
 #include "EventBus.hpp"
+#include "GlobalLogger.h"
 
 namespace poker {
 
@@ -11,33 +12,26 @@ ClientController::ClientController(EventBus* event_bus, ClientModel* client_mode
     : event_bus(event_bus), client_model(client_model), client_view(client_view) {}
 
 void ClientController::subscribeEvent() {
-    event_bus->subscribe<Event::PlayerJoinResponse>(
-        [this](const auto& event) { this->onPlayerJoinSucceeded(event); });
-    event_bus->subscribe<Event::GameStarted>(
-        [this](const auto& event) { this->onGameStarted(event); });
-    event_bus->subscribe<Event::HoleCardsDealt>(
-        [this](const auto& event) { this->onHoleCardsDealt(event); });
-    event_bus->subscribe<Event::BlindPosted>(
-        [this](const auto& event) { this->onBlindPosted(event); });
-    event_bus->subscribe<Event::CommunityCardsDealt>(
-        [this](const auto& event) { this->onCommunityCardsDealt(event); });
-    event_bus->subscribe<Event::BettingRoundStarted>(
-        [this](const auto& event) { this->onBettingRoundStarted(event); });
-    event_bus->subscribe<Event::BettingRoundEnded>(
-        [this](const auto& event) { this->onBettingRoundEnded(event); });
-    event_bus->subscribe<Event::PlayerActed>(
-        [this](const auto& event) { this->onPlayerActed(event); });
-    event_bus->subscribe<Event::AwaitPlayerAction>(
-        [this](const auto& event) { this->onAwaitPlayerInput(event); });
+    event_bus->subscribe<Event::PlayerJoinResponse>(&ClientController::handle, this);
+    event_bus->subscribe<Event::GameStarted>(&ClientController::handle, this);
+    event_bus->subscribe<Event::HoleCardsDealt>(&ClientController::handle, this);
+    event_bus->subscribe<Event::BlindPosted>(&ClientController::handle, this);
+    event_bus->subscribe<Event::CommunityCardsDealt>(&ClientController::handle, this);
+    event_bus->subscribe<Event::BettingRoundStarted>(&ClientController::handle, this);
+    event_bus->subscribe<Event::BettingRoundEnded>(&ClientController::handle, this);
+    event_bus->subscribe<Event::AwaitPlayerAction>(&ClientController::handle, this);
+    event_bus->subscribe<Event::PlayerActed>(&ClientController::handle, this);
+    event_bus->subscribe<Event::HoleCardsRevealed>(&ClientController::handle, this);
 }
-void ClientController::joinGame() {
-    event_bus->publish(Event::PlayerJoinRequest{});
-}
-void ClientController::onPlayerJoinSucceeded(const Event::PlayerJoinResponse& event) {
+void ClientController::handle(const Event::PlayerJoinResponse& event) {
+    GlobalLogger::debug("[ClientController] EventListener(PlayerJoinResponse)");
     client_model->this_player_seat = event.player_seat;
 }
-void ClientController::onGameJoined(const Event::NewPlayerJoined& event) {}
-void ClientController::onGameStarted(const Event::GameStarted& event) {
+void ClientController::handle(const Event::NewPlayerJoined& event) {
+    GlobalLogger::debug("[ClientController] EventListener(NewPlayerJoined)");
+}
+void ClientController::handle(const Event::GameStarted& event) {
+    GlobalLogger::debug("[ClientController] EventListener(GameStarted)");
     client_model->btn_seat = event.btn_seat;
     client_model->big_blind = event.big_blind;
     client_model->players.resize(event.player_count);
@@ -48,13 +42,15 @@ void ClientController::onGameStarted(const Event::GameStarted& event) {
     client_model->player_bets.resize(event.player_count);
     client_view->render(*client_model);
 }
-void ClientController::onHoleCardsDealt(const Event::HoleCardsDealt& event) {
+void ClientController::handle(const Event::HoleCardsDealt& event) {
+    GlobalLogger::debug("[ClientController] EventListener(HoleCardsDealt)");
     if (event.player_seat == client_model->this_player_seat) {
         client_model->players[event.player_seat].hole_cards = event.hole_cards;
         client_view->render(*client_model);
     }
 }
-void ClientController::onBlindPosted(const Event::BlindPosted& event) {
+void ClientController::handle(const Event::BlindPosted& event) {
+    GlobalLogger::debug("[ClientController] EventListener(BlindPosted)");
     if (event.is_big_blind) {
         client_model->player_states[event.seat] = PlayerState::BIG_BLIND;
     } else {
@@ -65,12 +61,16 @@ void ClientController::onBlindPosted(const Event::BlindPosted& event) {
     client_model->player_bets[event.seat] = event.player_bet;
     client_view->render(*client_model);
 }
-void ClientController::onCommunityCardsDealt(const Event::CommunityCardsDealt& event) {
+void ClientController::handle(const Event::CommunityCardsDealt& event) {
+    GlobalLogger::debug("[ClientController] EventListener(CommunityCardsDealt)");
     client_model->community_cards = event.community_cards;
     client_view->render(*client_model);
 }
-void ClientController::onBettingRoundStarted(const Event::BettingRoundStarted& event) {}
-void ClientController::onBettingRoundEnded(const Event::BettingRoundEnded& event) {
+void ClientController::handle(const Event::BettingRoundStarted& event) {
+    GlobalLogger::debug("[ClientController] EventListener(BettingRoundStarted)");
+}
+void ClientController::handle(const Event::BettingRoundEnded& event) {
+    GlobalLogger::debug("[ClientController] EventListener(BettingRoundEnded)");
     for (int i = 0; i < client_model->player_bets.size(); ++i) {
         client_model->player_bets[i] = 0;
     }
@@ -80,14 +80,16 @@ void ClientController::onBettingRoundEnded(const Event::BettingRoundEnded& event
     client_view->render(*client_model);
 }
 
-void ClientController::onAwaitPlayerInput(const Event::AwaitPlayerAction& event) {
+void ClientController::handle(const Event::AwaitPlayerAction& event) {
+    GlobalLogger::debug("[ClientController] EventListener(AwaitPlayerAction)");
     if (event.player_seat == client_model->this_player_seat) {
         event_bus->publish(
             Event::PlayerActionSubmitted{.target_bet = client_model->big_blind, .is_fold = false});
     }
 }
 
-void ClientController::onPlayerActed(const Event::PlayerActed& event) {
+void ClientController::handle(const Event::PlayerActed& event) {
+    GlobalLogger::debug("[ClientController] EventListener(PlayerActed)");
     PlayerState player_state;
     switch (event.action) {
     case Action::CALL: player_state = PlayerState::CALLED; break;
@@ -104,6 +106,8 @@ void ClientController::onPlayerActed(const Event::PlayerActed& event) {
     client_model->player_bets[event.actor_seat] = event.player_bet;
     client_view->render(*client_model);
 }
-void ClientController::onHoleCardsRevealed(const Event::HoleCardsRevealed& event) {}
+void ClientController::handle(const Event::HoleCardsRevealed& event) {
+    GlobalLogger::debug("[ClientController] EventListener(HoleCardsRevealed)");
+}
 
 } // namespace poker

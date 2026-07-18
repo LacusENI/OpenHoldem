@@ -35,8 +35,7 @@ private:
 
 public:
     GameModel(EventBus* event_bus, IDeck* deck, BettingRound* betting_round,
-              PotManager* pot_manager, SeatManager* seat_manager, Stage current_stage,
-              chips_t big_blind, cards_5_t community_cards);
+              PotManager* pot_manager, SeatManager* seat_manager);
     ~GameModel() = default;
 
     seat_idx_t getBtnSeat() const;
@@ -46,6 +45,9 @@ public:
     cards_5_t getCommunityCards() const;
     seat_idx_t getActorSeat() const;
     bool isRoundFinished() const;
+    BettingRound* getBettingRound() { return betting_round; }
+    PotManager* getPotManager() { return pot_manager; }
+    SeatManager* getSeatManager() { return seat_manager; }
 
     /* 加入新玩家 */
     void joinNewPlayer();

@@ -27,6 +27,13 @@ public:
             [callback](const void* eventPtr) { callback(*static_cast<const T*>(eventPtr)); });
     }
 
+    template <typename EventType, typename ClassType>
+    void subscribe(void(ClassType::*mem_func)(const EventType&), ClassType* instance) {
+        this->subscribe<EventType>([instance, mem_func](const EventType& event) {
+            (instance->*mem_func)(event);
+        });
+    }
+
     /**
      * 发布事件
      * @tparam T 事件类型

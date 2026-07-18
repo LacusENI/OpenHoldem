@@ -10,18 +10,12 @@
 namespace poker::ui::formatter {
 std::string format(Rank rank) {
     switch (rank) {
-    case Rank::ACE:
-        return "Ace";
-    case Rank::KING:
-        return "King";
-    case Rank::QUEEN:
-        return "Queen";
-    case Rank::JACK:
-        return "Jack";
-    case Rank::TEN:
-        return "Ten";
-    default:
-        return std::to_string(static_cast<int>(rank));
+    case Rank::ACE: return "Ace";
+    case Rank::KING: return "King";
+    case Rank::QUEEN: return "Queen";
+    case Rank::JACK: return "Jack";
+    case Rank::TEN: return "Ten";
+    default: return std::to_string(static_cast<int>(rank));
     }
 }
 
@@ -32,33 +26,22 @@ std::string format(Suit suit) {
 }
 
 std::string format(const Card& card) {
-    return format(card.suit) + to_string(card.rank);
+    return format(card.suit) + to_string(card)[1];
 }
 
 std::string format(const HandType& hand_type) {
     switch (hand_type) {
-    case HandType::ROYAL_FLUSH:
-        return "Royal Flush";
-    case HandType::STRAIGHT_FLUSH:
-        return "Straight Flush";
-    case HandType::FOUR_OF_A_KIND:
-        return "Four of a Kind";
-    case HandType::FULL_HOUSE:
-        return "Full House";
-    case HandType::FLUSH:
-        return "Flush";
-    case HandType::STRAIGHT:
-        return "Straight";
-    case HandType::THREE_OF_A_KIND:
-        return "Three of a Kind";
-    case HandType::TWO_PAIR:
-        return "Two Pair";
-    case HandType::ONE_PAIR:
-        return "One Pair";
-    case HandType::HIGH_CARD:
-        return "High Card";
-    default:
-        return "???";
+    case HandType::ROYAL_FLUSH: return "Royal Flush";
+    case HandType::STRAIGHT_FLUSH: return "Straight Flush";
+    case HandType::FOUR_OF_A_KIND: return "Four of a Kind";
+    case HandType::FULL_HOUSE: return "Full House";
+    case HandType::FLUSH: return "Flush";
+    case HandType::STRAIGHT: return "Straight";
+    case HandType::THREE_OF_A_KIND: return "Three of a Kind";
+    case HandType::TWO_PAIR: return "Two Pair";
+    case HandType::ONE_PAIR: return "One Pair";
+    case HandType::HIGH_CARD: return "High Card";
+    default: return "???";
     }
 }
 
@@ -67,8 +50,7 @@ std::string format(const HandValue& hand_value) {
     std::string x, y;
     std::string description;
     switch (hand_type) {
-    case HandType::ROYAL_FLUSH:
-        break;
+    case HandType::ROYAL_FLUSH: break;
     case HandType::STRAIGHT_FLUSH:
         x = format(hand_value.getRank(4));
         y = format(hand_value.getRank(0));
@@ -109,70 +91,46 @@ std::string format(const HandValue& hand_value) {
         x = format(hand_value.getRank(0));
         description = std::format("{}-high", x);
         break;
-    default:
-        description = "???";
+    default: description = "???";
     }
     return std::format("{}, {}", format(hand_type), description);
 }
 
 std::string format(const Action& action) {
     switch (action) {
-    case Action::CALL:
-        return "Call";
-    case Action::CHECK:
-        return "Check";
-    case Action::RAISE:
-        return "Raise";
-    case Action::BET:
-        return "Bet";
-    case Action::FOLD:
-        return "Fold";
-    case Action::ALL_IN:
-        return "All-in";
-    default:
-        return "???";
+    case Action::CALL: return "Call";
+    case Action::CHECK: return "Check";
+    case Action::RAISE: return "Raise";
+    case Action::BET: return "Bet";
+    case Action::FOLD: return "Fold";
+    case Action::ALL_IN: return "All-in";
+    default: return "???";
     }
 }
 
 std::string format(const Stage& stage) {
     switch (stage) {
-    case Stage::SHOWDOWN:
-        return "SHOWDOWN";
-    case Stage::RIVER:
-        return "RIVER";
-    case Stage::TURN:
-        return "TURN";
-    case Stage::FLOP:
-        return "FLOP";
-    case Stage::PREFLOP:
-        return "PREFLOP";
-    default:
-        return "???";
+    case Stage::SHOWDOWN: return "SHOWDOWN";
+    case Stage::RIVER: return "RIVER";
+    case Stage::TURN: return "TURN";
+    case Stage::FLOP: return "FLOP";
+    case Stage::PREFLOP: return "PREFLOP";
+    default: return "???";
     }
 }
 
 std::string format(const PlayerState& player_state) {
     switch (player_state) {
-    case PlayerState::IDLE:
-        return " ";
-    case PlayerState::BET:
-        return "Bet";
-    case PlayerState::RAISED:
-        return "Raised";
-    case PlayerState::CALLED:
-        return "Called";
-    case PlayerState::CHECKED:
-        return "Checked";
-        case PlayerState::ALL_IN:
-        return "All-in";
-        case PlayerState::FOLDED:
-        return "Folded";
-    case PlayerState::SMALL_BLIND:
-        return "Small Blind";
-    case PlayerState::BIG_BLIND:
-        return "Big Blind";
-    default:
-        return "???";
+    case PlayerState::IDLE: return " ";
+    case PlayerState::BET: return "Bet";
+    case PlayerState::RAISED: return "Raised";
+    case PlayerState::CALLED: return "Called";
+    case PlayerState::CHECKED: return "Checked";
+    case PlayerState::ALL_IN: return "All-in";
+    case PlayerState::FOLDED: return "Folded";
+    case PlayerState::SMALL_BLIND: return "Small Blind";
+    case PlayerState::BIG_BLIND: return "Big Blind";
+    default: return "???";
     }
 }
 } // namespace poker::ui::formatter

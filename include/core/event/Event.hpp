@@ -31,6 +31,10 @@ struct PlayerJoinResponse {
 
 GET_EVENT_NAME(PlayerJoinResponse)
 
+struct StartGame {};
+
+GET_EVENT_NAME(StartGame)
+
 struct GameStarted {
     seat_idx_t btn_seat;
     chips_t big_blind;
@@ -155,12 +159,32 @@ struct MinRaiseDeltaUpdated {
 GET_EVENT_NAME(MinRaiseDeltaUpdated)
 
 } // namespace Event
+
 using GameEvent =
     std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
                  Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
                  Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
                  Event::AwaitPlayerAction, Event::PlayerActionSubmitted, Event::PlayerActed,
                  Event::HoleCardsRevealed, Event::GameEnded>;
+
+namespace NetworkEvent {
+struct ClientConnected {
+    int client_id;
+};
+
+GET_EVENT_NAME(ClientConnected)
+
+struct ClientDisconnected {
+    int client_id;
+};
+
+GET_EVENT_NAME(ClientDisconnected)
+
+struct ServerDisconnected {};
+
+GET_EVENT_NAME(ServerDisconnected)
+
+} // namespace NetworkEvent
 } // namespace poker
 
 #undef GET_EVENT_NAME

@@ -4,24 +4,41 @@
 #include "Event.hpp"
 #include "EventBus.hpp"
 #include "GameModel.h"
+#include "GlobalLogger.h"
+#include "SeatManager.h"
 
 namespace poker {
 GameController::GameController(EventBus* event_bus, GameModel* model)
     : event_bus(event_bus), game_model(model) {}
 
 void GameController::subscribeEvent() {
-    event_bus->subscribe<Event::PlayerJoinRequest>(
-        [this](const Event::PlayerJoinRequest& event) { this->handlePlayerJoining(event); });
-    event_bus->subscribe<Event::PlayerActionSubmitted>(
-        [this](const auto& event) { this->handlePlayerInput(event); });
-}
-void GameController::handlePlayerJoining(const Event::PlayerJoinRequest& event) {
-    game_model->joinNewPlayer();
+    event_bus->subscribe<Event::StartGame>(&GameController::handle, this);
+    event_bus->subscribe<Event::PlayerJoinRequest>(&GameController::handle, this);
+    event_bus->subscribe<Event::PlayerActionSubmitted>(&GameController::handle, this);
 }
 
-void GameController::startGame() {
+void GameController::handle(const Event::StartGame& event) {
     game_model->startGame();
     enterStage(Stage::PREFLOP);
+}
+
+void GameController::handle(const Event::PlayerJoinRequest& event) {
+    GlobalLogger::debug("[GameController] EventListener(PlayerJoinRequest)");
+    game_model->joinNewPlayer();
+    if (game_model->getSeatManager()->getPlayerCount() == 3) {
+        event_bus->publish(Event::StartGame{});
+    }
+}
+
+void GameController::handle(const Event::PlayerActionSubmitted& event) {
+    GlobalLogger::debug("[GameController] EventListener(PlayerActionSubmitted)");
+    game_model->processPlayerInput(event);
+    if (game_model->isRoundFinished()) {
+        handleRoundEnded();
+    } else {
+        game_model->advanceToNextActor();
+        awaitPlayerInput();
+    }
 }
 
 void GameController::startBettingRound() {
@@ -37,16 +54,6 @@ void GameController::awaitPlayerInput() {
     game_model->awaitPlayerInput();
 }
 
-void GameController::handlePlayerInput(const Event::PlayerActionSubmitted& event) {
-    game_model->processPlayerInput(event);
-    if (game_model->isRoundFinished()) {
-        handleRoundEnded();
-    } else {
-        game_model->advanceToNextActor();
-        awaitPlayerInput();
-    }
-}
-
 void GameController::handleRoundEnded() {
     event_bus->publish(Event::BettingRoundEnded{});
     Stage stage = game_model->getCurrentStage();
@@ -57,7 +64,9 @@ void GameController::processShowdown() {
     game_model->revealHoleCards();
 }
 
-void GameController::processSettlement() {}
+void GameController::processSettlement() {
+    event_bus->publish(Event::GameEnded{});
+}
 
 void GameController::enterStage(Stage stage) {
     game_model->setCurrentStage(stage);
@@ -70,7 +79,7 @@ void GameController::enterStage(Stage stage) {
         processShowdown();
         enterStage(Stage::SETTLEMENT);
     } else if (stage == Stage::SETTLEMENT) {
-        // TODO
+        processSettlement();
     } else {
         game_model->dealCommunityCards();
         startBettingRound();

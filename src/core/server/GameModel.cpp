@@ -34,16 +34,12 @@ void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult r
 }
 
 GameModel::GameModel(EventBus* event_bus, IDeck* deck, BettingRound* betting_round,
-                     PotManager* pot_manager, SeatManager* seat_manager, Stage current_stage,
-                     chips_t big_blind, cards_5_t community_cards)
+                     PotManager* pot_manager, SeatManager* seat_manager)
     : event_bus(event_bus),
       deck(deck),
       betting_round(betting_round),
       pot_manager(pot_manager),
-      seat_manager(seat_manager),
-      current_stage(current_stage),
-      big_blind(big_blind),
-      community_cards(community_cards) {}
+      seat_manager(seat_manager) {}
 
 seat_idx_t GameModel::getBtnSeat() const {
     return seat_manager->getBtnSeat();

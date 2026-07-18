@@ -19,18 +19,18 @@ public:
 
     /* 订阅事件 */
     void subscribeEvent();
-
-    void handlePlayerJoining(const Event::PlayerJoinRequest& event);
+    /* 处理玩家加入请求 */
+    void handle(const Event::PlayerJoinRequest& event);
+    /* 处理玩家输入 */
+    void handle(const Event::PlayerActionSubmitted& event);
     /* 开始一局游戏 */
-    void startGame();
+    void handle(const Event::StartGame& event);
     /* 进入指定阶段 */
     void enterStage(Stage stage);
     /* 开始下注轮 */
     void startBettingRound();
     /* 等待玩家输入 */
     void awaitPlayerInput();
-    /* 处理玩家输入 */
-    void handlePlayerInput(const Event::PlayerActionSubmitted& event);
     /* 完成下注轮 */
     void handleRoundEnded();
     /* 执行摊牌阶段 */

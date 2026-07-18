@@ -34,6 +34,9 @@ add_library(poker_core
         include/core/event/Event.hpp
         include/core/event/EventBus.hpp
 
+        include/core/interface/ClientIoAdapter.h
+        include/core/interface/ServerIoAdapter.h
+
         include/core/server/BettingRound.h
         include/core/server/GameController.h
         include/core/server/GameModel.h
@@ -42,13 +45,15 @@ add_library(poker_core
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
+        include/core/interface/GlobalLogger.h
 )
 
 target_include_directories(poker_core PUBLIC
-        include/core/event
         include/core/algo
         include/core/client
         include/core/common
+        include/core/event
+        include/core/interface
         include/core/server
 )
 
@@ -106,7 +111,7 @@ target_link_libraries(presentation PUBLIC
 
 # 客户端程序
 add_executable(poker_client
-        src/client.cpp
+        src/client_main.cpp
 )
 
 target_link_libraries(poker_client PRIVATE
@@ -118,7 +123,7 @@ target_link_libraries(poker_client PRIVATE
 
 # 服务器程序
 add_executable(poker_server
-        src/server.cpp
+        src/server_main.cpp
 )
 
 target_link_libraries(poker_server PRIVATE
