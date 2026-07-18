@@ -1,6 +1,5 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "Card.hpp"
@@ -20,11 +19,11 @@ class PotManager;
  */
 class GameModel {
 private:
-    std::shared_ptr<EventBus> event_bus;
-    std::unique_ptr<IDeck> deck;
-    std::shared_ptr<BettingRound> betting_round;
-    std::shared_ptr<PotManager> pot_manager;
-    std::shared_ptr<SeatManager> seat_manager;
+    EventBus* event_bus;
+    IDeck* deck;
+    BettingRound* betting_round;
+    PotManager* pot_manager;
+    SeatManager* seat_manager;
 
     Stage current_stage = Stage::IDLE; // 游戏状态机
     chips_t big_blind = 10;            // 大盲注额
@@ -35,10 +34,10 @@ private:
     void applyBettingResult(seat_idx_t player_seat, algo::BettingResult result);
 
 public:
-    GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
-              std::shared_ptr<PotManager> pot_manager, std::shared_ptr<SeatManager> seat_manager,
-              std::unique_ptr<BettingRound> betting_round);
-    ~GameModel();
+    GameModel(EventBus* event_bus, IDeck* deck, BettingRound* betting_round,
+              PotManager* pot_manager, SeatManager* seat_manager, Stage current_stage,
+              chips_t big_blind, cards_5_t community_cards);
+    ~GameModel() = default;
 
     seat_idx_t getBtnSeat() const;
     Stage getCurrentStage() const;

@@ -6,11 +6,8 @@
 #include "GameModel.h"
 
 namespace poker {
-GameController::GameController(std::shared_ptr<EventBus> event_bus,
-                               std::unique_ptr<GameModel> model)
-    : event_bus(std::move(event_bus)), game_model(std::move(model)) {}
-
-GameController::~GameController() = default;
+GameController::GameController(EventBus* event_bus, GameModel* model)
+    : event_bus(event_bus), game_model(model) {}
 
 void GameController::subscribeEvent() {
     event_bus->subscribe<Event::PlayerJoinRequest>(

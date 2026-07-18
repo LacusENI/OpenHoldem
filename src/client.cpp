@@ -3,10 +3,9 @@
 #include <thread>
 
 #include <SFML/Network.hpp>
-#include <nlohmann/json.hpp>
 
 #include "ClientNetwork.h"
-#include "EventSerializer.hpp"
+#include "EventSerializer.h"
 
 const sf::IpAddress host = sf::IpAddress::LocalHost;
 constexpr unsigned short port = 8088;
@@ -28,7 +27,7 @@ int main() {
     sf::Packet packet1;
     GameEvent event1 = Event::CommunityCardsDealt{
         .community_cards = {Card("CT"), Card("DA"), Card("SQ"), Card("H5"), Card("DJ")}};
-    packet1 << serializeEvent(event1).dump();
+    packet1 << serializeEvent(event1);
     network.sendPacket(packet1);
     std::cout << "[Client] 已投递 Event1 (CommunityCardsDealt) 到发送队列\n";
 
@@ -36,7 +35,7 @@ int main() {
     sf::Packet packet2;
     GameEvent event2 = Event::PlayerActed{
         .actor_seat = 1, .action = Action::BET, .pot = 30, .player_chips = 70, .player_bet = 10};
-    packet2 << serializeEvent(event2).dump();
+    packet2 << serializeEvent(event2);
     network.sendPacket(packet2);
     std::cout << "[Client] 已投递 Event2 (PlayerActed) 到发送队列\n";
 

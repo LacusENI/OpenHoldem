@@ -33,17 +33,18 @@ void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult r
     }
 }
 
-GameModel::GameModel(std::shared_ptr<EventBus> event_bus, std::unique_ptr<IDeck> deck,
-                     std::shared_ptr<PotManager> pot_manager,
-                     std::shared_ptr<SeatManager> seat_manager,
-                     std::unique_ptr<BettingRound> betting_round)
-    : event_bus(std::move(event_bus)),
-      deck(std::move(deck)),
-      pot_manager(std::move(pot_manager)),
-      seat_manager(std::move(seat_manager)),
-      betting_round(std::move(betting_round)) {}
+GameModel::GameModel(EventBus* event_bus, IDeck* deck, BettingRound* betting_round,
+                     PotManager* pot_manager, SeatManager* seat_manager, Stage current_stage,
+                     chips_t big_blind, cards_5_t community_cards)
+    : event_bus(event_bus),
+      deck(deck),
+      betting_round(betting_round),
+      pot_manager(pot_manager),
+      seat_manager(seat_manager),
+      current_stage(current_stage),
+      big_blind(big_blind),
+      community_cards(community_cards) {}
 
-GameModel::~GameModel() = default;
 seat_idx_t GameModel::getBtnSeat() const {
     return seat_manager->getBtnSeat();
 }
@@ -76,7 +77,7 @@ void GameModel::joinNewPlayer() {
     seat_manager->addNewPlayer();
     const Player& player = seat_manager->getPlayerList().back();
     event_bus->publish(Event::NewPlayerJoined{.new_seat = player.position,
-                                           .player_count = seat_manager->getPlayerCount()});
+                                              .player_count = seat_manager->getPlayerCount()});
     event_bus->publish(Event::PlayerJoinResponse{.player_seat = player.position});
 }
 
@@ -101,21 +102,15 @@ void GameModel::dealHoleCards() {
 
 void GameModel::dealCommunityCards() {
     switch (current_stage) {
-    case Stage::PREFLOP:
-        break;
+    case Stage::PREFLOP: break;
     case Stage::FLOP:
         community_cards[0] = deck->deal();
         community_cards[1] = deck->deal();
         community_cards[2] = deck->deal();
         break;
-    case Stage::TURN:
-        community_cards[3] = deck->deal();
-        break;
-    case Stage::RIVER:
-        community_cards[4] = deck->deal();
-        break;
-    default:
-        break;
+    case Stage::TURN: community_cards[3] = deck->deal(); break;
+    case Stage::RIVER: community_cards[4] = deck->deal(); break;
+    default: break;
     }
     event_bus->publish(Event::CommunityCardsDealt{community_cards});
 }
@@ -174,8 +169,9 @@ void GameModel::awaitPlayerInput() {
     seat_idx_t actor_seat = betting_round->getActorSeat();
     const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    event_bus->publish(Event::AwaitPlayerAction{actor_seat, context.player_chips, context.player_bet,
-                                               context.round_bet, context.min_raise_delta});
+    event_bus->publish(Event::AwaitPlayerAction{actor_seat, context.player_chips,
+                                                context.player_bet, context.round_bet,
+                                                context.min_raise_delta});
 }
 
 void GameModel::advanceToNextActor() {

@@ -59,12 +59,14 @@ target_link_libraries(poker_core PUBLIC
 
 # 应用层
 add_library(application
-        include/logging/Logger.hpp
+        include/logging/EventLogger.hpp
 
         include/network/ClientNetwork.h
         include/network/ServerNetwork.h
 
-        include/serialization/EventSerializer.hpp
+        include/serialization/EventSerializer.h
+        src/serialization/EventSerializer.cpp
+
         include/serialization/GeneralSerializer.hpp
 )
 

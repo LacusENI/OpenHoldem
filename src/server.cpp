@@ -1,10 +1,13 @@
-#include <ServerNetwork.h>
 #include <iostream>
 #include <thread>
 
 #include <SFML/Network.hpp>
-#include <nlohmann/json.hpp>
-#include "EventSerializer.hpp" // 引入你的反序列化器
+
+#include "Event.hpp"
+#include "EventBus.hpp"
+#include "EventLogger.hpp"
+#include "EventSerializer.h"
+#include "ServerNetwork.h"
 
 const sf::IpAddress host = sf::IpAddress::LocalHost;
 constexpr unsigned short port = 8088;
@@ -12,6 +15,9 @@ constexpr unsigned short port = 8088;
 int main() {
     using namespace poker;
     network::ServerNetwork network;
+
+    EventBus event_bus;
+    logging::EventLogger event_logger(&event_bus, "Client");
 
     if (network.start(port)) {
         std::cout << "[Server] 服务端已启动，正在等待客户端连接 (端口 " << port << ")...\n";
@@ -27,7 +33,7 @@ int main() {
     });
 
     while (running) {
-        network.update(); // 查新连接，查非阻塞收包
+        network.update();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
         while (network.hasPackets()) {
@@ -41,14 +47,11 @@ int main() {
             } else {
                 std::cout << "[Server] 收到原始 JSON 数据: " << message << "\n";
 
-                try {
-                    nlohmann::json json_data = nlohmann::json::parse(message);
-                    GameEvent received_event = deserializeEvent(json_data);
-
+                std::optional<GameEvent> received_event = deserializeEvent(message);
+                if (received_event == std::nullopt) {
+                    std::cerr << "[Server] 反序列化失败！\n";
+                } else {
                     std::cout << "[Server] 序列化/反序列化校验成功！事件解析正常。\n\n";
-                }
-                catch (const std::exception& e) {
-                    std::cerr << "[Server] 反序列化失败！错误原因: " << e.what() << "\n\n";
                 }
             }
         }

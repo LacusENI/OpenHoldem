@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "Event.hpp"
 
 namespace poker {
@@ -13,11 +11,11 @@ class GameModel;
  */
 class GameController {
 public:
-    std::shared_ptr<EventBus> event_bus;
-    std::unique_ptr<GameModel> game_model;
+    EventBus* event_bus;
+    GameModel* game_model;
 
-    explicit GameController(std::shared_ptr<EventBus> event_bus, std::unique_ptr<GameModel> model);
-    ~GameController();
+    explicit GameController(EventBus* event_bus, GameModel* model);
+    ~GameController() = default;
 
     /* 订阅事件 */
     void subscribeEvent();

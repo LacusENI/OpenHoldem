@@ -5,13 +5,11 @@
 #include "EventBus.hpp"
 
 namespace poker {
-ClientController::ClientController(std::shared_ptr<EventBus> event_bus,
-                                   std::unique_ptr<ClientModel> client_model,
-                                   std::unique_ptr<ClientView> client_view)
-    : event_bus(std::move(event_bus)),
-      client_model(std::move(client_model)),
-      client_view(std::move(client_view)) {}
-ClientController::~ClientController() = default;
+
+ClientController::ClientController(EventBus* event_bus, ClientModel* client_model,
+                                   ClientView* client_view)
+    : event_bus(event_bus), client_model(client_model), client_view(client_view) {}
+
 void ClientController::subscribeEvent() {
     event_bus->subscribe<Event::PlayerJoinResponse>(
         [this](const auto& event) { this->onPlayerJoinSucceeded(event); });

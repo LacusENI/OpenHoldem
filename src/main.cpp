@@ -1,15 +1,15 @@
 #include <spdlog/spdlog.h>
 
 #include "Event.hpp"
-#include "EventBus.h"
+#include "EventBus.hpp"
 
 int main() {
     using namespace poker;
 
     auto event_bus = std::make_unique<EventBus>();
 
-    event_bus->subscribe<Event::PlayerJoined>([](const Event::PlayerJoined& event) {
-        spdlog::info(std::format("[Game] Player Joined | new_seat={}", event.new_seat));
+    event_bus->subscribe<Event::NewPlayerJoined>([](const Event::NewPlayerJoined& event) {
+        spdlog::info(std::format("[Game] New Player Joined | new_seat={}", event.new_seat));
     });
     event_bus->subscribe<Event::GameStarted>([](const Event::GameStarted& event) {
         spdlog::info(std::format("[Game] Game Started | btn_seat={} big_blind={}", event.btn_seat,
@@ -43,9 +43,9 @@ int main() {
         [](const Event::BettingRoundEnded& event) {
             spdlog::info(std::format("[Game] Betting Round Ended"));
         });
-    event_bus->subscribe<Event::AwaitPlayerInput>([](const Event::AwaitPlayerInput& event) {
+    event_bus->subscribe<Event::AwaitPlayerAction>([](const Event::AwaitPlayerAction& event) {
         spdlog::info(
-            std::format("[Game] Await Player Input | player_seat={} player_chips={} player_bet={} "
+            std::format("[Game] Await Player Action | player_seat={} player_chips={} player_bet={} "
                         "round_bet={} min_raise_delta={}",
                         event.player_seat, event.player_chips, event.player_bet, event.round_bet,
                         event.min_raise_delta));

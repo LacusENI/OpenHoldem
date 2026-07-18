@@ -1,4 +1,4 @@
-#pragma once
+#include "EventSerializer.h"
 
 #include <nlohmann/json.hpp>
 
@@ -48,8 +48,9 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(RoundBetUpdated, round_bet)
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MinRaiseDeltaUpdated, min_raise_delta)
 } // namespace poker::Event
+
 namespace poker {
-inline nlohmann::json serializeEvent(const GameEvent& event) {
+std::string serializeEvent(const GameEvent& event) {
     nlohmann::json j;
     std::visit(
         [&j]<typename T>(const T& e) {
@@ -58,10 +59,11 @@ inline nlohmann::json serializeEvent(const GameEvent& event) {
                 {"data", e}};
         },
         event);
-    return j;
+    return j.dump();
 }
 
-inline GameEvent deserializeEvent(const nlohmann::json& j) {
+std::optional<GameEvent> deserializeEvent(const std::string& json_str) {
+    nlohmann::json j = nlohmann::json::parse(json_str);
     std::string type = j.at("event").get<std::string>();
     const nlohmann::json& data = j.at("data");
     if (type == "PlayerJoinRequest") return data.get<Event::PlayerJoinRequest>();
@@ -79,6 +81,6 @@ inline GameEvent deserializeEvent(const nlohmann::json& j) {
     if (type == "PlayerActed") return data.get<Event::PlayerActed>();
     if (type == "HoleCardsRevealed") return data.get<Event::HoleCardsRevealed>();
     if (type == "GameEnded") return data.get<Event::GameEnded>();
-    throw std::runtime_error("Unknown event: " + type);
+    return std::nullopt;
 }
 } // namespace poker

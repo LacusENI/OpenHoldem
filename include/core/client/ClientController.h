@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 
 #include "Event.hpp"
 
@@ -10,14 +9,14 @@ class ClientView;
 
 class ClientController {
 private:
-    std::shared_ptr<EventBus> event_bus;
-    std::unique_ptr<ClientModel> client_model;
-    std::unique_ptr<ClientView> client_view;
+    EventBus* event_bus;
+    ClientModel* client_model;
+    ClientView* client_view;
 
 public:
-    ClientController(std::shared_ptr<EventBus> event_bus, std::unique_ptr<ClientModel> client_model,
-                     std::unique_ptr<ClientView> client_view);
-    ~ClientController();
+    ClientController(EventBus* event_bus, ClientModel* client_model,
+                     ClientView* client_view);
+    ~ClientController() = default;
 
     void subscribeEvent();
     void joinGame();
