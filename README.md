@@ -1,5 +1,10 @@
 # OpenHoldem
 
+![C++](https://img.shields.io/badge/C++-20-blue)
+![CMake](https://img.shields.io/badge/CMake-3.20-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen)
+![License](https://img.shields.io/badge/license-MIT-green)
+
 一个基于 C++ 的德州扑克游戏，支持局域网联机对战。
 
 > 当前状态：核心逻辑 + 网络联机已跑通，可进行单局对战。
