@@ -4,7 +4,7 @@
 ![CMake](https://img.shields.io/badge/CMake-3.20-blue)
 ![Vcpkg](https://img.shields.io/badge/vcpkg-enabled-blue)
 ![Platform](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
-![Status](https://img.shields.io/badge/status-active-brightgreen)
+![Status](https://img.shields.io/badge/status-alpha-brightgreen)
 ![Version](https://img.shields.io/badge/version-v1.0.0-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
