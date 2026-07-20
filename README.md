@@ -46,6 +46,7 @@ make
 ```
 ./poker_server
 ./poker_client
+./poker_test
 ```
 
 # 下一步计划
