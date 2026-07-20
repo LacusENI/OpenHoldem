@@ -4,8 +4,8 @@
 ![CMake](https://img.shields.io/badge/CMake-3.20-blue)
 ![Vcpkg](https://img.shields.io/badge/vcpkg-enabled-blue)
 ![Platform](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
-![Status](https://img.shields.io/badge/status-alpha-brightgreen)
-![Version](https://img.shields.io/badge/version-v1.0.0-brightgreen)
+![Status](https://img.shields.io/badge/status-alpha-orange)
+![Version](https://img.shields.io/badge/version-demo_v5-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 一个基于 C++ 的德州扑克游戏，支持局域网联机对战。
