@@ -38,9 +38,8 @@
 
 ```bash
 git clone https://github.com/microsoft/vcpkg.git
-cd vcpkg
-./bootstrap-vcpkg.sh
-./vcpkg install
+./vcpkg/bootstrap-vcpkg.sh
+./vcpkg/vcpkg install
 ```
 
 ### 安装依赖
@@ -50,9 +49,8 @@ cd vcpkg
 
 ### 编译
 ```bash
-mkdir build && cd build
-cmake .. -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake
-make
+cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
+make -C build
 ```
 
 ### 运行
