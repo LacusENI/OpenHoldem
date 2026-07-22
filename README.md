@@ -34,13 +34,18 @@
 
 ## 快速开始
 
-### 依赖安装
+### 安装 vcpkg
 
 ```bash
 git clone https://github.com/microsoft/vcpkg.git
 cd vcpkg
 ./bootstrap-vcpkg.sh
 ./vcpkg install
+```
+
+### 安装依赖
+```bash
+./vcpkg/vcpkg install
 ```
 
 ### 编译
@@ -52,9 +57,9 @@ make
 
 ### 运行
 ```
-./poker_server
-./poker_client
-./poker_test
+./build/poker_server
+./build/poker_client
+./build/poker_test
 ```
 
 # 下一步计划
