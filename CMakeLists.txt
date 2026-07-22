@@ -73,6 +73,9 @@ add_library(application
         src/serialization/EventSerializer.cpp
 
         include/serialization/GeneralSerializer.hpp
+        include/network/MockNetwork.h
+        src/network/ClientNetwork.cpp
+        src/network/ServerNetwork.cpp
 )
 
 target_include_directories(application PUBLIC

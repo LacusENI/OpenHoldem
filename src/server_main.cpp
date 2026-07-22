@@ -15,7 +15,6 @@
 #include "ServerIoAdapter.h"
 #include "ServerNetwork.h"
 
-const sf::IpAddress host = sf::IpAddress::LocalHost;
 constexpr unsigned short port = 8088;
 
 int main() {
@@ -48,15 +47,11 @@ int main() {
 
     io_adapter.sendToAllClient = [&network](const GameEvent& event) {
         std::string message = serializeEvent(event);
-        sf::Packet packet;
-        packet << message;
-        network.sendPacketToAll(packet);
+        network.sendMessageToAll(message);
     };
     io_adapter.sendToOneClient = [&network](int client_id, const GameEvent& event) {
         std::string message = serializeEvent(event);
-        sf::Packet packet;
-        packet << message;
-        network.sendPacketTo(client_id, packet);
+        network.sendMessageTo(client_id, message);
     };
 
     bool connected = false;
@@ -82,14 +77,12 @@ int main() {
 
     while (running) {
         // 网络拉取接收到的消息
-        network.poll();
+        network.pull();
 
         // 处理消息并反序列化为事件，存入事件队列
         std::queue<GameEvent> event_queue;
-        while (network.hasPackets()) {
-            sf::Packet packet = network.popPacket();
-            std::string message;
-            packet >> message;
+        while (network.hasReceivedMessage()) {
+            std::string message = network.popMessage();
             std::optional<GameEvent> event = deserializeEvent(message);
             if (event) event_queue.push(*event);
         }

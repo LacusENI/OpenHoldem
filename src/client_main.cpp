@@ -13,10 +13,11 @@
 #include "EventLogger.hpp"
 #include "EventSerializer.h"
 
-const sf::IpAddress host = sf::IpAddress::LocalHost;
 constexpr unsigned short port = 8088;
 
 int main() {
+    const sf::IpAddress host = sf::IpAddress::LocalHost;
+
     using namespace poker;
 
     spdlog::set_level(spdlog::level::debug);
@@ -37,9 +38,7 @@ int main() {
 
     io_adapter.sendToServer = [&network](const GameEvent& event) {
         std::string message = serializeEvent(event);
-        sf::Packet packet;
-        packet << message;
-        network.sendPacket(packet);
+        network.sendMessage(message);
     };
 
     GlobalLogger::trace = [](std::string_view message) { spdlog::trace(message); };
@@ -65,14 +64,12 @@ int main() {
 
     while (running) {
         // 网络拉取接收到的消息
-        network.poll();
+        network.pull();
 
         // 处理消息并反序列化为事件，存入事件队列
         std::queue<GameEvent> event_queue;
-        while (network.hasPackets()) {
-            sf::Packet packet = network.popPacket();
-            std::string message;
-            packet >> message;
+        while (network.hasReceivedMessage()) {
+            std::string message = network.popMessage();
             std::optional<GameEvent> event = deserializeEvent(message);
             if (event) event_queue.push(*event);
         }
