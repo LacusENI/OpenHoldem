@@ -24,7 +24,8 @@
 ## 技术栈
 
 - **语言**：C++20
-- **构建**：CMake
+- **编译器**：clang
+- **构建**：CMake(3.20) & Ninja
 - **包管理**：vcpkg
 - **网络**：SFML Network
 - **序列化**：nlohmann/json
@@ -47,17 +48,28 @@ git clone https://github.com/microsoft/vcpkg.git
 ./vcpkg/vcpkg install
 ```
 
-### 编译
+### 构建
+1. debug 模式
 ```bash
-cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=./vcpkg/scripts/buildsystems/vcpkg.cmake
-make -C build
+cmake --preset debug
+cmake --debug --preset debug
+./cmake-build-debug/poker_server
+./cmake-build-debug/poker_client
 ```
 
-### 运行
+2. release 模式
+```bash
+cmake --preset release
+cmake --debug --preset release
+./cmake-build-release/poker_server
+./cmake-build-release/poker_client
 ```
-./build/poker_server
-./build/poker_client
-./build/poker_test
+
+3. 测试
+```bash
+cmake --preset debug-with-tests
+cmake --build --preset debug
+ctest --preset test
 ```
 
 # 下一步计划
