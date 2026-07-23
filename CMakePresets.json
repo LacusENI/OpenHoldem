@@ -36,14 +36,14 @@
             }
         },
         {
-            "name" : "debug-with-tests",
-            "displayName" : "Debug Test Config",
-            "description" : "Debug Test build configuration",
-            "inherits" : "default",
-            "binaryDir" : "${sourceDir}/cmake-build-debug",
-            "cacheVariables" : {
-                "CMAKE_BUILD_TYPE" : "Debug",
-                "BUILD_TESTING" : "ON"
+            "name": "debug-with-tests",
+            "displayName": "Debug Test Config",
+            "description": "Debug Test build configuration",
+            "inherits": "default",
+            "binaryDir": "${sourceDir}/cmake-build-debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "BUILD_TESTING": "ON"
             }
         }
     ],

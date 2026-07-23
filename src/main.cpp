@@ -24,25 +24,22 @@ int main() {
         spdlog::info(std::format("[Game] Hole Cards Dealt | player_seat={} hole_cards={}",
                                  event.player_seat, to_string(event.hole_cards)));
     });
-    event_bus->subscribe<Event::CommunityCardsDealt>(
-        [](const Event::CommunityCardsDealt& event) {
-            spdlog::info(std::format("[Game] Community Cards Dealt | community_cards={}",
-                                     to_string(event.community_cards)));
-        });
+    event_bus->subscribe<Event::CommunityCardsDealt>([](const Event::CommunityCardsDealt& event) {
+        spdlog::info(std::format("[Game] Community Cards Dealt | community_cards={}",
+                                 to_string(event.community_cards)));
+    });
     event_bus->subscribe<Event::BlindPosted>([](const Event::BlindPosted& event) {
         std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
         spdlog::info(std::format(
             "[Game] Blind Posted({}) | seat={} amount={} pot={} player_chips={} player_bet={}",
             blind_type, event.seat, event.amount, event.pot, event.player_chips, event.player_bet));
     });
-    event_bus->subscribe<Event::BettingRoundStarted>(
-        [](const Event::BettingRoundStarted& event) {
-            spdlog::info(std::format("[Game] Betting Round Started"));
-        });
-    event_bus->subscribe<Event::BettingRoundEnded>(
-        [](const Event::BettingRoundEnded& event) {
-            spdlog::info(std::format("[Game] Betting Round Ended"));
-        });
+    event_bus->subscribe<Event::BettingRoundStarted>([](const Event::BettingRoundStarted& event) {
+        spdlog::info(std::format("[Game] Betting Round Started"));
+    });
+    event_bus->subscribe<Event::BettingRoundEnded>([](const Event::BettingRoundEnded& event) {
+        spdlog::info(std::format("[Game] Betting Round Ended"));
+    });
     event_bus->subscribe<Event::AwaitPlayerAction>([](const Event::AwaitPlayerAction& event) {
         spdlog::info(
             std::format("[Game] Await Player Action | player_seat={} player_chips={} player_bet={} "
@@ -57,10 +54,9 @@ int main() {
                         event.actor_seat, to_string(event.action), event.pot, event.player_chips,
                         event.player_bet));
     });
-    event_bus->subscribe<Event::HoleCardsRevealed>(
-        [](const Event::HoleCardsRevealed& event) {
-            spdlog::info("[Game] Hole Cards Revealed | ...");
-        });
+    event_bus->subscribe<Event::HoleCardsRevealed>([](const Event::HoleCardsRevealed& event) {
+        spdlog::info("[Game] Hole Cards Revealed | ...");
+    });
 
     return 0;
 }
