@@ -135,6 +135,24 @@ target_link_libraries(poker_server PRIVATE
 )
 
 
+# UI 测试
+add_executable(ui_test
+        ui_test/ui_test_main.cpp
+        ui_test/table_test.cpp
+        ui_test/ui_test.h
+)
+
+target_include_directories(ui_test PUBLIC
+        ui_test.h
+)
+
+target_link_libraries(ui_test PRIVATE
+        poker_core
+        application
+        presentation
+)
+
+
 # 测试
 add_executable(poker_test
         test/include/MockDeck.h
