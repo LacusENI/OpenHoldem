@@ -50,6 +50,7 @@ add_library(poker_core
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
         include/core/interface/GlobalLogger.h
+        include/core/model/BettingManager.h
 )
 
 target_include_directories(poker_core PUBLIC
