@@ -52,6 +52,7 @@ add_library(poker_core
         include/core/interface/GlobalLogger.h
         include/core/model/BettingManager.h
         include/core/model/ChipsManager.h
+        include/core/model/FlowManager.h
 )
 
 target_include_directories(poker_core PUBLIC
