@@ -38,6 +38,7 @@ add_library(poker_core
         include/core/interface/ServerIoAdapter.h
 
         include/core/model/CardsManager.h
+        include/core/model/PlayerSet.h
         src/core/model/CardsManager.cpp
 
         include/core/server/BettingRound.h
