@@ -37,6 +37,9 @@ add_library(poker_core
         include/core/interface/ClientIoAdapter.h
         include/core/interface/ServerIoAdapter.h
 
+        include/core/model/CardsManager.h
+        src/core/model/CardsManager.cpp
+
         include/core/server/BettingRound.h
         include/core/server/GameController.h
         include/core/server/GameModel.h
@@ -54,6 +57,7 @@ target_include_directories(poker_core PUBLIC
         include/core/common
         include/core/event
         include/core/interface
+        include/core/model
         include/core/server
 )
 
