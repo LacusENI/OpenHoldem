@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GameTypes.hpp"
 #include "Player.hpp"
 #include "PlayerSet.h"
 
@@ -32,5 +33,8 @@ public:
     seat_idx_t getUtgSeat() const { return (btn_seat + 3) % playerCount(); }
     seat_idx_t getPostflopFirstActorSeat() const { return findNextActorSeat(btn_seat); }
     seat_idx_t getPreflopFirstActorSeat() const { return getUtgSeat(); }
+    int distanceFromSeatLeft(seat_idx_t seat, seat_idx_t ref_seat) {
+        return (seat - ref_seat + playerCount()) % playerCount();
+    }
 };
 } // namespace poker

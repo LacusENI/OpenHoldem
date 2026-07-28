@@ -22,6 +22,7 @@ public:
     auto begin() const { return players.begin(); }
     auto end() const { return players.end(); }
     int playerCount() { return players.size(); }
+    void resize(int new_size) { players.resize(new_size); }
     auto getActivePlayers() {
         return players | std::ranges::views::filter([](const Player& p) { return p.isActive(); });
     }

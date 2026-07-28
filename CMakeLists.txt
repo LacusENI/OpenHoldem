@@ -35,24 +35,22 @@ add_library(poker_core
         include/core/event/EventBus.hpp
 
         include/core/interface/ClientIoAdapter.h
+        include/core/interface/GlobalLogger.h
         include/core/interface/ServerIoAdapter.h
 
+        include/core/model/BettingManager.h
         include/core/model/CardsManager.h
+        include/core/model/ChipsManager.h
+        include/core/model/FlowManager.h
         include/core/model/PlayerSet.h
         src/core/model/CardsManager.cpp
 
         include/core/server/BettingRound.h
         include/core/server/GameController.h
         include/core/server/GameModel.h
-        include/core/server/PotManager.h
-        include/core/server/SeatManager.h
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
-        include/core/interface/GlobalLogger.h
-        include/core/model/BettingManager.h
-        include/core/model/ChipsManager.h
-        include/core/model/FlowManager.h
 )
 
 target_include_directories(poker_core PUBLIC
@@ -168,6 +166,7 @@ add_executable(poker_test
         test/card_test.cpp
         test/eval_hand_test.cpp
         test/chips_calc_test.cpp
+        test/seat_manager_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE

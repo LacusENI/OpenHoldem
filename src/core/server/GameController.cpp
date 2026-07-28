@@ -25,9 +25,9 @@ void GameController::handle(const Event::StartGame& event) {
 void GameController::handle(const Event::PlayerJoinRequest& event) {
     GlobalLogger::debug("[GameController] EventListener(PlayerJoinRequest)");
     game_model->joinNewPlayer();
-    if (game_model->getSeatManager()->getPlayerCount() == 3) {
-        event_bus->publish(Event::StartGame{});
-    }
+    // if (game_model->getSeatManager()->getPlayerCount() == 3) {
+    //     event_bus->publish(Event::StartGame{});
+    // }
 }
 
 void GameController::handle(const Event::PlayerActionSubmitted& event) {

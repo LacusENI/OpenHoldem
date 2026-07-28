@@ -17,13 +17,13 @@ void join_hole_cards(cards_7_t& cards7, const cards_2_t& cards2) {
 }
 
 void GameModel::takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips) {
-    seat_manager->getPlayerAtSeat(player_seat).bet(chips);
-    pot_manager->addChips(chips);
+    // seat_manager->getPlayerAtSeat(player_seat).bet(chips);
+    // pot_manager->addChips(chips);
 }
 
 void GameModel::takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips) {
     pot_manager->takeChips(chips);
-    seat_manager->getPlayerAtSeat(player_seat).win(chips);
+    // seat_manager->getPlayerAtSeat(player_seat).win(chips);
 }
 
 void GameModel::applyBettingResult(seat_idx_t player_seat, algo::BettingResult result) {
@@ -70,30 +70,30 @@ bool GameModel::isRoundFinished() const {
 }
 
 void GameModel::joinNewPlayer() {
-    seat_manager->addNewPlayer();
-    const Player& player = seat_manager->getPlayerList().back();
-    event_bus->publish(Event::NewPlayerJoined{.new_seat = player.position,
-                                              .player_count = seat_manager->getPlayerCount()});
-    event_bus->publish(Event::PlayerJoinResponse{.player_seat = player.position});
+    // seat_manager->addNewPlayer();
+    // const Player& player = seat_manager->getPlayerList().back();
+    // event_bus->publish(Event::NewPlayerJoined{.new_seat = player.position,
+    //                                         .player_count = seat_manager->getPlayerCount()});
+    // event_bus->publish(Event::PlayerJoinResponse{.player_seat = player.position});
 }
 
 void GameModel::startGame() {
-    current_stage = Stage::IDLE;
-    deck->shuffle();
-    pot_manager->clearPot();
-    betting_round->onGameStarted(seat_manager->getPlayerCount());
-    event_bus->publish(Event::GameStarted{.btn_seat = getBtnSeat(),
-                                          .big_blind = big_blind,
-                                          .player_count = seat_manager->getPlayerCount()});
+    // current_stage = Stage::IDLE;
+    // deck->shuffle();
+    // pot_manager->clearPot();
+    // betting_round->onGameStarted(seat_manager->getPlayerCount());
+    // event_bus->publish(Event::GameStarted{.btn_seat = getBtnSeat(),
+    //                                       .big_blind = big_blind,
+    //                                       .player_count = seat_manager->getPlayerCount()});
 }
 
 void GameModel::dealHoleCards() {
-    for (Player& player : seat_manager->getPlayerList()) {
-        cards_2_t hole_cards = {deck->deal(), deck->deal()};
-        player.hole_cards = hole_cards;
-        event_bus->publish(
-            Event::HoleCardsDealt{.player_seat = player.position, .hole_cards = hole_cards});
-    }
+    // for (Player& player : seat_manager->getPlayerList()) {
+    //     cards_2_t hole_cards = {deck->deal(), deck->deal()};
+    //     player.hole_cards = hole_cards;
+    //     event_bus->publish(
+    //         Event::HoleCardsDealt{.player_seat = player.position, .hole_cards = hole_cards});
+    // }
 }
 
 void GameModel::dealCommunityCards() {
@@ -115,26 +115,26 @@ void GameModel::postForcedBlind() {
     // Small Blind
     seat_idx_t sb_seat = seat_manager->getSbSeat();
     takePlayerChipsToPot(sb_seat, big_blind / 2);
-    const Player& sb_player = seat_manager->getPlayerAtSeat(sb_seat);
-    // Big Blind
+    // const Player& sb_player = seat_manager->getPlayerAtSeat(sb_seat);
+    //  Big Blind
     seat_idx_t bb_seat = seat_manager->getBbSeat();
-    const Player& bb_player = seat_manager->getPlayerAtSeat(bb_seat);
+    // const Player& bb_player = seat_manager->getPlayerAtSeat(bb_seat);
     takePlayerChipsToPot(bb_seat, big_blind);
     betting_round->processForcedBlind(sb_seat, bb_seat, big_blind);
-    event_bus->publish(
-        Event::BlindPosted{.seat = sb_seat,
-                           .amount = big_blind / 2,
-                           .is_big_blind = false,
-                           .pot = pot_manager->getPot(),
-                           .player_chips = sb_player.chips,
-                           .player_bet = betting_round->getPlayerBetAtSeat(sb_seat)});
-    event_bus->publish(
-        Event::BlindPosted{.seat = bb_seat,
-                           .amount = big_blind,
-                           .is_big_blind = true,
-                           .pot = pot_manager->getPot(),
-                           .player_chips = bb_player.chips,
-                           .player_bet = betting_round->getPlayerBetAtSeat(bb_seat)});
+    // event_bus->publish(
+    //     Event::BlindPosted{.seat = sb_seat,
+    //                        .amount = big_blind / 2,
+    //                        .is_big_blind = false,
+    //                        .pot = pot_manager->getPot(),
+    //                        .player_chips = sb_player.chips,
+    //                        .player_bet = betting_round->getPlayerBetAtSeat(sb_seat)});
+    // event_bus->publish(
+    //     Event::BlindPosted{.seat = bb_seat,
+    //                        .amount = big_blind,
+    //                        .is_big_blind = true,
+    //                        .pot = pot_manager->getPot(),
+    //                        .player_chips = bb_player.chips,
+    //                        .player_bet = betting_round->getPlayerBetAtSeat(bb_seat)});
 }
 
 void GameModel::enterPreflopStreet() {
@@ -162,12 +162,12 @@ void GameModel::setupRoundStart() {
 }
 
 void GameModel::awaitPlayerInput() {
-    seat_idx_t actor_seat = betting_round->getActorSeat();
-    const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
-    algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    event_bus->publish(Event::AwaitPlayerAction{actor_seat, context.player_chips,
-                                                context.player_bet, context.round_bet,
-                                                context.min_raise_delta});
+    // seat_idx_t actor_seat = betting_round->getActorSeat();
+    // const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
+    // algo::BettingContext context = betting_round->getBettingContext(actor.chips);
+    // event_bus->publish(Event::AwaitPlayerAction{actor_seat, context.player_chips,
+    //                                             context.player_bet, context.round_bet,
+    //                                             context.min_raise_delta});
 }
 
 void GameModel::advanceToNextActor() {
@@ -176,32 +176,32 @@ void GameModel::advanceToNextActor() {
 }
 
 void GameModel::processPlayerInput(const Event::PlayerActionSubmitted& event) {
-    seat_idx_t actor_seat = betting_round->getActorSeat();
-    const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
-    algo::BettingContext context = betting_round->getBettingContext(actor.chips);
-    algo::BettingInput input = {event.target_bet, event.is_fold};
-    algo::BettingResult result = algo::process_betting(context, input);
-    takePlayerChipsToPot(getActorSeat(), result.bet_delta);
-    betting_round->applyBettingResult(result);
-    event_bus->publish(
-        Event::PlayerActed{.actor_seat = actor_seat,
-                           .action = result.action,
-                           .pot = pot_manager->getPot(),
-                           .player_chips = seat_manager->getPlayerAtSeat(actor_seat).chips,
-                           .player_bet = result.player_bet});
+    // seat_idx_t actor_seat = betting_round->getActorSeat();
+    // const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
+    // algo::BettingContext context = betting_round->getBettingContext(actor.chips);
+    // algo::BettingInput input = {event.target_bet, event.is_fold};
+    // algo::BettingResult result = algo::process_betting(context, input);
+    // takePlayerChipsToPot(getActorSeat(), result.bet_delta);
+    // betting_round->applyBettingResult(result);
+    // event_bus->publish(
+    //     Event::PlayerActed{.actor_seat = actor_seat,
+    //                        .action = result.action,
+    //                        .pot = pot_manager->getPot(),
+    //                        .player_chips = seat_manager->getPlayerAtSeat(actor_seat).chips,
+    //                        .player_bet = result.player_bet});
 }
 
 void GameModel::revealHoleCards() {
-    Event::HoleCardsRevealed event;
-    cards_7_t seven_cards;
-    join_community_cards(seven_cards, community_cards);
-    for (const Player& player : seat_manager->getPlayerList()) {
-        if (player.isActive()) {
-            join_hole_cards(seven_cards, player.hole_cards);
-            event.active_players.push_back(player.position);
-            event.hole_cards.push_back(player.hole_cards);
-        }
-    }
-    event_bus->publish(event);
+    // Event::HoleCardsRevealed event;
+    // cards_7_t seven_cards;
+    // join_community_cards(seven_cards, community_cards);
+    // for (const Player& player : seat_manager->getPlayerList()) {
+    //     if (player.isActive()) {
+    //         join_hole_cards(seven_cards, player.hole_cards);
+    //         event.active_players.push_back(player.position);
+    //         event.hole_cards.push_back(player.hole_cards);
+    //     }
+    // }
+    // event_bus->publish(event);
 }
 } // namespace poker
