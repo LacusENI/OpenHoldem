@@ -1,8 +1,14 @@
 #include "CardsManager.h"
 
 #include "Deck.hpp"
+#include "Player.hpp"
+#include "PlayerSet.h"
 
 namespace poker {
+cards_2_t CardsManager::getHoleCardsAt(seat_idx_t seat_idx) const {
+    return player_set->playerAt(seat_idx).hole_cards;
+}
+
 void CardsManager::dealCommunityCards(Stage stage) {
     switch (stage) {
     case Stage::FLOP:
@@ -17,8 +23,8 @@ void CardsManager::dealCommunityCards(Stage stage) {
 }
 
 void CardsManager::dealHoleCards() {
-    for (auto& cards : hole_cards) {
-        cards = {deck->deal(), deck->deal()};
+    for (Player& player : *player_set) {
+        player.hole_cards = {deck->deal(), deck->deal()};
     }
 }
 } // namespace poker

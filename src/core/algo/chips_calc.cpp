@@ -42,7 +42,7 @@ std::vector<chips_t> calculate_awards(int pot, int winners_n) {
     const int remainder = pot % winners_n;
 
     std::vector<chips_t> amounts;
-    for (size_t i = 0; i < winners_n; ++i) {
+    for (int i = 0; i < winners_n; ++i) {
         int amount = share;
         // 前 remainder 个玩家多得 1 个筹码
         if (i < remainder) amount += 1;

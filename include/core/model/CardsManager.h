@@ -1,24 +1,24 @@
-#include <vector>
+#pragma once
 
 #include "Card.hpp"
 #include "GameTypes.hpp"
 
 namespace poker {
 class IDeck;
+class PlayerSet;
 
 class CardsManager {
 private:
     IDeck* deck;
+    PlayerSet* player_set;
     cards_5_t community_cards;
-    std::vector<cards_2_t> hole_cards;
 
 public:
     CardsManager(IDeck* deck) : deck(deck) {}
     ~CardsManager() = default;
 
-    void set_player_count(int player_count) { hole_cards.resize(player_count); }
-    cards_5_t get_community_cards() const { return community_cards; }
-    cards_2_t get_hole_cards_at(seat_idx_t seat_idx) const { return hole_cards[seat_idx]; }
+    cards_5_t getCommunityCards() const { return community_cards; }
+    cards_2_t getHoleCardsAt(seat_idx_t seat_idx) const;
     void dealCommunityCards(Stage stage);
     void dealHoleCards();
 };
