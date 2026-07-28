@@ -171,7 +171,7 @@ void GameModel::awaitPlayerInput() {
 }
 
 void GameModel::advanceToNextActor() {
-    seat_idx_t next_actor_seat = seat_manager->findNextActorSeat(betting_round->getActorSeat());
+    seat_idx_t next_actor_seat = seat_manager->nextActorSeat(betting_round->getActorSeat());
     betting_round->advanceToNextActor(next_actor_seat);
 }
 

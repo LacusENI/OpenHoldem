@@ -167,6 +167,7 @@ add_executable(poker_test
         test/eval_hand_test.cpp
         test/chips_calc_test.cpp
         test/seat_manager_test.cpp
+        test/chips_manager_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE
