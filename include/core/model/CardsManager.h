@@ -1,7 +1,10 @@
 #pragma once
 
+#include <vector>
+
 #include "Card.hpp"
 #include "GameTypes.hpp"
+#include "HandValue.hpp"
 
 namespace poker {
 class IDeck;
@@ -14,12 +17,17 @@ private:
     cards_5_t community_cards;
 
 public:
-    CardsManager(IDeck* deck) : deck(deck) {}
+    CardsManager(IDeck* deck, PlayerSet* player_set) : deck(deck), player_set(player_set) {}
     ~CardsManager() = default;
 
     cards_5_t getCommunityCards() const { return community_cards; }
+    void setCommunityCards(cards_5_t cc) { community_cards = cc; }
     cards_2_t getHoleCardsAt(seat_idx_t seat_idx) const;
+    void setHoleCardsAt(seat_idx_t seat_idx, cards_2_t hole_cards);
+
     void dealCommunityCards(Stage stage);
     void dealHoleCards();
+    HandValue computePlayerHandValue(seat_idx_t seat_idx);
+    std::vector<seat_idx_t> determineWinners();
 };
 } // namespace poker

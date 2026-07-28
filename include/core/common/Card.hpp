@@ -1,8 +1,9 @@
 #pragma once
 
 #include <array>
-#include <magic_enum/magic_enum.hpp>
 #include <string>
+
+#include <magic_enum/magic_enum.hpp>
 
 namespace poker {
 /**
@@ -13,7 +14,7 @@ enum class Suit : uint8_t {
     CLUB,    // 梅花
     DIAMOND, // 方块
     HEART,   // 红心
-    SPADE,   // 黑桃
+    SPADE,   // 红桃
 };
 
 /**

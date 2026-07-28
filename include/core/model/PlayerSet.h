@@ -26,6 +26,10 @@ public:
     auto getActivePlayers() {
         return players | std::ranges::views::filter([](const Player& p) { return p.isActive(); });
     }
+    auto getActiveSeats() {
+        return std::views::iota(0, playerCount()) |
+               std::views::filter([&](seat_idx_t seat) { return this->playerAt(seat).isActive(); });
+    }
     int getActivePlayerCount() {
         return std::ranges::count_if(players, [](const Player& p) { return p.isActive(); });
     }
