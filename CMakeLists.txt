@@ -43,7 +43,12 @@ add_library(poker_core
         include/core/model/ChipsManager.h
         include/core/model/FlowManager.h
         include/core/model/PlayerSet.h
+        src/core/model/BettingManager.cpp
         src/core/model/CardsManager.cpp
+        src/core/model/ChipsManager.cpp
+        src/core/model/PlayerSet.cpp
+        src/core/model/SeatManager.cpp
+        
 
         include/core/server/BettingRound.h
         include/core/server/GameController.h
@@ -51,9 +56,7 @@ add_library(poker_core
         src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
-        src/core/model/ChipsManager.cpp
-        src/core/model/SeatManager.cpp
-        src/core/model/PlayerSet.cpp
+        
 )
 
 target_include_directories(poker_core PUBLIC

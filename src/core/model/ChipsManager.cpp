@@ -25,13 +25,13 @@ void ChipsManager::setPlayerChipsAt(seat_idx_t seat_idx, chips_t player_chips) {
 }
 
 void ChipsManager::moveChipsToPot(seat_idx_t player_seat, chips_t chips) {
-    player_set->playerAt(player_seat).bet(chips);
+    player_set->playerAt(player_seat).commitChips(chips);
     pot_manager->addChips(chips);
 }
 
 void ChipsManager::moveChipsToPlayer(seat_idx_t player_seat, chips_t chips) {
     pot_manager->takeChips(chips);
-    player_set->playerAt(player_seat).win(chips);
+    player_set->playerAt(player_seat).winChips(chips);
 }
 
 void ChipsManager::awardWinners(const std::vector<seat_idx_t>& winners) {

@@ -52,9 +52,9 @@ void ClientController::handle(const Event::HoleCardsDealt& event) {
 void ClientController::handle(const Event::BlindPosted& event) {
     GlobalLogger::debug("[ClientController] EventListener(BlindPosted)");
     if (event.is_big_blind) {
-        client_model->player_states[event.seat] = PlayerState::BIG_BLIND;
+        client_model->player_states[event.seat] = PlayerStatus::BIG_BLIND;
     } else {
-        client_model->player_states[event.seat] = PlayerState::SMALL_BLIND;
+        client_model->player_states[event.seat] = PlayerStatus::SMALL_BLIND;
     }
     client_model->pot = event.pot;
     client_model->players[event.seat].chips = event.player_chips;
@@ -75,7 +75,7 @@ void ClientController::handle(const Event::BettingRoundEnded& event) {
         client_model->player_bets[i] = 0;
     }
     for (int i = 0; i < client_model->player_states.size(); ++i) {
-        client_model->player_states[i] = PlayerState::IDLE;
+        client_model->player_states[i] = PlayerStatus::IDLE;
     }
     client_view->render(*client_model);
 }
@@ -90,15 +90,15 @@ void ClientController::handle(const Event::AwaitPlayerAction& event) {
 
 void ClientController::handle(const Event::PlayerActed& event) {
     GlobalLogger::debug("[ClientController] EventListener(PlayerActed)");
-    PlayerState player_state;
+    PlayerStatus player_state;
     switch (event.action) {
-    case Action::CALL: player_state = PlayerState::CALLED; break;
-    case Action::CHECK: player_state = PlayerState::CHECKED; break;
-    case Action::RAISE: player_state = PlayerState::RAISED; break;
-    case Action::BET: player_state = PlayerState::BET; break;
-    case Action::FOLD: player_state = PlayerState::FOLDED; break;
-    case Action::ALL_IN: player_state = PlayerState::ALL_IN; break;
-    default: player_state = PlayerState::IDLE;
+    case Action::CALL: player_state = PlayerStatus::CALLED; break;
+    case Action::CHECK: player_state = PlayerStatus::CHECKED; break;
+    case Action::RAISE: player_state = PlayerStatus::RAISED; break;
+    case Action::BET: player_state = PlayerStatus::BET; break;
+    case Action::FOLD: player_state = PlayerStatus::FOLDED; break;
+    case Action::ALL_IN: player_state = PlayerStatus::ALL_IN; break;
+    default: player_state = PlayerStatus::IDLE;
     }
     client_model->player_states[event.actor_seat] = player_state;
     client_model->pot = event.pot;

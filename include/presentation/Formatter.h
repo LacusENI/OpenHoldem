@@ -14,7 +14,7 @@ class HandValue;
 enum class Action;
 enum class Stage;
 struct Player;
-enum class PlayerState;
+enum class PlayerStatus;
 } // namespace poker
 
 namespace poker::ui::formatter {
@@ -32,7 +32,7 @@ std::string format(const Action& action);
 
 std::string format(const Stage& stage);
 
-std::string format(const PlayerState& player_state);
+std::string format(const PlayerStatus& player_state);
 
 template <std::size_t N>
 std::string format(const std::array<Card, N>& cards) {

@@ -55,6 +55,6 @@ template <>
 struct adl_serializer<poker::HandValue> : poker::GeneralSerializer<poker::HandValue> {};
 
 template <>
-struct adl_serializer<poker::PlayerState> : poker::GeneralSerializer<poker::PlayerState> {};
+struct adl_serializer<poker::PlayerStatus> : poker::GeneralSerializer<poker::PlayerStatus> {};
 
 } // namespace nlohmann

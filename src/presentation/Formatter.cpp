@@ -119,17 +119,17 @@ std::string format(const Stage& stage) {
     }
 }
 
-std::string format(const PlayerState& player_state) {
+std::string format(const PlayerStatus& player_state) {
     switch (player_state) {
-    case PlayerState::IDLE: return " ";
-    case PlayerState::BET: return "Bet";
-    case PlayerState::RAISED: return "Raised";
-    case PlayerState::CALLED: return "Called";
-    case PlayerState::CHECKED: return "Checked";
-    case PlayerState::ALL_IN: return "All-in";
-    case PlayerState::FOLDED: return "Folded";
-    case PlayerState::SMALL_BLIND: return "Small Blind";
-    case PlayerState::BIG_BLIND: return "Big Blind";
+    case PlayerStatus::IDLE: return " ";
+    case PlayerStatus::BET: return "Bet";
+    case PlayerStatus::RAISED: return "Raised";
+    case PlayerStatus::CALLED: return "Called";
+    case PlayerStatus::CHECKED: return "Checked";
+    case PlayerStatus::ALL_IN: return "All-in";
+    case PlayerStatus::FOLDED: return "Folded";
+    case PlayerStatus::SMALL_BLIND: return "Small Blind";
+    case PlayerStatus::BIG_BLIND: return "Big Blind";
     default: return "???";
     }
 }
