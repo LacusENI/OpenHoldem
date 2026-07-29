@@ -1,10 +1,11 @@
 #pragma once
 
 #include "GameTypes.hpp"
-#include "PlayerSet.h"
-#include "SeatManager.h"
 
 namespace poker {
+class PlayerSet;
+class SeatManager;
+
 class FlowManager {
 private:
     PlayerSet* player_set;
