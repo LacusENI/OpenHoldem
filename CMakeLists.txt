@@ -167,7 +167,7 @@ target_link_libraries(ui_test PRIVATE
 
 # 测试
 add_executable(poker_test
-        test/include/MockDeck.h
+        test/include/MockDeck.hpp
 
         test/card_test.cpp
         test/eval_hand_test.cpp

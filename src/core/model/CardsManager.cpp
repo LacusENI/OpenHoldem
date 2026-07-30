@@ -22,6 +22,7 @@ void CardsManager::setHoleCardsAt(seat_idx_t seat_idx, cards_2_t hole_cards) {
 
 void CardsManager::dealCommunityCards(Stage stage) {
     switch (stage) {
+    case Stage::PREFLOP: break;
     case Stage::FLOP:
         community_cards[0] = deck->deal();
         community_cards[1] = deck->deal();
@@ -29,7 +30,7 @@ void CardsManager::dealCommunityCards(Stage stage) {
         break;
     case Stage::TURN: community_cards[3] = deck->deal(); break;
     case Stage::RIVER: community_cards[4] = deck->deal(); break;
-    default: throw std::invalid_argument("Invalid stage for dealing community cards");
+    default: break;
     }
 }
 

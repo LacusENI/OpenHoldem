@@ -1,5 +1,6 @@
 #pragma once
 
+#include <ranges>
 #include <vector>
 
 #include "GameTypes.hpp"
@@ -22,10 +23,12 @@ public:
     auto end() const { return players.end(); }
     int playerCount() { return players.size(); }
     void resize(int new_size) { players.resize(new_size); }
-    auto getActivePlayers();
-    auto getActiveSeats();
+    auto getActiveSeats() {
+        return std::views::iota(0, playerCount()) | std::views::filter([this](seat_idx_t seat) {
+                   return this->playerAt(seat).isActive();
+               });
+    }
     int getActivePlayerCount();
-    auto getActionablePlayers();
     int getActionablePlayerCount();
 };
 } // namespace poker
