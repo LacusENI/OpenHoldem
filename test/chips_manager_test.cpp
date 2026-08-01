@@ -4,7 +4,7 @@
 
 #include "ChipsManager.h"
 #include "GameTypes.hpp"
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 #include "PotManager.h"
 #include "SeatManager.h"
 

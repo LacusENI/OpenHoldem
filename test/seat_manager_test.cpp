@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "GameTypes.hpp"
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 #include "SeatManager.h"
 
 using namespace poker;

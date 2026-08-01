@@ -35,7 +35,7 @@ TEST(ActionFlowTest, SetupToStart) {
     action_flow.setupToStart(Stage::FLOP);
     EXPECT_EQ(4, action_flow.getActorSeat());
 
-    player_set.playerAt(4).is_folded = true;
+    player_set.playerAt(4).fold();
     action_flow.setupToStart(Stage::TURN);
     EXPECT_EQ(0, action_flow.getActorSeat());
 }

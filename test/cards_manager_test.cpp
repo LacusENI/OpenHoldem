@@ -6,7 +6,7 @@
 #include "CardsManager.h"
 #include "GameTypes.hpp"
 #include "MockDeck.hpp"
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 #include "gmock/gmock.h"
 
 using namespace poker;

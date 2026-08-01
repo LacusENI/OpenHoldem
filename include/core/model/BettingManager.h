@@ -8,6 +8,7 @@ class PlayerSet;
 class BettingManager {
 private:
     PlayerSet* player_set;
+
     chips_t big_blind = 10;
     chips_t round_bet = 0;
     chips_t min_raise_delta = 0;

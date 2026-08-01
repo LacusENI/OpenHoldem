@@ -154,12 +154,7 @@ void GameModel::advanceToNextStreet() {
     current_stage = next_stage(current_stage);
 }
 
-void GameModel::setupRoundStart() {
-    seat_idx_t first_actor_seat = (current_stage == Stage::PREFLOP)
-                                      ? seat_manager->getPreflopFirstActorSeat()
-                                      : seat_manager->getPostflopFirstActorSeat();
-    betting_round->onRoundStarted(first_actor_seat);
-}
+void GameModel::setupRoundStart() {}
 
 void GameModel::awaitPlayerInput() {
     // seat_idx_t actor_seat = betting_round->getActorSeat();
@@ -171,7 +166,7 @@ void GameModel::awaitPlayerInput() {
 }
 
 void GameModel::advanceToNextActor() {
-    seat_idx_t next_actor_seat = seat_manager->nextActorSeat(betting_round->getActorSeat());
+    seat_idx_t next_actor_seat = seat_manager->nextAliveSeat(betting_round->getActorSeat());
     betting_round->advanceToNextActor(next_actor_seat);
 }
 

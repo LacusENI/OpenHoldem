@@ -1,6 +1,6 @@
 #include "ActionFlow.h"
 
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 #include "SeatManager.h"
 
 namespace poker {
@@ -15,16 +15,16 @@ void ActionFlow::setupToStart(Stage stage) {
     case Stage::RIVER: actor_seat = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
     default: break;
     }
-    pending_player_count = player_set->getActionablePlayerCount();
+    pending_player_count = player_set->getActivePlayerCount();
 }
 void ActionFlow::handlePlayerAction(Action action) {
     if (action == Action::RAISE) {
-        pending_player_count = player_set->getActionablePlayerCount() - 1;
+        pending_player_count = player_set->getActivePlayerCount() - 1;
     } else {
         pending_player_count--;
     }
 }
 bool ActionFlow::isEnded() {
-    return pending_player_count == 0 || player_set->getActivePlayerCount() == 1;
+    return pending_player_count == 0 || player_set->getAlivePlayerCount() == 1;
 }
 } // namespace poker

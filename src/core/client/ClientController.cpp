@@ -36,7 +36,7 @@ void ClientController::handle(const Event::GameStarted& event) {
     client_model->big_blind = event.big_blind;
     client_model->players.resize(event.player_count);
     for (seat_idx_t seat = 0; seat < client_model->players.size(); ++seat) {
-        client_model->players[seat].position = seat;
+        // client_model->players[seat].position = seat;
     }
     client_model->player_states.resize(event.player_count);
     client_model->player_bets.resize(event.player_count);
@@ -45,7 +45,7 @@ void ClientController::handle(const Event::GameStarted& event) {
 void ClientController::handle(const Event::HoleCardsDealt& event) {
     GlobalLogger::debug("[ClientController] EventListener(HoleCardsDealt)");
     if (event.player_seat == client_model->this_player_seat) {
-        client_model->players[event.player_seat].hole_cards = event.hole_cards;
+        client_model->players[event.player_seat].setHoleCards(event.hole_cards);
         client_view->render(*client_model);
     }
 }
@@ -57,7 +57,7 @@ void ClientController::handle(const Event::BlindPosted& event) {
         client_model->player_states[event.seat] = PlayerStatus::SMALL_BLIND;
     }
     client_model->pot = event.pot;
-    client_model->players[event.seat].chips = event.player_chips;
+    client_model->players[event.seat].setChips(event.player_chips);
     client_model->player_bets[event.seat] = event.player_bet;
     client_view->render(*client_model);
 }
@@ -89,6 +89,7 @@ void ClientController::handle(const Event::AwaitPlayerAction& event) {
 }
 
 void ClientController::handle(const Event::PlayerActed& event) {
+    /**/
     GlobalLogger::debug("[ClientController] EventListener(PlayerActed)");
     PlayerStatus player_state;
     switch (event.action) {
@@ -102,7 +103,7 @@ void ClientController::handle(const Event::PlayerActed& event) {
     }
     client_model->player_states[event.actor_seat] = player_state;
     client_model->pot = event.pot;
-    client_model->players[event.actor_seat].chips = event.player_chips;
+    client_model->players[event.actor_seat].setChips(event.player_chips);
     client_model->player_bets[event.actor_seat] = event.player_bet;
     client_view->render(*client_model);
 }

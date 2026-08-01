@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GameTypes.hpp"
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 
 namespace poker {
 /**
@@ -20,13 +20,12 @@ public:
     void setBtnSeat(seat_idx_t new_btn_position) { btn_seat = new_btn_position; }
     void advanceBtnSeat() { btn_seat = nextSeat(btn_seat); }
     seat_idx_t nextSeat(seat_idx_t position) const { return (position + 1) % playerCount(); }
-    seat_idx_t nextActiveSeat(seat_idx_t position) const;
-    seat_idx_t nextActorSeat(seat_idx_t position) const;
-    seat_idx_t getSbSeat() const;
-    seat_idx_t getBbSeat() const;
-    seat_idx_t getUtgSeat() const;
-    seat_idx_t getPostflopFirstActorSeat() const;
-    seat_idx_t getPreflopFirstActorSeat() const;
+    seat_idx_t nextActiveSeat(seat_idx_t current) const;
+    seat_idx_t nextAliveSeat(seat_idx_t current) const;
+    seat_idx_t getSbSeat() const { return (btn_seat + 1) % playerCount(); }
+    seat_idx_t getBbSeat() const { return (btn_seat + 2) % playerCount(); }
+    seat_idx_t getUtgSeat() const { return (btn_seat + 3) % playerCount(); }
     int distanceFromSeatLeft(seat_idx_t seat, seat_idx_t ref_seat);
+    void sortSeats(std::vector<seat_idx_t>& seats);
 };
 } // namespace poker

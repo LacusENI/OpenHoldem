@@ -8,16 +8,16 @@
 #include "GameTypes.hpp"
 #include "HandValue.hpp"
 #include "Player.hpp"
-#include "PlayerSet.h"
+#include "PlayerSet.hpp"
 #include "eval_hand.h"
 
 namespace poker {
 cards_2_t CardsManager::getHoleCardsAt(seat_idx_t seat_idx) const {
-    return player_set->playerAt(seat_idx).hole_cards;
+    return player_set->playerAt(seat_idx).getHoleCards();
 }
 
 void CardsManager::setHoleCardsAt(seat_idx_t seat_idx, cards_2_t hole_cards) {
-    player_set->playerAt(seat_idx).hole_cards = hole_cards;
+    player_set->playerAt(seat_idx).setHoleCards(hole_cards);
 }
 
 void CardsManager::dealCommunityCards(Stage stage) {
@@ -36,7 +36,7 @@ void CardsManager::dealCommunityCards(Stage stage) {
 
 void CardsManager::dealHoleCards() {
     for (Player& player : *player_set) {
-        player.hole_cards = {deck->deal(), deck->deal()};
+        player.setHoleCards({deck->deal(), deck->deal()});
     }
 }
 
@@ -51,14 +51,14 @@ HandValue CardsManager::computePlayerHandValue(seat_idx_t seat_idx) {
 std::vector<seat_idx_t> CardsManager::determineWinners() {
     std::vector<seat_idx_t> winners;
     HandValue max_hand_value(0);
-    for (seat_idx_t active_seat : player_set->getActiveSeats()) {
-        HandValue hand_value = computePlayerHandValue(active_seat);
+    for (seat_idx_t player_seat : player_set->getAlivePlayers()) {
+        HandValue hand_value = computePlayerHandValue(player_seat);
         if (hand_value > max_hand_value) {
             winners.clear();
             max_hand_value = hand_value;
-            winners.push_back(active_seat);
+            winners.push_back(player_seat);
         } else if (hand_value == max_hand_value) {
-            winners.push_back(active_seat);
+            winners.push_back(player_seat);
         }
     }
     return winners;
