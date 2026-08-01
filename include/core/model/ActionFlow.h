@@ -6,7 +6,7 @@ namespace poker {
 class PlayerSet;
 class SeatManager;
 
-class FlowManager {
+class ActionFlow {
 private:
     PlayerSet* player_set;
     SeatManager* seat_manager;
@@ -14,14 +14,15 @@ private:
     int pending_player_count;
 
 public:
-    FlowManager(PlayerSet* player_set, SeatManager* seat_manager)
+    ActionFlow(PlayerSet* player_set, SeatManager* seat_manager)
         : player_set(player_set), seat_manager(seat_manager) {}
-    ~FlowManager() = default;
+    ~ActionFlow() = default;
 
-    seat_idx_t getActorSeat();
+    seat_idx_t getActorSeat() { return actor_seat; }
+    void setActorSeat(seat_idx_t seat) { actor_seat = seat; }
     void moveToNextActor();
-    void setupFirstActor(Stage stage);
-    bool isFlowEnded();
+    void setupToStart(Stage stage);
     void handlePlayerAction(Action action);
+    bool isEnded();
 };
 } // namespace poker

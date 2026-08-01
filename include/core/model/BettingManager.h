@@ -18,6 +18,7 @@ public:
 
     chips_t getPlayerBetAt(seat_idx_t seat_idx) const;
     chips_t getBigBlind() const { return big_blind; }
+    chips_t getSmallBlind() const { return big_blind / 2; }
     chips_t getRoundBet() const { return round_bet; }
     chips_t getMinRaiseDelta() const { return min_raise_delta; }
     chips_t getMinRaise() const { return round_bet + min_raise_delta; }

@@ -38,11 +38,14 @@ add_library(poker_core
         include/core/interface/GlobalLogger.h
         include/core/interface/ServerIoAdapter.h
 
+        include/core/model/ActionFlow.h
         include/core/model/BettingManager.h
         include/core/model/CardsManager.h
         include/core/model/ChipsManager.h
-        include/core/model/FlowManager.h
         include/core/model/PlayerSet.h
+        include/core/model/PotManager.h
+        include/core/model/SeatManager.h
+        src/core/model/ActionFlow.cpp
         src/core/model/BettingManager.cpp
         src/core/model/CardsManager.cpp
         src/core/model/ChipsManager.cpp
@@ -169,6 +172,7 @@ target_link_libraries(ui_test PRIVATE
 add_executable(poker_test
         test/include/MockDeck.hpp
 
+        test/action_flow_test.cpp
         test/card_test.cpp
         test/eval_hand_test.cpp
         test/chips_calc_test.cpp
