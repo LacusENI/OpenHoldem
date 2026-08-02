@@ -18,6 +18,7 @@ add_library(poker_core
         include/core/common/GameTypes.hpp
         include/core/common/HandValue.hpp
         include/core/common/Player.hpp
+        include/core/common/PlayerSet.hpp
 
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
@@ -42,7 +43,6 @@ add_library(poker_core
         include/core/model/BettingManager.h
         include/core/model/CardsManager.h
         include/core/model/ChipsManager.h
-        include/core/model/PlayerSet.hpp
         include/core/model/PotManager.h
         include/core/model/SeatManager.h
         src/core/model/ActionFlow.cpp

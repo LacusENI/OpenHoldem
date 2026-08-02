@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "ActionFlow.h"
+#include "GameTypes.hpp"
 #include "SeatManager.h"
 
 using namespace poker;
@@ -16,9 +17,15 @@ TEST(ActionFlowTest, MoveToNextActor) {
     EXPECT_EQ(1, action_flow.getActorSeat());
     action_flow.moveToNextActor();
     EXPECT_EQ(2, action_flow.getActorSeat());
+
     action_flow.setActorSeat(4);
     action_flow.moveToNextActor();
     EXPECT_EQ(0, action_flow.getActorSeat());
+
+    // 测试是否会跳过已弃牌玩家
+    player_set.playerAt(1).fold();
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
 }
 
 TEST(ActionFlowTest, SetupToStart) {
@@ -40,7 +47,35 @@ TEST(ActionFlowTest, SetupToStart) {
     EXPECT_EQ(0, action_flow.getActorSeat());
 }
 
-TEST(ActionFlowTest, HandlePlayerAction) {
+TEST(ActionFlowTest, FlowEndByAllCalled) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ActionFlow action_flow(&player_set, &seat_manager);
+
+    player_set.resize(5);
+    // [3] BTN [4] SB [0] BB [1] UTG [2] CO
+    seat_manager.setBtnSeat(3);
+    action_flow.setupToStart(Stage::PREFLOP);
+
+    // 从 1 开始, 一直跟注, 直到 0 过牌, 检验流程是否结束
+    EXPECT_EQ(1, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(3, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(4, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(0, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CHECK);
+    EXPECT_TRUE(action_flow.isEnded());
+}
+
+TEST(ActionFlowTest, OneRaiseThenAllCall) {
     PlayerSet player_set;
     SeatManager seat_manager(&player_set);
     ActionFlow action_flow(&player_set, &seat_manager);
@@ -68,5 +103,112 @@ TEST(ActionFlowTest, HandlePlayerAction) {
     action_flow.moveToNextActor();
     EXPECT_EQ(1, action_flow.getActorSeat());
     action_flow.handlePlayerAction(Action::CALL);
+    EXPECT_TRUE(action_flow.isEnded());
+}
+
+TEST(ActionFlowTest, SkipFoldedPlayer) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ActionFlow action_flow(&player_set, &seat_manager);
+
+    player_set.resize(5);
+    // [3] BTN [4] SB [0] BB [1] UTG [2] CO
+    seat_manager.setBtnSeat(3);
+    player_set.playerAt(1).fold();
+    player_set.playerAt(4).fold();
+    action_flow.setupToStart(Stage::FLOP);
+
+    EXPECT_EQ(0, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CHECK);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CHECK);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(3, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CHECK);
+    EXPECT_TRUE(action_flow.isEnded());
+}
+
+TEST(ActionFlowTest, IgnoreFoldedPlayer) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ActionFlow action_flow(&player_set, &seat_manager);
+
+    player_set.resize(5);
+    // [3] BTN [4] SB [0] BB [1] UTG [2] CO
+    seat_manager.setBtnSeat(3);
+    action_flow.setupToStart(Stage::PREFLOP);
+
+    // 让 1 和 2 弃牌, 检验之后流程是否跳过 1 和 2
+    EXPECT_EQ(1, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    EXPECT_TRUE(player_set.playerAt(1).isFolded());
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    EXPECT_TRUE(player_set.playerAt(2).isFolded());
+    action_flow.moveToNextActor();
+    // 3 加注, 由于 1 和 2 弃牌, 所以流程应该在 4, 0 跟注后结束
+    EXPECT_EQ(3, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::RAISE);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(4, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(0, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_TRUE(action_flow.isEnded());
+}
+
+TEST(ActionFlowTest, FoldAfterRaise) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ActionFlow action_flow(&player_set, &seat_manager);
+
+    player_set.resize(5);
+    // [3] BTN [4] SB [0] BB [1] UTG [2] CO
+    seat_manager.setBtnSeat(3);
+    action_flow.setupToStart(Stage::PREFLOP);
+    EXPECT_EQ(1, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::RAISE);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(3, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(4, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::RAISE);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(0, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(1, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::CALL);
+    EXPECT_TRUE(action_flow.isEnded());
+}
+
+TEST(ActionFlowTest, OnlyOneNotFolded) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ActionFlow action_flow(&player_set, &seat_manager);
+
+    player_set.resize(5);
+    // [3] BTN [4] SB [0] BB [1] UTG [2] CO
+    seat_manager.setBtnSeat(3);
+    action_flow.setupToStart(Stage::PREFLOP);
+    EXPECT_EQ(1, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(2, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(3, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
+    action_flow.moveToNextActor();
+    EXPECT_EQ(4, action_flow.getActorSeat());
+    action_flow.handlePlayerAction(Action::FOLD);
     EXPECT_TRUE(action_flow.isEnded());
 }

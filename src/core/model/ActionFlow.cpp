@@ -23,6 +23,11 @@ void ActionFlow::handlePlayerAction(Action action) {
     } else {
         pending_player_count--;
     }
+    if (action == Action::FOLD) {
+        player_set->playerAt(actor_seat).fold();
+    } else if (action == Action::ALL_IN) {
+        player_set->playerAt(actor_seat).allIn();
+    }
 }
 bool ActionFlow::isEnded() {
     return pending_player_count == 0 || player_set->getAlivePlayerCount() == 1;
