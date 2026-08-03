@@ -27,7 +27,8 @@ public:
 
     void dealCommunityCards(Stage stage);
     void dealHoleCards();
-    HandValue computePlayerHandValue(seat_idx_t seat_idx);
-    std::vector<seat_idx_t> determineWinners();
+    HandValue evaluatePlayerHand(seat_idx_t seat_idx);
+    ShowdownResult processShowdown();
+    std::vector<seat_idx_t> determineWinners(const ShowdownResult& showdown_result);
 };
 } // namespace poker

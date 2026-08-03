@@ -40,7 +40,7 @@ void CardsManager::dealHoleCards() {
     }
 }
 
-HandValue CardsManager::computePlayerHandValue(seat_idx_t seat_idx) {
+HandValue CardsManager::evaluatePlayerHand(seat_idx_t seat_idx) {
     cards_7_t seven_cards;
     cards_2_t hole_cards = getHoleCardsAt(seat_idx);
     std::ranges::copy(community_cards, seven_cards.begin());
@@ -48,11 +48,20 @@ HandValue CardsManager::computePlayerHandValue(seat_idx_t seat_idx) {
     return algo::eval_hand(seven_cards);
 }
 
-std::vector<seat_idx_t> CardsManager::determineWinners() {
+ShowdownResult CardsManager::processShowdown() {
+    ShowdownResult showdown_result;
+    for (seat_idx_t player_seat : player_set->getAlivePlayers()) {
+        HandValue hand_value = evaluatePlayerHand(player_seat);
+        cards_2_t hole_cards = getHoleCardsAt(player_seat);
+        showdown_result.push_back({player_seat, hole_cards, hand_value});
+    }
+    return showdown_result;
+}
+
+std::vector<seat_idx_t> CardsManager::determineWinners(const ShowdownResult& showdown_result) {
     std::vector<seat_idx_t> winners;
     HandValue max_hand_value(0);
-    for (seat_idx_t player_seat : player_set->getAlivePlayers()) {
-        HandValue hand_value = computePlayerHandValue(player_seat);
+    for (const auto& [player_seat, _, hand_value] : showdown_result) {
         if (hand_value > max_hand_value) {
             winners.clear();
             max_hand_value = hand_value;

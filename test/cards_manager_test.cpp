@@ -67,7 +67,8 @@ TEST(CardsManagerTest, DetermineWinners) {
     // 公共牌: ♥A ♠A ♦K ♣Q ♥J
     // 底牌 [0]: ♥K ♠Q [1]: ♣K ♠J [2] ♦J ♣8 [3] ♠K ♥2
     // 手牌 [0]: AK两对 踢脚牌Q [1]: AK两对 踢脚牌Q [2]: 三条A 踢脚牌K, Q [3]: AK两对 踢脚牌Q
-    std::vector<seat_idx_t> winners = cards_manager.determineWinners();
+    ShowdownResult showdown_result = cards_manager.processShowdown();
+    std::vector<seat_idx_t> winners = cards_manager.determineWinners(showdown_result);
     std::vector<seat_idx_t> expected = {0, 1, 3};
     EXPECT_EQ(expected, winners);
 }

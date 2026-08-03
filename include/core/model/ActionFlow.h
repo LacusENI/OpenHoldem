@@ -20,6 +20,7 @@ public:
 
     seat_idx_t getActorSeat() { return actor_seat; }
     void setActorSeat(seat_idx_t seat) { actor_seat = seat; }
+
     void moveToNextActor();
     void setupToStart(Stage stage);
     void handlePlayerAction(Action action);
