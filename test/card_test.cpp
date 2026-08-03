@@ -4,20 +4,20 @@
 
 using namespace poker;
 
-// 测试 Card 的 toString() 方法
+// 测试 toString(Card)
 TEST(CardTest, ToStringFunction) {
-    Card card1(Suit::CLUB, Rank::ACE);
+    Card card1(Rank::ACE, Suit::CLUB);
 
-    EXPECT_EQ("CA", to_string(card1));
+    EXPECT_EQ("Ac", to_string(card1));
 
-    Card card2(Suit::DIAMOND, Rank::KING);
+    Card card2(Rank::KING, Suit::DIAMOND);
 
-    EXPECT_EQ("DK", to_string(card2));
+    EXPECT_EQ("Kd", to_string(card2));
 }
 
 TEST(CardTest, FromStringBuilder) {
-    EXPECT_EQ(Card("CA"), Card(Suit::CLUB, Rank::ACE));
-    EXPECT_EQ(Card("DK"), Card(Suit::DIAMOND, Rank::KING));
-    EXPECT_EQ(Card("HT"), Card(Suit::HEART, Rank::TEN));
-    EXPECT_EQ(Card("S8"), Card(Suit::SPADE, Rank::EIGHT));
+    EXPECT_EQ(Card("Ac"), Card(Rank::ACE, Suit::CLUB));
+    EXPECT_EQ(Card("Kd"), Card(Rank::KING, Suit::DIAMOND));
+    EXPECT_EQ(Card("Th"), Card(Rank::TEN, Suit::HEART));
+    EXPECT_EQ(Card("8s"), Card(Rank::EIGHT, Suit::SPADE));
 }

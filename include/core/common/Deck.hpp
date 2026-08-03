@@ -34,7 +34,7 @@ public:
         int i = 0;
         for (int s = MIN_SUIT; s <= MAX_SUIT; ++s) {
             for (int r = MIN_RANK; r <= MAX_RANK; ++r) {
-                cards[i++] = Card(static_cast<Suit>(s), static_cast<Rank>(r));
+                cards[i++] = Card(static_cast<Rank>(r), static_cast<Suit>(s));
             }
         }
         const auto seed = std::chrono::system_clock::now().time_since_epoch().count();

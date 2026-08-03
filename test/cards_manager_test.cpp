@@ -15,9 +15,9 @@ using namespace testing;
 TEST(CardsManagerTest, DealCommunityCards) {
     MockDeck mock_deck;
     CardsManager cards_manager(&mock_deck, nullptr);
-    cards_5_t community_cards = {Card(Suit::CLUB, Rank::TWO), Card(Suit::DIAMOND, Rank::EIGHT),
-                                 Card(Suit::HEART, Rank::ACE), Card(Suit::SPADE, Rank::JACK),
-                                 Card(Suit::DIAMOND, Rank::QUEEN)};
+    cards_5_t community_cards = {Card(Rank::TWO, Suit::CLUB), Card(Rank::EIGHT, Suit::DIAMOND),
+                                 Card(Rank::ACE, Suit::HEART), Card(Rank::JACK, Suit::SPADE),
+                                 Card(Rank::QUEEN, Suit::DIAMOND)};
     EXPECT_CALL(mock_deck, deal())
         .WillOnce(Return(community_cards[0]))
         .WillOnce(Return(community_cards[1]))
@@ -42,8 +42,8 @@ TEST(CardsManagerTest, DealHoleCards) {
     PlayerSet player_set;
     CardsManager cards_manager(&mock_deck, &player_set);
     player_set.resize(2);
-    cards_2_t hole_cards_1 = {Card(Suit::CLUB, Rank::TWO), Card(Suit::DIAMOND, Rank::EIGHT)};
-    cards_2_t hole_cards_2 = {Card(Suit::HEART, Rank::ACE), Card(Suit::SPADE, Rank::JACK)};
+    cards_2_t hole_cards_1 = {Card(Rank::TWO, Suit::CLUB), Card(Rank::EIGHT, Suit::DIAMOND)};
+    cards_2_t hole_cards_2 = {Card(Rank::ACE, Suit::HEART), Card(Rank::JACK, Suit::SPADE)};
     EXPECT_CALL(mock_deck, deal())
         .WillOnce(Return(hole_cards_1[0]))
         .WillOnce(Return(hole_cards_1[1]))
@@ -58,12 +58,12 @@ TEST(CardsManagerTest, DetermineWinners) {
     PlayerSet player_set;
     CardsManager cards_manager(nullptr, &player_set);
     player_set.resize(4);
-    cards_5_t community_cards = {Card("HA"), Card("SA"), Card("DK"), Card("CQ"), Card("HJ")};
+    cards_5_t community_cards = {Card("Ah"), Card("As"), Card("Kd"), Card("Qc"), Card("Jh")};
     cards_manager.setCommunityCards(community_cards);
-    cards_manager.setHoleCardsAt(0, {Card("HK"), Card("SQ")});
-    cards_manager.setHoleCardsAt(1, {Card("CK"), Card("SJ")});
-    cards_manager.setHoleCardsAt(2, {Card("DJ"), Card("C8")});
-    cards_manager.setHoleCardsAt(3, {Card("SK"), Card("H2")});
+    cards_manager.setHoleCardsAt(0, {Card("Kh"), Card("Qs")});
+    cards_manager.setHoleCardsAt(1, {Card("Kc"), Card("Js")});
+    cards_manager.setHoleCardsAt(2, {Card("Jd"), Card("8c")});
+    cards_manager.setHoleCardsAt(3, {Card("Ks"), Card("2h")});
     // 公共牌: ♥A ♠A ♦K ♣Q ♥J
     // 底牌 [0]: ♥K ♠Q [1]: ♣K ♠J [2] ♦J ♣8 [3] ♠K ♥2
     // 手牌 [0]: AK两对 踢脚牌Q [1]: AK两对 踢脚牌Q [2]: 三条A 踢脚牌K, Q [3]: AK两对 踢脚牌Q

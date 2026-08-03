@@ -1,6 +1,8 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
+#include <stdexcept>
 #include <string>
 
 #include <magic_enum/magic_enum.hpp>
@@ -42,55 +44,66 @@ constexpr int MAX_SUIT = static_cast<int>(Suit::SPADE);
 constexpr int MIN_RANK = static_cast<int>(Rank::TWO);
 constexpr int MAX_RANK = static_cast<int>(Rank::ACE);
 
+inline constexpr std::optional<Suit> parse_suit(char str) {
+    switch (str) {
+    case 'c': return Suit::CLUB;
+    case 'd': return Suit::DIAMOND;
+    case 'h': return Suit::HEART;
+    case 's': return Suit::SPADE;
+    case '_': return Suit::NONE;
+    default: return std::nullopt;
+    }
+}
+
+inline constexpr std::optional<Rank> parse_rank(char str) {
+    switch (str) {
+    case '2': return Rank::TWO;
+    case '3': return Rank::THREE;
+    case '4': return Rank::FOUR;
+    case '5': return Rank::FIVE;
+    case '6': return Rank::SIX;
+    case '7': return Rank::SEVEN;
+    case '8': return Rank::EIGHT;
+    case '9': return Rank::NINE;
+    case 'T': return Rank::TEN;
+    case 'J': return Rank::JACK;
+    case 'Q': return Rank::QUEEN;
+    case 'K': return Rank::KING;
+    case 'A': return Rank::ACE;
+    case '_': return Rank::NONE;
+    default: return std::nullopt;
+    }
+}
+
 /**
  * @brief 扑克牌的实体类
  */
 struct Card {
-    Suit suit;
     Rank rank;
+    Suit suit;
 
-    Card() : suit(Suit::NONE), rank(Rank::NONE) {}
-    explicit Card(std::string_view str) { *this = from_string(str).value_or(Card{}); }
-    Card(Suit suit, Rank rank) : suit(suit), rank(rank) {}
-
-    bool operator<(const Card& other) const {
-        if (rank == other.rank) return suit < other.suit;
-        return rank < other.rank;
+    constexpr Card() : rank(Rank::NONE), suit(Suit::NONE) {}
+    constexpr Card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
+    consteval Card(std::string_view str) {
+        auto card = from_string(str);
+        if (!card) throw std::invalid_argument("Invalid card string: " + std::string(str));
+        rank = card->rank;
+        suit = card->suit;
     }
 
-    bool operator==(const Card& other) const { return suit == other.suit && rank == other.rank; }
-
-    bool operator>(const Card& other) const {
-        if (rank == other.rank) return suit > other.suit;
-        return rank > other.rank;
+    constexpr uint16_t pack() const {
+        return (static_cast<uint16_t>(rank) << 8) | static_cast<uint16_t>(suit);
     }
 
-    static std::optional<Card> from_string(std::string_view str) {
-        if (str.size() < 2) return std::nullopt;
-        Suit s;
-        switch (str[0]) {
-        case 'C': s = Suit::CLUB; break;
-        case 'D': s = Suit::DIAMOND; break;
-        case 'H': s = Suit::HEART; break;
-        case 'S': s = Suit::SPADE; break;
-        case '_': s = Suit::NONE; break;
-        default: return std::nullopt;
-        }
-        Rank r;
-        switch (str[1]) {
-        case 'T': r = Rank::TEN; break;
-        case 'J': r = Rank::JACK; break;
-        case 'Q': r = Rank::QUEEN; break;
-        case 'K': r = Rank::KING; break;
-        case 'A': r = Rank::ACE; break;
-        case '_': r = Rank::NONE; break;
-        default:
-            if (str[1] >= '2' && str[1] <= '9')
-                r = static_cast<Rank>(str[1] - '0');
-            else
-                return std::nullopt;
-        }
-        return Card{s, r};
+    constexpr auto operator==(const Card& other) const { return pack() == other.pack(); }
+    constexpr auto operator<=>(const Card& other) const { return pack() <=> other.pack(); }
+
+    static constexpr std::optional<Card> from_string(std::string_view str) {
+        if (str.size() != 2) return std::nullopt;
+        auto rank = parse_rank(str[0]);
+        auto suit = parse_suit(str[1]);
+        if (!rank || !suit) return std::nullopt;
+        return Card{*rank, *suit};
     }
 };
 
@@ -107,10 +120,10 @@ inline std::string to_string(Rank rank) {
 }
 
 inline std::string to_string(Card card) {
-    static std::vector<std::string> suits = {"_", "C", "D", "H", "S"};
+    static std::vector<std::string> suits = {"_", "c", "d", "h", "s"};
     static std::vector<std::string> ranks = {"_", "?", "2", "3", "4", "5", "6", "7",
                                              "8", "9", "T", "J", "Q", "K", "A"};
-    return suits[static_cast<int>(card.suit)] + ranks[static_cast<int>(card.rank)];
+    return ranks[static_cast<int>(card.rank)] + suits[static_cast<int>(card.suit)];
 }
 
 template <std::size_t N>
