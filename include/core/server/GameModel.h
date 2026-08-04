@@ -70,7 +70,7 @@ public:
     /* 移至下一个行动玩家 */
     void advanceToNextActor();
     /* 处理玩家输入 */
-    void processPlayerInput(const Event::PlayerActionSubmitted& event);
+    void processPlayerInput(const Event::PlayerAction& event);
     /* 处理摊牌 */
     void revealHoleCards();
     void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);

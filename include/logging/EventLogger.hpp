@@ -30,13 +30,13 @@ public:
             spdlog::info(std::format("[{}][Network] Client Disconnected | client_id={}",
                                      logger_name, event.client_id));
         });
-        event_bus->subscribe<NetworkEvent::ServerDisconnected>([this](const auto& event) {
+        event_bus->subscribe<NetworkEvent::ServerDisconnected>([this](const auto& _) {
             spdlog::info(std::format("[{}][Network] Server Disconnected", logger_name));
         });
     }
 
     void subscribeGameEvent() {
-        event_bus->subscribe<Event::StartGame>([this](const auto& event) {
+        event_bus->subscribe<Event::StartGame>([this](const auto& _) {
             spdlog::info(std::format("[{}][Game] Start Game |", logger_name));
         });
         event_bus->subscribe<Event::NewPlayerJoined>([this](const auto& event) {
@@ -44,8 +44,8 @@ public:
                                      event.new_seat));
         });
         event_bus->subscribe<Event::PlayerJoinRequest>([this](const auto& event) {
-            spdlog::info(std::format("[{}][Game] Player Join Request | player_name=\"{}\"", logger_name,
-                                     event.player_name));
+            spdlog::info(std::format("[{}][Game] Player Join Request | player_name=\"{}\"",
+                                     logger_name, event.player_name));
         });
         event_bus->subscribe<Event::PlayerJoinResponse>([this](const auto& event) {
             spdlog::info(std::format("[{}][Game] Player Join Response | player_seat={}",
@@ -71,33 +71,27 @@ public:
         });
         event_bus->subscribe<Event::BlindPosted>([this](const auto& event) {
             std::string blind_type = event.is_big_blind ? "Big Blind" : "Small Blind";
-            spdlog::info(
-                std::format("[{}][Game] Blind Posted({}) | seat={} amount={} pot={} "
-                            "player_chips={} player_bet={}",
-                            logger_name, blind_type, event.seat, event.amount, event.pot,
-                            event.player_chips, event.player_bet));
+            spdlog::info(std::format("[{}][Game] Blind Posted({}) | player={} amount={}",
+                                     logger_name, blind_type, event.player, event.amount));
         });
-        event_bus->subscribe<Event::BettingRoundStarted>([this](const auto& event) {
+        event_bus->subscribe<Event::BettingRoundStarted>([this](const auto& _) {
             spdlog::info(std::format("[{}][Game] Betting Round Started", logger_name));
         });
-        event_bus->subscribe<Event::BettingRoundEnded>([this](const auto& event) {
+        event_bus->subscribe<Event::BettingRoundEnded>([this](const auto& _) {
             spdlog::info(std::format("[{}][Game] Betting Round Ended", logger_name));
         });
-        event_bus->subscribe<Event::AwaitPlayerAction>([this](const auto& event) {
+        event_bus->subscribe<Event::WaitingForAction>([this](const auto& event) {
             spdlog::info(std::format(
-                "[{}][Game] Await Player Action | player_seat={} player_chips={} player_bet={} "
+                "[{}][Game] Await Player Action | player={} player_bet={} "
                 "round_bet={} min_raise_delta={}",
-                logger_name, event.player_seat, event.player_chips, event.player_bet,
-                event.round_bet, event.min_raise_delta));
+                logger_name, event.player, event.player_bet, event.round_bet, event.min_raise));
         });
         event_bus->subscribe<Event::PlayerActed>([this](const auto& event) {
-            spdlog::info(std::format(
-                "[{}][Game] Player Acted | actor_seat={} action={} pot={} player_chips={} "
-                "player_bet={}",
-                logger_name, event.actor_seat, to_string(event.action), event.pot,
-                event.player_chips, event.player_bet));
+            spdlog::info(std::format("[{}][Game] Player Acted | player={} bet={} action={}",
+                                     logger_name, event.player, event.bet,
+                                     to_string(event.action)));
         });
-        event_bus->subscribe<Event::HoleCardsRevealed>([this](const auto& event) {
+        event_bus->subscribe<Event::HoleCardsRevealed>([this](const auto& _) {
             spdlog::info("[{}][Game] Hole Cards Revealed | ...", logger_name);
         });
     }

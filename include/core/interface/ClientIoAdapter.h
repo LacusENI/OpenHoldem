@@ -16,9 +16,9 @@ public:
     std::function<void(const GameEvent&)> sendToServer;
 
     void subscribeEvent() {
-        event_bus->subscribe<Event::PlayerActionSubmitted>(&ClientIoAdapter::handle, this);
+        event_bus->subscribe<Event::PlayerAction>(&ClientIoAdapter::handle, this);
     }
-    void handle(const Event::PlayerActionSubmitted& event) {
+    void handle(const Event::PlayerAction& event) {
         GlobalLogger::debug("[ClientIoAdapter] EventListener(PlayerActionSubmitted)");
         sendToServer(event);
     }

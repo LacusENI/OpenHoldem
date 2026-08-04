@@ -14,7 +14,7 @@ GameController::GameController(EventBus* event_bus, GameModel* model)
 void GameController::subscribeEvent() {
     event_bus->subscribe<Event::StartGame>(&GameController::handle, this);
     event_bus->subscribe<Event::PlayerJoinRequest>(&GameController::handle, this);
-    event_bus->subscribe<Event::PlayerActionSubmitted>(&GameController::handle, this);
+    event_bus->subscribe<Event::PlayerAction>(&GameController::handle, this);
 }
 
 void GameController::handle(const Event::StartGame& event) {
@@ -30,7 +30,7 @@ void GameController::handle(const Event::PlayerJoinRequest& event) {
     // }
 }
 
-void GameController::handle(const Event::PlayerActionSubmitted& event) {
+void GameController::handle(const Event::PlayerAction& event) {
     GlobalLogger::debug("[GameController] EventListener(PlayerActionSubmitted)");
     game_model->processPlayerInput(event);
     if (game_model->isRoundFinished()) {

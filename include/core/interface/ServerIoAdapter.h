@@ -28,7 +28,7 @@ public:
         event_bus->subscribe<Event::BettingRoundEnded>(&ServerIoAdapter::handle, this);
         event_bus->subscribe<Event::PlayerActed>(&ServerIoAdapter::handle, this);
         event_bus->subscribe<Event::HoleCardsDealt>(&ServerIoAdapter::handle, this);
-        event_bus->subscribe<Event::AwaitPlayerAction>(&ServerIoAdapter::handle, this);
+        event_bus->subscribe<Event::WaitingForAction>(&ServerIoAdapter::handle, this);
     }
     void publishGameEventReceived(const GameEvent& event);
     void handle(const NetworkEvent::ClientConnected& event) {
@@ -74,7 +74,7 @@ public:
         GlobalLogger::debug("[ServerIoAdapter] EventListener(HoleCardsDealt)");
         sendToOneClient(event.player_seat, event);
     }
-    void handle(const Event::AwaitPlayerAction& event) {
+    void handle(const Event::WaitingForAction& event) {
         GlobalLogger::debug("[ServerIoAdapter] EventListener(AwaitPlayerAction)");
         sendToOneClient(event.player_seat, event);
     }

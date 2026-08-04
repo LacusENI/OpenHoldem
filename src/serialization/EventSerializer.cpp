@@ -27,10 +27,10 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BettingRoundStarted, stage)
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BettingRoundEnded, stage)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AwaitPlayerAction, player_seat, player_chips, player_bet,
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(WaitingForAction, player_seat, player_chips, player_bet,
                                    round_bet, min_raise_delta)
 
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerActionSubmitted, target_bet, is_fold)
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerAction, target_bet, is_fold)
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerActed, actor_seat, action, pot, player_chips, player_bet)
 
@@ -76,8 +76,8 @@ std::optional<GameEvent> deserializeEvent(const std::string& json_str) {
     if (type == "CommunityCardsDealt") return data.get<Event::CommunityCardsDealt>();
     if (type == "BettingRoundStarted") return data.get<Event::BettingRoundStarted>();
     if (type == "BettingRoundEnded") return data.get<Event::BettingRoundEnded>();
-    if (type == "AwaitPlayerAction") return data.get<Event::AwaitPlayerAction>();
-    if (type == "PlayerActionSubmitted") return data.get<Event::PlayerActionSubmitted>();
+    if (type == "AwaitPlayerAction") return data.get<Event::WaitingForAction>();
+    if (type == "PlayerActionSubmitted") return data.get<Event::PlayerAction>();
     if (type == "PlayerActed") return data.get<Event::PlayerActed>();
     if (type == "HoleCardsRevealed") return data.get<Event::HoleCardsRevealed>();
     if (type == "GameEnded") return data.get<Event::GameEnded>();

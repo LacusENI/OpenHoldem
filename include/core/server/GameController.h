@@ -22,7 +22,7 @@ public:
     /* 处理玩家加入请求 */
     void handle(const Event::PlayerJoinRequest& event);
     /* 处理玩家输入 */
-    void handle(const Event::PlayerActionSubmitted& event);
+    void handle(const Event::PlayerAction& event);
     /* 开始一局游戏 */
     void handle(const Event::StartGame& event);
     /* 进入指定阶段 */

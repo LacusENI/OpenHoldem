@@ -57,12 +57,9 @@ struct StageChanged {
 GET_EVENT_NAME(StageChanged)
 
 struct BlindPosted {
-    seat_idx_t seat;
+    seat_idx_t player;
     chips_t amount;
     bool is_big_blind;
-    chips_t pot;
-    chips_t player_chips;
-    chips_t player_bet;
 };
 
 GET_EVENT_NAME(BlindPosted)
@@ -85,78 +82,46 @@ struct BettingRoundEnded {
 
 GET_EVENT_NAME(BettingRoundEnded)
 
-struct AwaitPlayerAction {
-    seat_idx_t player_seat;
-    chips_t player_chips;
+struct WaitingForAction {
+    seat_idx_t player;
     chips_t player_bet;
     chips_t round_bet;
-    chips_t min_raise_delta;
+    chips_t min_raise;
 };
 
-GET_EVENT_NAME(AwaitPlayerAction)
+GET_EVENT_NAME(WaitingForAction)
 
-struct PlayerActionSubmitted {
+struct PlayerAction {
     chips_t target_bet;
     bool is_fold;
+    bool is_all_in;
 };
 
-GET_EVENT_NAME(PlayerActionSubmitted)
+GET_EVENT_NAME(PlayerAction)
 
 struct PlayerActed {
-    seat_idx_t actor_seat;
+    seat_idx_t player;
+    chips_t bet;
     Action action;
-    chips_t pot;
-    chips_t player_chips;
-    chips_t player_bet;
 };
 
 GET_EVENT_NAME(PlayerActed)
 
 struct HoleCardsRevealed {
-    std::vector<seat_idx_t> active_players;
-    std::vector<cards_2_t> hole_cards;
+    std::vector<std::pair<seat_idx_t, cards_2_t>> players_with_hole_cards;
 };
 
 GET_EVENT_NAME(HoleCardsRevealed)
 
-struct GameEnded {
-    std::vector<seat_idx_t> winners;
-    std::vector<chips_t> awards;
+struct WinnerDeclared {
+    std::vector<std::pair<seat_idx_t, chips_t>> winners_with_awards;
 };
+
+GET_EVENT_NAME(WinnerDeclared)
+
+struct GameEnded {};
 
 GET_EVENT_NAME(GameEnded)
-
-struct PlayerChipsUpdated {
-    seat_idx_t player_seat;
-    chips_t player_chips;
-};
-
-GET_EVENT_NAME(PlayerChipsUpdated)
-
-struct PotUpdated {
-    chips_t pot;
-};
-
-GET_EVENT_NAME(PotUpdated)
-
-struct PlayerBetUpdated {
-    seat_idx_t player_seat;
-    chips_t player_bet;
-};
-
-GET_EVENT_NAME(PlayerBetUpdated)
-
-struct RoundBetUpdated {
-    chips_t round_bet;
-};
-
-GET_EVENT_NAME(RoundBetUpdated)
-
-struct MinRaiseDeltaUpdated {
-    chips_t min_raise_delta;
-};
-
-GET_EVENT_NAME(MinRaiseDeltaUpdated)
 
 } // namespace Event
 
@@ -164,8 +129,8 @@ using GameEvent =
     std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
                  Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
                  Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
-                 Event::AwaitPlayerAction, Event::PlayerActionSubmitted, Event::PlayerActed,
-                 Event::HoleCardsRevealed, Event::GameEnded>;
+                 Event::WaitingForAction, Event::PlayerAction, Event::PlayerActed,
+                 Event::HoleCardsRevealed, Event::WinnerDeclared, Event::GameEnded>;
 
 namespace NetworkEvent {
 struct ClientConnected {

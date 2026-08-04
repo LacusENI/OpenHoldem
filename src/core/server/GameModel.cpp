@@ -170,7 +170,7 @@ void GameModel::advanceToNextActor() {
     betting_round->advanceToNextActor(next_actor_seat);
 }
 
-void GameModel::processPlayerInput(const Event::PlayerActionSubmitted& event) {
+void GameModel::processPlayerInput(const Event::PlayerAction& event) {
     // seat_idx_t actor_seat = betting_round->getActorSeat();
     // const Player& actor = seat_manager->getPlayerAtSeat(actor_seat);
     // algo::BettingContext context = betting_round->getBettingContext(actor.chips);
