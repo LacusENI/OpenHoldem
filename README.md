@@ -53,16 +53,14 @@ git clone https://github.com/microsoft/vcpkg.git
 ```bash
 cmake --preset debug
 cmake --build --preset debug
-./cmake-build-debug/poker_server
-./cmake-build-debug/poker_client
+./cmake-build-debug/poker
 ```
 
 2. release 模式
 ```bash
 cmake --preset release
 cmake --build --preset release
-./cmake-build-release/poker_server
-./cmake-build-release/poker_client
+./cmake-build-release/poker
 ```
 
 3. 测试

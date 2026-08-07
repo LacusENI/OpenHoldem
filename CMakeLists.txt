@@ -75,6 +75,16 @@ target_link_libraries(poker_core PUBLIC
 )
 
 
+# 测试业务核心逻辑的程序
+add_executable(poker
+        src/main.cpp
+)
+
+target_link_libraries(poker PRIVATE
+        poker_core
+)
+
+
 # 应用层
 add_library(application
         include/logging/EventLogger.hpp
@@ -123,48 +133,6 @@ target_link_libraries(presentation PUBLIC
         poker_core
         spdlog::spdlog_header_only
 )
-
-
-# 客户端程序
-add_executable(poker_client
-        src/client_main.cpp
-)
-
-target_link_libraries(poker_client PRIVATE
-        poker_core
-        application
-        presentation
-)
-
-
-# 服务器程序
-add_executable(poker_server
-        src/server_main.cpp
-)
-
-target_link_libraries(poker_server PRIVATE
-        poker_core
-        application
-)
-
-
-# UI 测试
-add_executable(ui_test
-        ui_test/ui_test_main.cpp
-        ui_test/table_test.cpp
-        ui_test/ui_test.h
-)
-
-target_include_directories(ui_test PUBLIC
-        ui_test.h
-)
-
-target_link_libraries(ui_test PRIVATE
-        poker_core
-        application
-        presentation
-)
-
 
 # 测试
 add_executable(poker_test
