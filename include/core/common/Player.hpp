@@ -48,8 +48,8 @@ private:
 
     cards_2_t hole_cards{}; // 玩家的底牌
 
-    chips_t chips = 0; // 玩家拥有的筹码
-    chips_t bet = 0;   // 玩家的下注额
+    chips_t chips = 200; // 玩家拥有的筹码
+    chips_t bet = 0;     // 玩家的下注额
 };
 
 template <typename T>

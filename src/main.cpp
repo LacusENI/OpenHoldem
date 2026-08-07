@@ -13,7 +13,6 @@
 #include "GameController.h"
 #include "GameModel.h"
 #include "GameTypes.hpp"
-#include "HandValue.hpp"
 #include "Player.hpp"
 #include "PlayerSet.hpp"
 #include "PotManager.h"
@@ -28,8 +27,8 @@ void printEvent(const Event::BlindPosted& event) {
 void printEvent(const Event::WaitingForAction& event) {
     std::cout << std::format(
         "[Event] Waiting For Action | "
-        "@P{} bet:${} round-bet:${} min-raise:${}\n",
-        event.player, event.player_bet, event.round_bet, event.min_raise);
+        "@P{} chips:${} bet:${} round-bet:${} min-raise:${}\n",
+        event.player, event.player_chips, event.player_bet, event.round_bet, event.min_raise);
 }
 
 void printEvent(const Event::PlayerActed& event) {
@@ -71,7 +70,19 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
         } else {
             try {
                 int target_bet = std::stoi(input);
-
+                if (target_bet - event.player_bet > event.player_chips) {
+                    std::cout << std::format("Beyond the chips you have(${}).\n",
+                                             event.player_chips);
+                    continue;
+                }
+                if (target_bet < event.round_bet) {
+                    std::cout << std::format("Under the call(${}).\n", event.round_bet);
+                    continue;
+                }
+                if (target_bet > event.round_bet && target_bet < event.min_raise) {
+                    std::cout << std::format("Under the min-raise(${}).\n", event.min_raise);
+                    continue;
+                }
                 if (target_bet == event.round_bet ||
                     (target_bet > event.round_bet && target_bet >= event.min_raise)) {
                     return Event::PlayerAction{

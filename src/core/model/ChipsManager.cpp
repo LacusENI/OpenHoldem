@@ -1,5 +1,8 @@
 #include "ChipsManager.h"
 
+#include <format>
+#include <stdexcept>
+
 #include "PlayerSet.hpp"
 #include "PotManager.h"
 #include "SeatManager.h"
@@ -15,11 +18,18 @@ void ChipsManager::setPlayerChipsAt(seat_t seat_idx, chips_t player_chips) {
 }
 
 void ChipsManager::moveChipsToPot(seat_t player_seat, chips_t chips) {
-    player_set->playerAt(player_seat).commitChips(chips);
+    Player& player = player_set->playerAt(player_seat);
+    if (chips > player.getChips()) {
+        throw std::invalid_argument(std::format("Player's chips is not enough"));
+    }
+    player.commitChips(chips);
     pot_manager->addChips(chips);
 }
 
 void ChipsManager::moveChipsToPlayer(seat_t player_seat, chips_t chips) {
+    if (chips > pot_manager->getPot()) {
+        throw std::invalid_argument(std::format("Chips of Pot is not enough"));
+    }
     pot_manager->takeChips(chips);
     player_set->playerAt(player_seat).winChips(chips);
 }

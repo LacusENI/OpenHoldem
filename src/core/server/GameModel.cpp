@@ -74,10 +74,12 @@ void GameModel::closeBettingRound() {
 }
 void GameModel::awaitPlayerAction() {
     seat_t acting_player = action_flow->getActingPlayer();
+    chips_t player_chips = chips_manager->getPlayerChipsAt(acting_player);
     chips_t player_bet = betting_manager->getPlayerBetAt(acting_player);
     chips_t round_bet = betting_manager->getRoundBet();
     chips_t min_raise = betting_manager->getMinRaise();
     Event::WaitingForAction event = {.player = acting_player,
+                                     .player_chips = player_chips,
                                      .player_bet = player_bet,
                                      .round_bet = round_bet,
                                      .min_raise = min_raise};
@@ -93,7 +95,7 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     algo::BettingInput input = {.target_bet = event.target_bet, .is_fold = event.is_fold};
     algo::BettingResult result = algo::process_betting(context, input);
 
-    if (result.is_target_bet_valid) {
+    if (result.is_target_bet_valid && result.has_sufficient_chips) {
         chips_manager->moveChipsToPot(acting_player, result.bet_delta);
         betting_manager->setMinRaiseDelta(result.min_raise_delta);
         betting_manager->setRoundBet(result.round_bet);
@@ -106,7 +108,6 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
 void GameModel::moveActingPlayer() {
     action_flow->moveActingPlayer();
 }
-
 void GameModel::revealHoleCards() {
     std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
     for (seat_t player : player_set->getActivePlayers()) {

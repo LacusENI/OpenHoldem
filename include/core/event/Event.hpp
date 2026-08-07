@@ -84,6 +84,7 @@ GET_EVENT_NAME(BettingRoundEnded)
 
 struct WaitingForAction {
     seat_t player;
+    chips_t player_chips;
     chips_t player_bet;
     chips_t round_bet;
     chips_t min_raise;
