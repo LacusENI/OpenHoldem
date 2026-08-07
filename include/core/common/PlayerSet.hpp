@@ -22,6 +22,7 @@ public:
     auto end() { return players.end(); }
     auto begin() const { return players.begin(); }
     auto end() const { return players.end(); }
+    void addNewPlayer() { players.emplace_back(); }
     int playerCount() { return players.size(); }
     void resize(int new_size) { players.resize(new_size); }
     auto getAlivePlayers() {

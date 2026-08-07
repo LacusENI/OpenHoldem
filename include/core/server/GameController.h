@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include "Event.hpp"
+#include "GameTypes.hpp"
 
 namespace poker {
 class EventBus;
@@ -25,6 +28,17 @@ public:
     void handle(const Event::PlayerAction& event);
     /* 开始一局游戏 */
     void handle(const Event::StartGame& event);
+
+    /* 翻牌前阶段 */
+    void processPreflopStage();
+    /* 翻牌后阶段 */
+    void processPostflopStage();
+    /* 摊牌阶段 */
+    void processShowdownStage();
+    /* 结算阶段 */
+    void processSettlementStage(std::vector<seat_t> winners);
+    /* 处理只剩一名玩家留有手牌的情况 */
+    void processOnlyOnePlayerAlive();
 };
 
 } // namespace poker

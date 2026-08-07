@@ -44,14 +44,28 @@ public:
           seat_manager(seat_manager) {}
     ~GameModel() = default;
 
-    Stage getCurrentStage() { return current_stage; }
+    Stage getCurrentStage() const { return current_stage; }
     void setCurrentStage(Stage stage) { current_stage = stage; }
+
+    EventBus* getEventBus() const { return event_bus; }
+    ActionFlow* getActionFlow() const { return action_flow; }
+    BettingManager* getBettingManager() const { return betting_manager; }
+    CardsManager* getCardsManager() const { return cards_manager; }
+    ChipsManager* getChipsManager() const { return chips_manager; }
+    PlayerSet* getPlayerSet() const { return player_set; }
+    PotManager* getPotManager() const { return pot_manager; }
+    SeatManager* getSeatManager() const { return seat_manager; }
+
+    /* 改变游戏阶段 */
+    void changeStage(Stage new_stage);
 
     /* 加入新玩家 */
     void joinNewPlayer();
 
     /* 开始一局游戏 */
     void startGame();
+    /* 结束本局游戏 */
+    void finishGame();
     /* 洗牌 */
     void shuffleDeck();
     /* 给玩家发放底牌 */
@@ -71,6 +85,8 @@ public:
     void awaitPlayerAction();
     /* 处理玩家行动 */
     void handlePlayerAction(const Event::PlayerAction& event);
+    /* 移至下一个行动的玩家 */
+    void moveActingPlayer();
 
     /* 揭露玩家底牌 */
     void revealHoleCards();

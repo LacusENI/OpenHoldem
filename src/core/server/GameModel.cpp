@@ -17,6 +17,21 @@
 #include "chips_calc.h"
 
 namespace poker {
+void GameModel::joinNewPlayer() {
+    player_set->addNewPlayer();
+    event_bus->publish(Event::NewPlayerJoined{.new_seat = player_set->playerCount() - 1,
+                                              .player_count = player_set->playerCount()});
+}
+void GameModel::startGame() {
+    event_bus->publish(Event::GameStarted{});
+}
+void GameModel::finishGame() {
+    event_bus->publish(Event::GameEnded{});
+}
+void GameModel::changeStage(Stage new_stage) {
+    current_stage = new_stage;
+    event_bus->publish(Event::StageChanged{new_stage});
+}
 void GameModel::shuffleDeck() {
     cards_manager->shuffleDeck();
 }
@@ -84,8 +99,14 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
         betting_manager->setRoundBet(result.round_bet);
         betting_manager->setMinRaiseDelta(result.min_raise_delta);
         action_flow->applyAction(result.action);
+        event_bus->publish(Event::PlayerActed{
+            .player = acting_player, .bet = result.player_bet, .action = result.action});
     }
 }
+void GameModel::moveActingPlayer() {
+    action_flow->moveActingPlayer();
+}
+
 void GameModel::revealHoleCards() {
     std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
     for (seat_t player : player_set->getActivePlayers()) {

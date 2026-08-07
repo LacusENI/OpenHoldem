@@ -23,7 +23,7 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
         } else {
             result.action = Action::CALL;
         }
-    } else if (input.target_bet > context.round_bet + context.min_raise_delta) {
+    } else if (input.target_bet >= context.round_bet + context.min_raise_delta) {
         if (context.round_bet == 0) {
             result.action = Action::BET;
         } else {

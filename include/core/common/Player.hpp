@@ -52,6 +52,18 @@ private:
     chips_t bet = 0;   // 玩家的下注额
 };
 
+template <typename T>
+std::optional<T> from_string(std::string_view str);
+
+inline std::string to_string(Player::State state) {
+    return std::string{magic_enum::enum_name(state)};
+}
+
+template <>
+inline std::optional<Player::State> from_string(std::string_view str) {
+    return magic_enum::enum_cast<Player::State>(str);
+}
+
 enum class PlayerStatus {
     IDLE,
     BET,
@@ -64,12 +76,9 @@ enum class PlayerStatus {
     BIG_BLIND
 };
 
-inline std::string to_string(PlayerStatus state) {
-    return std::string{magic_enum::enum_name(state)};
+inline std::string to_string(PlayerStatus status) {
+    return std::string{magic_enum::enum_name(status)};
 }
-
-template <typename T>
-std::optional<T> from_string(std::string_view str);
 
 template <>
 inline std::optional<PlayerStatus> from_string(std::string_view str) {
