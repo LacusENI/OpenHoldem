@@ -13,8 +13,8 @@ public:
     std::vector<Player> players;
     std::vector<PlayerStatus> player_states;
     std::vector<chips_t> player_bets;
-    seat_idx_t this_player_seat;
-    seat_idx_t btn_seat{};
+    seat_t this_player_seat;
+    seat_t btn_seat{};
     chips_t big_blind{};
     chips_t pot{};
 };

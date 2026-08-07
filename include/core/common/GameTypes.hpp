@@ -1,16 +1,12 @@
 #pragma once
 
 #include <string>
-#include <vector>
 
 #include <magic_enum/magic_enum.hpp>
 
-#include "Card.hpp"
-#include "HandValue.hpp"
-
 namespace poker {
-using seat_idx_t = int; // 玩家座位
-using chips_t = int;    // 筹码数量
+using seat_t = int;  // 玩家座位
+using chips_t = int; // 筹码数量
 
 enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 
@@ -23,9 +19,6 @@ enum class Action {
     FOLD,
     ALL_IN,
 };
-
-using ShowdownEntry = std::tuple<seat_idx_t, cards_2_t, HandValue>;
-using ShowdownResult = std::vector<ShowdownEntry>;
 
 inline Stage next_stage(Stage stage) {
     return static_cast<Stage>(static_cast<int>(stage) + 1);

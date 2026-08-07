@@ -25,18 +25,6 @@ public:
     void handle(const Event::PlayerAction& event);
     /* 开始一局游戏 */
     void handle(const Event::StartGame& event);
-    /* 进入指定阶段 */
-    void enterStage(Stage stage);
-    /* 开始下注轮 */
-    void startBettingRound();
-    /* 等待玩家输入 */
-    void awaitPlayerInput();
-    /* 完成下注轮 */
-    void handleRoundEnded();
-    /* 执行摊牌阶段 */
-    void processShowdown();
-    /* 执行结算阶段 */
-    void processSettlement();
 };
 
 } // namespace poker

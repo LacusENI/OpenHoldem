@@ -22,13 +22,13 @@ public:
 
     cards_5_t getCommunityCards() const { return community_cards; }
     void setCommunityCards(cards_5_t cc) { community_cards = cc; }
-    cards_2_t getHoleCardsAt(seat_idx_t seat_idx) const;
-    void setHoleCardsAt(seat_idx_t seat_idx, cards_2_t hole_cards);
+    cards_2_t getHoleCardsAt(seat_t seat_idx) const;
+    void setHoleCardsAt(seat_t seat_idx, cards_2_t hole_cards);
 
-    void dealCommunityCards(Stage stage);
+    void shuffleDeck();
     void dealHoleCards();
-    HandValue evaluatePlayerHand(seat_idx_t seat_idx);
-    ShowdownResult processShowdown();
-    std::vector<seat_idx_t> determineWinners(const ShowdownResult& showdown_result);
+    void dealCommunityCards(Stage stage);
+    HandValue evaluatePlayerHand(seat_t seat_idx);
+    std::vector<seat_t> determineWinners(const std::vector<seat_t>& players);
 };
 } // namespace poker

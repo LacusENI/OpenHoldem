@@ -45,7 +45,7 @@ TEST(ChipsManagerTest, DistributePot) {
     player_set.resize(9);
     pot_manager.addChips(100);
     seat_manager.setBtnSeat(2);
-    std::vector<seat_idx_t> winners = {1, 2, 3, 4, 6, 7, 8};
+    std::vector<seat_t> winners = {1, 2, 3, 4, 6, 7, 8};
     // 底池 100 赢家 7名 3, 4, 6, 7, 8, 1, 2
 
     chips_manager.distributePot(winners);

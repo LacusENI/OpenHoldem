@@ -4,32 +4,32 @@
 #include "SeatManager.h"
 
 namespace poker {
-void ActionFlow::moveToNextActor() {
-    actor_seat = seat_manager->nextActiveSeat(actor_seat);
+void ActionFlow::moveActingPlayer() {
+    acting_player = seat_manager->nextActiveSeat(acting_player);
 }
 void ActionFlow::setupToStart(Stage stage) {
     switch (stage) {
-    case Stage::PREFLOP: actor_seat = seat_manager->getUtgSeat(); break;
+    case Stage::PREFLOP: acting_player = seat_manager->getUtgSeat(); break;
     case Stage::FLOP:
     case Stage::TURN:
-    case Stage::RIVER: actor_seat = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
+    case Stage::RIVER: acting_player = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
     default: break;
     }
     pending_player_count = player_set->getActivePlayerCount();
 }
-void ActionFlow::handlePlayerAction(Action action) {
+void ActionFlow::applyAction(Action action) {
     if (action == Action::RAISE) {
         pending_player_count = player_set->getActivePlayerCount() - 1;
     } else {
         pending_player_count--;
     }
     if (action == Action::FOLD) {
-        player_set->playerAt(actor_seat).fold();
+        player_set->playerAt(acting_player).fold();
     } else if (action == Action::ALL_IN) {
-        player_set->playerAt(actor_seat).allIn();
+        player_set->playerAt(acting_player).allIn();
     }
 }
-bool ActionFlow::isEnded() {
+bool ActionFlow::isFlowEnded() {
     return pending_player_count == 0 || player_set->getAlivePlayerCount() == 1;
 }
 } // namespace poker

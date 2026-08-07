@@ -10,20 +10,21 @@ class ActionFlow {
 private:
     PlayerSet* player_set;
     SeatManager* seat_manager;
-    seat_idx_t actor_seat;
-    int pending_player_count;
+    seat_t acting_player;
+    int pending_player_count = 0;
 
 public:
     ActionFlow(PlayerSet* player_set, SeatManager* seat_manager)
         : player_set(player_set), seat_manager(seat_manager) {}
     ~ActionFlow() = default;
 
-    seat_idx_t getActorSeat() { return actor_seat; }
-    void setActorSeat(seat_idx_t seat) { actor_seat = seat; }
+    seat_t getActingPlayer() const { return acting_player; }
+    void setActingPlayer(seat_t player) { acting_player = player; }
+    int getPendingPlayerCount() const { return pending_player_count; }
 
-    void moveToNextActor();
+    void moveActingPlayer();
     void setupToStart(Stage stage);
-    void handlePlayerAction(Action action);
-    bool isEnded();
+    void applyAction(Action action);
+    bool isFlowEnded();
 };
 } // namespace poker

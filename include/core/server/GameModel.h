@@ -2,17 +2,18 @@
 
 #include <vector>
 
-#include "Card.hpp"
 #include "Event.hpp"
 #include "GameTypes.hpp"
-#include "chips_calc.h"
 
 namespace poker {
 class EventBus;
-class IDeck;
-class SeatManager;
-class BettingRound;
+class ActionFlow;
+class BettingManager;
+class CardsManager;
+class ChipsManager;
+class PlayerSet;
 class PotManager;
+class SeatManager;
 
 /**
  * @brief 游戏领域模型
@@ -20,59 +21,71 @@ class PotManager;
 class GameModel {
 private:
     EventBus* event_bus;
-    IDeck* deck;
-    BettingRound* betting_round;
+    ActionFlow* action_flow;
+    BettingManager* betting_manager;
+    CardsManager* cards_manager;
+    ChipsManager* chips_manager;
+    PlayerSet* player_set;
     PotManager* pot_manager;
     SeatManager* seat_manager;
-
-    Stage current_stage = Stage::IDLE; // 游戏状态机
-    chips_t big_blind = 10;            // 大盲注额
-    cards_5_t community_cards;
-
-    void takePlayerChipsToPot(seat_idx_t player_seat, chips_t chips);
-    void takePotChipsToPlayer(seat_idx_t player_seat, chips_t chips);
-    void applyBettingResult(seat_idx_t player_seat, algo::BettingResult result);
+    Stage current_stage = Stage::IDLE;
 
 public:
-    GameModel(EventBus* event_bus, IDeck* deck, BettingRound* betting_round,
-              PotManager* pot_manager, SeatManager* seat_manager);
+    GameModel(EventBus* event_bus, ActionFlow* action_flow, BettingManager* betting_manager,
+              CardsManager* cards_manager, ChipsManager* chips_manager, PlayerSet* player_set,
+              PotManager* pot_manager, SeatManager* seat_manager)
+        : event_bus(event_bus),
+          action_flow(action_flow),
+          betting_manager(betting_manager),
+          cards_manager(cards_manager),
+          chips_manager(chips_manager),
+          player_set(player_set),
+          pot_manager(pot_manager),
+          seat_manager(seat_manager) {}
     ~GameModel() = default;
 
-    seat_idx_t getBtnSeat() const;
-    Stage getCurrentStage() const;
-    void setCurrentStage(Stage next_street);
-    chips_t getBigBlind() const;
-    cards_5_t getCommunityCards() const;
-    seat_idx_t getActorSeat() const;
-    bool isRoundFinished() const;
-    BettingRound* getBettingRound() { return betting_round; }
-    PotManager* getPotManager() { return pot_manager; }
-    SeatManager* getSeatManager() { return seat_manager; }
+    Stage getCurrentStage() { return current_stage; }
+    void setCurrentStage(Stage stage) { current_stage = stage; }
 
     /* 加入新玩家 */
     void joinNewPlayer();
+
     /* 开始一局游戏 */
     void startGame();
-    /* 向所有玩家发放底牌 */
+    /* 洗牌 */
+    void shuffleDeck();
+    /* 给玩家发放底牌 */
     void dealHoleCards();
     /* 发放公共牌 */
     void dealCommunityCards();
-    /* 执行盲注 */
-    void postForcedBlind();
-    /* 进入第一个阶段(Pre-flop) */
-    void enterPreflopStreet();
-    /* 进入下一个阶段 */
-    void advanceToNextStreet();
+    /* 执行小盲注 */
+    void postSmallBlind();
+    /* 执行大盲注 */
+    void postBigBlind();
+
     /* 开始下注轮 */
-    void setupRoundStart();
-    /* 等待玩家输入 */
-    void awaitPlayerInput();
-    /* 移至下一个行动玩家 */
-    void advanceToNextActor();
-    /* 处理玩家输入 */
-    void processPlayerInput(const Event::PlayerAction& event);
-    /* 处理摊牌 */
+    void startBettingRound();
+    /* 关闭下注轮 */
+    void closeBettingRound();
+    /* 等待玩家行动 */
+    void awaitPlayerAction();
+    /* 处理玩家行动 */
+    void handlePlayerAction(const Event::PlayerAction& event);
+
+    /* 揭露玩家底牌 */
     void revealHoleCards();
-    void distributePot(const std::vector<chips_t>& amounts, const std::vector<seat_idx_t>& winners);
+    /* 比较玩家手牌大小 */
+    std::vector<seat_t> comparePlayerHands();
+    /* 分配底池给赢家 */
+    void awardPotToWinners(std::vector<seat_t>& winners);
+
+    /* 下注轮是否已结束 */
+    bool isBettingRoundEnded() const;
+    /* 是否只有一名玩家留有手牌 */
+    bool isOnlyOnePlayerAlive() const;
+    /* 是否只有一名活跃玩家 */
+    bool isOnlyOnePlayerActive() const;
+    /* 没有任何玩家留在牌局 */
+    bool isNoOnePlayerAlive() const;
 };
 } // namespace poker

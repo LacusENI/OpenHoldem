@@ -20,11 +20,11 @@ public:
         : player_set(player_set), pot_manager(pot_manager), seat_manager(seat_manager) {}
     ~ChipsManager() = default;
 
-    chips_t getPlayerChipsAt(seat_idx_t seat_idx);
-    void setPlayerChipsAt(seat_idx_t seat_idx, chips_t player_chips);
+    chips_t getPlayerChipsAt(seat_t seat_idx);
+    void setPlayerChipsAt(seat_t seat_idx, chips_t player_chips);
 
-    void moveChipsToPot(seat_idx_t player_seat, chips_t chips);
-    void moveChipsToPlayer(seat_idx_t player_seat, chips_t chips);
-    void distributePot(std::vector<seat_idx_t>& winners);
+    void moveChipsToPot(seat_t player_seat, chips_t chips);
+    void moveChipsToPlayer(seat_t player_seat, chips_t chips);
+    void distributePot(std::vector<seat_t>& winners);
 };
 } // namespace poker

@@ -16,8 +16,8 @@ public:
     PlayerSet() = default;
     ~PlayerSet() = default;
 
-    const Player& playerAt(seat_idx_t seat_idx) const { return players[seat_idx]; }
-    Player& playerAt(seat_idx_t seat_idx) { return players[seat_idx]; }
+    const Player& playerAt(seat_t seat_idx) const { return players[seat_idx]; }
+    Player& playerAt(seat_t seat_idx) { return players[seat_idx]; }
     auto begin() { return players.begin(); }
     auto end() { return players.end(); }
     auto begin() const { return players.begin(); }
@@ -25,10 +25,14 @@ public:
     int playerCount() { return players.size(); }
     void resize(int new_size) { players.resize(new_size); }
     auto getAlivePlayers() {
-        return std::views::iota(0, playerCount()) | std::views::filter([this](seat_idx_t seat) {
-                   return this->playerAt(seat).isAlive();
-               });
+        return std::views::iota(0, playerCount()) |
+               std::views::filter([this](seat_t seat) { return this->playerAt(seat).isAlive(); });
     }
+    auto getActivePlayers() {
+        return std::views::iota(0, playerCount()) |
+               std::views::filter([this](seat_t seat) { return this->playerAt(seat).isActive(); });
+    }
+    auto getPlayerSeats() { return std::views::iota(0, playerCount()); }
     int getAlivePlayerCount() {
         return std::ranges::count_if(players, [](const Player& p) { return p.isAlive(); });
     }

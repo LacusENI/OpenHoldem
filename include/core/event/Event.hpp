@@ -19,14 +19,14 @@ struct PlayerJoinRequest {
 GET_EVENT_NAME(PlayerJoinRequest)
 
 struct NewPlayerJoined {
-    seat_idx_t new_seat;
+    seat_t new_seat;
     int player_count;
 };
 
 GET_EVENT_NAME(NewPlayerJoined)
 
 struct PlayerJoinResponse {
-    seat_idx_t player_seat;
+    seat_t player_seat;
 };
 
 GET_EVENT_NAME(PlayerJoinResponse)
@@ -36,7 +36,7 @@ struct StartGame {};
 GET_EVENT_NAME(StartGame)
 
 struct GameStarted {
-    seat_idx_t btn_seat;
+    seat_t btn_seat;
     chips_t big_blind;
     int player_count;
 };
@@ -44,7 +44,7 @@ struct GameStarted {
 GET_EVENT_NAME(GameStarted)
 
 struct HoleCardsDealt {
-    seat_idx_t player_seat;
+    seat_t player_seat;
     cards_2_t hole_cards;
 };
 
@@ -57,7 +57,7 @@ struct StageChanged {
 GET_EVENT_NAME(StageChanged)
 
 struct BlindPosted {
-    seat_idx_t player;
+    seat_t player;
     chips_t amount;
     bool is_big_blind;
 };
@@ -83,7 +83,7 @@ struct BettingRoundEnded {
 GET_EVENT_NAME(BettingRoundEnded)
 
 struct WaitingForAction {
-    seat_idx_t player;
+    seat_t player;
     chips_t player_bet;
     chips_t round_bet;
     chips_t min_raise;
@@ -100,7 +100,7 @@ struct PlayerAction {
 GET_EVENT_NAME(PlayerAction)
 
 struct PlayerActed {
-    seat_idx_t player;
+    seat_t player;
     chips_t bet;
     Action action;
 };
@@ -108,13 +108,13 @@ struct PlayerActed {
 GET_EVENT_NAME(PlayerActed)
 
 struct HoleCardsRevealed {
-    std::vector<std::pair<seat_idx_t, cards_2_t>> players_with_hole_cards;
+    std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
 };
 
 GET_EVENT_NAME(HoleCardsRevealed)
 
 struct WinnerDeclared {
-    std::vector<std::pair<seat_idx_t, chips_t>> winners_with_awards;
+    std::vector<seat_t> winners;
 };
 
 GET_EVENT_NAME(WinnerDeclared)

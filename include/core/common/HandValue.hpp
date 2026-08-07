@@ -1,8 +1,9 @@
 #pragma once
 
 #include <format>
-#include <magic_enum/magic_enum.hpp>
 #include <vector>
+
+#include <magic_enum/magic_enum.hpp>
 
 #include "Card.hpp"
 
@@ -77,7 +78,7 @@ public:
     static HandValue build(HandType hand_type, std::vector<Rank> ranks) {
         int handValue = static_cast<int>(hand_type);
         int i = 0;
-        for (; i < ranks.size(); i++) {
+        for (; i < static_cast<int>(ranks.size()); i++) {
             handValue = (handValue << 4) + static_cast<int>(ranks[i]);
         }
         for (; i < 5; i++) handValue = handValue << 4;

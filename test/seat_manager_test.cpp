@@ -15,9 +15,9 @@ TEST(SeatManagerTest, SortSeats) {
     SeatManager seat_manager(&player_set);
     seat_manager.setBtnSeat(3);
 
-    std::vector<seat_idx_t> seats = {0, 1, 2, 3, 4, 5, 6};
+    std::vector<seat_t> seats = {0, 1, 2, 3, 4, 5, 6};
     seat_manager.sortSeats(seats);
 
-    std::vector<seat_idx_t> expected = {4, 5, 6, 0, 1, 2, 3};
+    std::vector<seat_t> expected = {4, 5, 6, 0, 1, 2, 3};
     EXPECT_EQ(expected, seats);
 }

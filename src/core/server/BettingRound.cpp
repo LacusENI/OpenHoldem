@@ -18,7 +18,7 @@ void BettingRound::onGameStarted(int player_count) {
     algo::setupGameStart(round_state, player_count);
 }
 
-void BettingRound::onRoundStarted(seat_idx_t start_position) {
+void BettingRound::onRoundStarted(seat_t start_position) {
     actor_seat = start_position;
     round_bet = 0;
     min_raise_delta = 0;
@@ -44,14 +44,14 @@ void BettingRound::applyBettingResult(const algo::BettingResult& result) {
     algo::handlePlayerAction(round_state, result.action);
 }
 
-void BettingRound::processForcedBlind(seat_idx_t sb_seat, seat_idx_t bb_seat, chips_t big_blind) {
+void BettingRound::processForcedBlind(seat_t sb_seat, seat_t bb_seat, chips_t big_blind) {
     player_bets[sb_seat] = big_blind / 2;
     player_bets[bb_seat] = big_blind;
     round_bet = big_blind;
     min_raise_delta = big_blind;
 }
 
-void BettingRound::advanceToNextActor(seat_idx_t next_actor_seat) {
+void BettingRound::advanceToNextActor(seat_t next_actor_seat) {
     actor_seat = next_actor_seat;
 }
 } // namespace poker
