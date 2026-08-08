@@ -18,7 +18,15 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
     if (input.is_fold) {
         result.action = Action::FOLD;
     } else if (result.bet_delta == context.player_chips) {
-        result.action = Action::ALL_IN;
+        if (input.target_bet < context.round_bet) {
+            result.action = Action::ALL_IN_UNDER_CALL;
+        } else if (input.target_bet == context.round_bet) {
+            result.action = Action::ALL_IN_CALL;
+        } else if (input.target_bet < context.min_raise_delta + context.round_bet) {
+            result.action = Action::ALL_IN_UNDER_RAISE;
+        } else {
+            result.action = Action::ALL_IN_RAISE;
+        }
     } else if (input.target_bet < context.player_bet) {
         result.is_target_bet_valid = false;
     } else if (input.target_bet == context.round_bet) {

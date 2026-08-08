@@ -71,8 +71,8 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
             try {
                 int target_bet = std::stoi(input);
                 if (target_bet - event.player_bet > event.player_chips) {
-                    std::cout << std::format("Beyond the chips you have(${}).\n",
-                                             event.player_chips);
+                    std::cout << std::format("Beyond the chips you have(${} to all-in).\n",
+                                             event.player_chips + event.player_bet);
                     continue;
                 }
                 if (target_bet - event.player_bet == event.player_chips) {

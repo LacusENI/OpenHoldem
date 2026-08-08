@@ -19,14 +19,16 @@ void ActionFlow::setupToStart(Stage stage) {
     pending_player_count = player_set->getActivePlayerCount();
 }
 void ActionFlow::applyAction(Action action) {
-    if (action == Action::RAISE || action == Action::BET) {
+    if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE) {
         pending_player_count = player_set->getActivePlayerCount();
         last_aggressor = acting_player;
     }
     pending_player_count--;
     if (action == Action::FOLD) {
         player_set->playerAt(acting_player).fold();
-    } else if (action == Action::ALL_IN) {
+    } else if (action == Action::ALL_IN_CALL || action == Action::ALL_IN_RAISE) {
+        player_set->playerAt(acting_player).allIn();
+    } else if (action == Action::ALL_IN_UNDER_CALL || action == Action::ALL_IN_UNDER_RAISE) {
         player_set->playerAt(acting_player).allIn();
     }
 }

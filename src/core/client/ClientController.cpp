@@ -95,7 +95,10 @@ void ClientController::handle(const Event::PlayerActed& event) {
     case Action::RAISE: player_state = PlayerStatus::RAISED; break;
     case Action::BET: player_state = PlayerStatus::BET; break;
     case Action::FOLD: player_state = PlayerStatus::FOLDED; break;
-    case Action::ALL_IN: player_state = PlayerStatus::ALL_IN; break;
+    case Action::ALL_IN_UNDER_CALL:
+    case Action::ALL_IN_UNDER_RAISE:
+    case Action::ALL_IN_CALL:
+    case Action::ALL_IN_RAISE: player_state = PlayerStatus::ALL_IN; break;
     default: player_state = PlayerStatus::IDLE;
     }
     client_model->player_states[event.player] = player_state;

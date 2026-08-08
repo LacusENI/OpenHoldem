@@ -22,11 +22,9 @@ add_library(poker_core
 
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
-        include/core/algo/round_state.h
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
-        src/core/algo/round_state.cpp
-
+        
         include/core/client/ClientModel.h
         include/core/client/ClientController.h
         include/core/client/ClientView.h

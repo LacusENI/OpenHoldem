@@ -10,7 +10,18 @@ using chips_t = int; // 筹码数量
 
 enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 
-enum class Action { VOID, CALL, CHECK, RAISE, BET, FOLD, ALL_IN };
+enum class Action {
+    VOID,
+    CALL,
+    CHECK,
+    RAISE,
+    BET,
+    FOLD,
+    ALL_IN_UNDER_CALL,
+    ALL_IN_CALL,
+    ALL_IN_UNDER_RAISE,
+    ALL_IN_RAISE
+};
 
 inline Stage next_stage(Stage stage) {
     return static_cast<Stage>(static_cast<int>(stage) + 1);
