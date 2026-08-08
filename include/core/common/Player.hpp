@@ -19,6 +19,9 @@ public:
 
     State getState() const { return state; }
     void setState(State new_state) { state = new_state; }
+    bool isActed() const { return is_acted; }
+    void setActed() { is_acted = true; }
+    void setNotActed() { is_acted = false; }
     cards_2_t getHoleCards() const { return hole_cards; }
     void setHoleCards(cards_2_t cards) { hole_cards = cards; }
     chips_t getChips() const { return chips; }
@@ -45,7 +48,7 @@ public:
 
 private:
     State state = State::ACTIVE; // 玩家状态
-
+    bool is_acted = false;
     cards_2_t hole_cards{}; // 玩家的底牌
 
     chips_t chips = 200; // 玩家拥有的筹码

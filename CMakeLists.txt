@@ -51,10 +51,8 @@ add_library(poker_core
         src/core/model/ChipsManager.cpp
         src/core/model/SeatManager.cpp
         
-        include/core/server/BettingRound.h
         include/core/server/GameController.h
         include/core/server/GameModel.h
-        src/core/server/BettingRound.cpp
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
         
@@ -134,17 +132,18 @@ target_link_libraries(presentation PUBLIC
         spdlog::spdlog_header_only
 )
 
+
 # 测试
 add_executable(poker_test
         test/include/MockDeck.hpp
 
         test/action_flow_test.cpp
         test/card_test.cpp
-        test/eval_hand_test.cpp
-        test/chips_calc_test.cpp
-        test/seat_manager_test.cpp
-        test/chips_manager_test.cpp
         test/cards_manager_test.cpp
+        test/chips_calc_test.cpp
+        test/chips_manager_test.cpp
+        test/eval_hand_test.cpp
+        test/seat_manager_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE

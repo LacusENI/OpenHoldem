@@ -1,5 +1,6 @@
 #include "ActionFlow.h"
 
+#include "GameTypes.hpp"
 #include "PlayerSet.hpp"
 #include "SeatManager.h"
 
@@ -18,11 +19,9 @@ void ActionFlow::setupToStart(Stage stage) {
     pending_player_count = player_set->getActivePlayerCount();
 }
 void ActionFlow::applyAction(Action action) {
-    if (action == Action::RAISE) {
-        pending_player_count = player_set->getActivePlayerCount() - 1;
-    } else {
-        pending_player_count--;
-    }
+    if (action == Action::RAISE || action == Action::BET)
+        pending_player_count = player_set->getActivePlayerCount();
+    pending_player_count--;
     if (action == Action::FOLD) {
         player_set->playerAt(acting_player).fold();
     } else if (action == Action::ALL_IN) {

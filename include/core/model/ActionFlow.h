@@ -10,7 +10,9 @@ class ActionFlow {
 private:
     PlayerSet* player_set;
     SeatManager* seat_manager;
-    seat_t acting_player;
+
+    seat_t acting_player = -1;
+    seat_t last_aggressor = -1;
     int pending_player_count = 0;
 
 public:
