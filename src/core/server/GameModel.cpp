@@ -97,6 +97,7 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
 
     if (result.is_target_bet_valid && result.has_sufficient_chips) {
         chips_manager->moveChipsToPot(acting_player, result.bet_delta);
+        betting_manager->setPlayerBetAt(acting_player, result.player_bet);
         betting_manager->setMinRaiseDelta(result.min_raise_delta);
         betting_manager->setRoundBet(result.round_bet);
         betting_manager->setMinRaiseDelta(result.min_raise_delta);
@@ -130,7 +131,7 @@ bool GameModel::isBettingRoundEnded() const {
 bool GameModel::isOnlyOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 1;
 }
-bool GameModel::isOnlyOnePlayerActive() const {
+bool GameModel::shouldSkipToShowdown() const {
     return player_set->getActivePlayerCount() == 1;
 }
 bool GameModel::isNoOnePlayerAlive() const {

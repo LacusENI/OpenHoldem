@@ -58,6 +58,8 @@ public:
 
     /* 改变游戏阶段 */
     void changeStage(Stage new_stage);
+    /* 移至下一个阶段 */
+    void advanceStage() { changeStage(next_stage(current_stage)); }
 
     /* 加入新玩家 */
     void joinNewPlayer();
@@ -99,8 +101,8 @@ public:
     bool isBettingRoundEnded() const;
     /* 是否只有一名玩家留有手牌 */
     bool isOnlyOnePlayerAlive() const;
-    /* 是否只有一名活跃玩家 */
-    bool isOnlyOnePlayerActive() const;
+    /* 是否应该直接跳转至摊牌阶段  */
+    bool shouldSkipToShowdown() const;
     /* 没有任何玩家留在牌局 */
     bool isNoOnePlayerAlive() const;
 };
