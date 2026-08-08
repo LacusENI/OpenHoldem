@@ -37,8 +37,6 @@ public:
     void processShowdownStage();
     /* 结算阶段 */
     void processSettlementStage(std::vector<seat_t> winners);
-    /* 处理只剩一名玩家留有手牌的情况 */
-    void processOnlyOnePlayerAlive();
 };
 
 } // namespace poker

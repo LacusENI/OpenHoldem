@@ -132,7 +132,7 @@ bool GameModel::isOnlyOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 1;
 }
 bool GameModel::shouldSkipToShowdown() const {
-    return player_set->getActivePlayerCount() == 1;
+    return player_set->getActivePlayerCount() <= 1;
 }
 bool GameModel::isNoOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 0;

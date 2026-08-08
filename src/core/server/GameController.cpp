@@ -35,6 +35,7 @@ void GameController::handle(const Event::PlayerAction& event) {
             processShowdownStage();
         } else if (game_model->shouldSkipToShowdown()) {
             game_model->changeStage(Stage::SHOWDOWN);
+            game_model->dealCommunityCards();
             processShowdownStage();
         } else { // 进入下一个阶段
             if (game_model->getCurrentStage() == Stage::RIVER) {

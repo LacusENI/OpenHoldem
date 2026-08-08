@@ -25,16 +25,18 @@ void CardsManager::shuffleDeck() {
 }
 
 void CardsManager::dealCommunityCards(Stage stage) {
+    int size;
     switch (stage) {
-    case Stage::PREFLOP: break;
-    case Stage::FLOP:
-        community_cards[0] = deck->deal();
-        community_cards[1] = deck->deal();
-        community_cards[2] = deck->deal();
-        break;
-    case Stage::TURN: community_cards[3] = deck->deal(); break;
-    case Stage::RIVER: community_cards[4] = deck->deal(); break;
-    default: break;
+    case Stage::FLOP: size = 3; break;
+    case Stage::TURN: size = 4; break;
+    case Stage::RIVER: size = 5; break;
+    case Stage::SHOWDOWN: size = 5; break;
+    default: return;
+    }
+    for (int i = 0; i < size; i++) {
+        if (community_cards[i] == Card()) {
+            community_cards[i] = deck->deal();
+        }
     }
 }
 
