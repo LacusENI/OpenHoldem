@@ -15,6 +15,8 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
     result.has_sufficient_chips = result.bet_delta <= context.player_chips;
     if (input.is_fold) {
         result.action = Action::FOLD;
+    } else if (result.bet_delta == context.player_chips) {
+        result.action = Action::ALL_IN;
     } else if (input.target_bet < context.player_bet) {
         result.is_target_bet_valid = false;
     } else if (input.target_bet == context.round_bet) {
@@ -29,8 +31,6 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
         } else {
             result.action = Action::RAISE;
         }
-    } else if (result.bet_delta == context.player_chips) {
-        result.action = Action::ALL_IN;
     } else {
         result.is_target_bet_valid = false;
     }

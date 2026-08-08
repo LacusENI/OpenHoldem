@@ -19,8 +19,10 @@ void ActionFlow::setupToStart(Stage stage) {
     pending_player_count = player_set->getActivePlayerCount();
 }
 void ActionFlow::applyAction(Action action) {
-    if (action == Action::RAISE || action == Action::BET)
+    if (action == Action::RAISE || action == Action::BET) {
         pending_player_count = player_set->getActivePlayerCount();
+        last_aggressor = acting_player;
+    }
     pending_player_count--;
     if (action == Action::FOLD) {
         player_set->playerAt(acting_player).fold();

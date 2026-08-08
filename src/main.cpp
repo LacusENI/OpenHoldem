@@ -75,6 +75,10 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
                                              event.player_chips);
                     continue;
                 }
+                if (target_bet - event.player_bet == event.player_chips) {
+                    return Event::PlayerAction{
+                        .target_bet = target_bet, .is_fold = false, .is_all_in = true};
+                }
                 if (target_bet < event.round_bet) {
                     std::cout << std::format("Under the call(${}).\n", event.round_bet);
                     continue;
