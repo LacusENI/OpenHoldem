@@ -2,14 +2,16 @@
 
 #include <algorithm>
 
+#include "GameTypes.hpp"
+
 namespace poker::algo {
 BettingResult process_betting(BettingContext context, BettingInput input) {
     BettingResult result;
     result.bet_delta = input.target_bet - context.player_bet;
     result.player_bet = input.target_bet;
     result.round_bet = std::max(context.round_bet, input.target_bet);
-    result.min_raise_delta =
-        std::max(context.min_raise_delta, input.target_bet - context.round_bet);
+    chips_t raise_delta = input.target_bet - context.round_bet;
+    result.min_raise_delta = std::max(context.min_raise_delta, raise_delta);
     result.action = Action::VOID;
     result.is_target_bet_valid = true;
     result.has_sufficient_chips = result.bet_delta <= context.player_chips;

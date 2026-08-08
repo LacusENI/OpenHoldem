@@ -62,7 +62,7 @@ void printGameModel(const GameModel& model) {
 
 Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
     while (true) {
-        std::cout << ">>>";
+        std::cout << std::format("@P{} >>> ", event.player);
         std::string input;
         std::cin >> input;
         if (input == "f") {
@@ -130,6 +130,16 @@ int main() {
     event_bus.publish(Event::PlayerJoinRequest{});
     event_bus.publish(Event::PlayerJoinRequest{});
     event_bus.publish(Event::PlayerJoinRequest{});
+    event_bus.publish(Event::PlayerJoinRequest{});
+    event_bus.publish(Event::PlayerJoinRequest{});
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dis(100, 300);
+    for (Player& player : player_set) {
+        player.setChips(dis(gen));
+    }
+
     event_bus.publish(Event::StartGame{});
 
     return 0;
