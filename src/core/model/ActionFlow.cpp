@@ -17,6 +17,10 @@ void ActionFlow::setupToStart(Stage stage) {
     default: break;
     }
     pending_player_count = player_set->getActivePlayerCount();
+    for (Player& player : *player_set) {
+        player.setNotActed();
+    }
+    has_incomplete_raise = false;
 }
 void ActionFlow::applyAction(Action action) {
     if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE) {
@@ -24,6 +28,7 @@ void ActionFlow::applyAction(Action action) {
         last_aggressor = acting_player;
     }
     pending_player_count--;
+    player_set->playerAt(acting_player).setActed();
     if (action == Action::FOLD) {
         player_set->playerAt(acting_player).fold();
     } else if (action == Action::ALL_IN_CALL || action == Action::ALL_IN_RAISE) {
@@ -31,8 +36,15 @@ void ActionFlow::applyAction(Action action) {
     } else if (action == Action::ALL_IN_UNDER_CALL || action == Action::ALL_IN_UNDER_RAISE) {
         player_set->playerAt(acting_player).allIn();
     }
+    if (action == Action::ALL_IN_UNDER_RAISE) {
+        has_incomplete_raise = true;
+    }
 }
 bool ActionFlow::isFlowEnded() {
     return pending_player_count == 0 || player_set->getAlivePlayerCount() == 1;
+}
+bool ActionFlow::canPlayerRaise(seat_t seat) const {
+    const Player& player = player_set->playerAt(seat);
+    return !(player.isActed() && has_incomplete_raise);
 }
 } // namespace poker

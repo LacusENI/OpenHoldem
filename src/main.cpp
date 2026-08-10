@@ -27,8 +27,9 @@ void printEvent(const Event::BlindPosted& event) {
 void printEvent(const Event::WaitingForAction& event) {
     std::cout << std::format(
         "[Event] Waiting For Action | "
-        "@P{} chips:${} bet:${} round-bet:${} min-raise:${}\n",
-        event.player, event.player_chips, event.player_bet, event.round_bet, event.min_raise);
+        "@P{} chips:${} bet:${} round-bet:${} min-raise:${} can-raise:{}\n",
+        event.player, event.player_chips, event.player_bet, event.round_bet, event.min_raise,
+        event.can_raise);
 }
 
 void printEvent(const Event::PlayerActed& event) {
@@ -71,8 +72,12 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
             try {
                 int target_bet = std::stoi(input);
                 if (target_bet - event.player_bet > event.player_chips) {
-                    std::cout << std::format("Beyond the chips you have(${} to all-in).\n",
+                    std::cout << std::format("You don't have enough chips(${} to all-in).\n",
                                              event.player_chips + event.player_bet);
+                    continue;
+                }
+                if (target_bet > event.round_bet && !event.can_raise) {
+                    std::cout << "You can't raise now.\n";
                     continue;
                 }
                 if (target_bet - event.player_bet == event.player_chips) {

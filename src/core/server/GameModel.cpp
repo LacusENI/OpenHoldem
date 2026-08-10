@@ -78,11 +78,13 @@ void GameModel::awaitPlayerAction() {
     chips_t player_bet = betting_manager->getPlayerBetAt(acting_player);
     chips_t round_bet = betting_manager->getRoundBet();
     chips_t min_raise = betting_manager->getMinRaise();
+    bool can_raise = action_flow->canPlayerRaise(acting_player);
     Event::WaitingForAction event = {.player = acting_player,
                                      .player_chips = player_chips,
                                      .player_bet = player_bet,
                                      .round_bet = round_bet,
-                                     .min_raise = min_raise};
+                                     .min_raise = min_raise,
+                                     .can_raise = can_raise};
     event_bus->publish(event);
 }
 void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
@@ -91,7 +93,8 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     algo::BettingContext context = {.player_chips = chips_manager->getPlayerChipsAt(acting_player),
                                     .player_bet = betting_manager->getPlayerBetAt(acting_player),
                                     .round_bet = betting_manager->getRoundBet(),
-                                    .min_raise_delta = betting_manager->getMinRaiseDelta()};
+                                    .min_raise_delta = betting_manager->getMinRaiseDelta(),
+                                    .can_raise = action_flow->canPlayerRaise(acting_player)};
     algo::BettingInput input = {.target_bet = event.target_bet, .is_fold = event.is_fold};
     algo::BettingResult result = algo::process_betting(context, input);
 
@@ -105,6 +108,7 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
         event_bus->publish(Event::PlayerActed{
             .player = acting_player, .bet = result.player_bet, .action = result.action});
     }
+    // TODO: 增加输入无效时的信息返回
 }
 void GameModel::moveActingPlayer() {
     action_flow->moveActingPlayer();

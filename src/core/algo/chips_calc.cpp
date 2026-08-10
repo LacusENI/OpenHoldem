@@ -22,6 +22,8 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
             result.action = Action::ALL_IN_UNDER_CALL;
         } else if (input.target_bet == context.round_bet) {
             result.action = Action::ALL_IN_CALL;
+        } else if (!context.can_raise) {
+            result.is_target_bet_valid = false;
         } else if (input.target_bet < context.min_raise_delta + context.round_bet) {
             result.action = Action::ALL_IN_UNDER_RAISE;
         } else {
@@ -35,6 +37,8 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
         } else {
             result.action = Action::CALL;
         }
+    } else if (!context.can_raise) {
+        result.is_target_bet_valid = false;
     } else if (input.target_bet >= context.round_bet + context.min_raise_delta) {
         if (context.round_bet == 0) {
             result.action = Action::BET;

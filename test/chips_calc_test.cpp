@@ -5,6 +5,10 @@
 using namespace poker;
 using namespace poker::algo;
 
+// TODO: 增加对下注刚好等于最小加注的测试
+// TODO: 增加对 all-in 情况的测试
+// TODO: 增加对 raise 被禁止情况下的测试
+
 TEST(ProcessBettingTest, Bet) {
     BettingContext context = {
         .player_chips = 100,

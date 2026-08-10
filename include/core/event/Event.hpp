@@ -88,6 +88,7 @@ struct WaitingForAction {
     chips_t player_bet;
     chips_t round_bet;
     chips_t min_raise;
+    bool can_raise;
 };
 
 GET_EVENT_NAME(WaitingForAction)
