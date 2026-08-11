@@ -90,6 +90,13 @@ void GameModel::awaitPlayerAction() {
 void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     seat_t acting_player = action_flow->getActingPlayer();
 
+    if (event.is_fold) {
+        player_set->playerAt(acting_player).fold();
+        action_flow->applyAction(Action::FOLD);
+        event_bus->publish(
+            Event::PlayerActed{.player = acting_player, .bet = 0, .action = Action::FOLD});
+        return;
+    }
     algo::BettingContext context = {.player_chips = chips_manager->getPlayerChipsAt(acting_player),
                                     .player_bet = betting_manager->getPlayerBetAt(acting_player),
                                     .round_bet = betting_manager->getRoundBet(),
