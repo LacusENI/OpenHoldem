@@ -54,7 +54,7 @@ void ClientController::handle(const Event::BlindPosted& event) {
         client_model->player_states[event.player] = PlayerStatus::SMALL_BLIND;
     }
     client_model->pot += event.amount;
-    client_model->players[event.player].commitChips(event.amount);
+    client_model->players[event.player].payChips(event.amount);
     client_model->player_bets[event.player] = event.amount;
     client_view->render(*client_model);
 }
@@ -104,7 +104,7 @@ void ClientController::handle(const Event::PlayerActed& event) {
     client_model->player_states[event.player] = player_state;
     chips_t delta = event.bet - client_model->player_bets[event.player];
     client_model->pot += delta;
-    client_model->players[event.player].commitChips(delta);
+    client_model->players[event.player].payChips(delta);
     client_model->player_bets[event.player] = event.bet;
     client_view->render(*client_model);
 }

@@ -28,16 +28,35 @@ public:
     void setChips(chips_t new_chips) { chips = new_chips; }
     chips_t getBet() const { return bet; }
     void setBet(chips_t new_bet) { bet = new_bet; }
+    void resetBet() { bet = 0; }
+    chips_t getCommited() const { return commited; }
+    void setCommited(chips_t new_commited) { commited = new_commited; }
 
     /* 玩家获取筹码 */
     void winChips(chips_t delta) { chips += delta; }
     /* 玩家支付筹码 */
-    void commitChips(chips_t delta) { chips -= delta; }
+    void payChips(chips_t delta) {
+        chips -= delta;
+        commited += delta;
+        if (chips == 0) allIn();
+    }
+    bool commit(chips_t target_bet) {
+        chips_t delta = target_bet - bet;
+        if (delta > chips) return false;
+        bet = target_bet;
+        payChips(delta);
+        return true;
+    }
+    bool needsToAct(chips_t round_bet) { return isActive() && bet < round_bet; }
+
     bool isActive() const { return state == State::ACTIVE; }
     bool isAllIn() const { return state == State::ALL_IN; }
     bool isFolded() const { return state == State::FOLDED; }
     bool isOut() const { return state == State::OUT; }
     bool isAlive() const { return state == State::ACTIVE || state == State::ALL_IN; }
+    bool isPlaying() const {
+        return state == State::ACTIVE || state == State::ALL_IN || state == State::FOLDED;
+    }
 
     /* 玩家弃牌 */
     void fold() { state = State::FOLDED; }
@@ -52,7 +71,9 @@ private:
     cards_2_t hole_cards{}; // 玩家的底牌
 
     chips_t chips = 200; // 玩家拥有的筹码
-    chips_t bet = 0;     // 玩家的下注额
+
+    chips_t bet = 0;      // 玩家在本轮的下注额
+    chips_t commited = 0; // 玩家在本局的总投入
 };
 
 template <typename T>

@@ -33,6 +33,10 @@ public:
         return std::views::iota(0, playerCount()) |
                std::views::filter([this](seat_t seat) { return this->playerAt(seat).isActive(); });
     }
+    auto getPlayingPlayers() {
+        return std::views::iota(0, playerCount()) |
+               std::views::filter([this](seat_t seat) { return this->playerAt(seat).isPlaying(); });
+    }
     auto getPlayerSeats() { return std::views::iota(0, playerCount()); }
     int getAlivePlayerCount() {
         return std::ranges::count_if(players, [](const Player& p) { return p.isAlive(); });

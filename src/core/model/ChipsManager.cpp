@@ -3,6 +3,7 @@
 #include <format>
 #include <stdexcept>
 
+#include "GameTypes.hpp"
 #include "PlayerSet.hpp"
 #include "PotManager.h"
 #include "SeatManager.h"
@@ -22,7 +23,7 @@ void ChipsManager::moveChipsToPot(seat_t player_seat, chips_t chips) {
     if (chips > player.getChips()) {
         throw std::invalid_argument(std::format("Player's chips is not enough"));
     }
-    player.commitChips(chips);
+    player.payChips(chips);
     pot_manager->addChips(chips);
 }
 
