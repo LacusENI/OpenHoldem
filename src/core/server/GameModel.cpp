@@ -105,12 +105,11 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     algo::BettingInput input = {.target_bet = event.target_bet, .is_fold = event.is_fold};
     algo::BettingResult result = algo::process_betting(context, input);
 
-    if (result.is_target_bet_valid && result.has_sufficient_chips) {
+    if (result.isValid()) {
         chips_manager->moveChipsToPot(acting_player, result.bet_delta);
         betting_manager->setPlayerBetAt(acting_player, result.player_bet);
         betting_manager->setMinRaiseDelta(result.min_raise_delta);
         betting_manager->setRoundBet(result.round_bet);
-        betting_manager->setMinRaiseDelta(result.min_raise_delta);
         action_flow->applyAction(result.action);
         event_bus->publish(Event::PlayerActed{
             .player = acting_player, .bet = result.player_bet, .action = result.action});

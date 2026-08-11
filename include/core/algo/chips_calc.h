@@ -27,6 +27,7 @@ struct BettingResult {
     Action action;
     bool is_target_bet_valid;
     bool has_sufficient_chips;
+    bool isValid() const { return is_target_bet_valid && has_sufficient_chips; }
 };
 
 BettingResult process_betting(BettingContext context, BettingInput input);
