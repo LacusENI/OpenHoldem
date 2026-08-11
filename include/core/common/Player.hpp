@@ -29,15 +29,15 @@ public:
     chips_t getBet() const { return bet; }
     void setBet(chips_t new_bet) { bet = new_bet; }
     void resetBet() { bet = 0; }
-    chips_t getCommited() const { return commited; }
-    void setCommited(chips_t new_commited) { commited = new_commited; }
+    chips_t getCommitted() const { return committed; }
+    void setCommitted(chips_t new_commited) { committed = new_commited; }
 
     /* 玩家获取筹码 */
     void winChips(chips_t delta) { chips += delta; }
     /* 玩家支付筹码 */
     void payChips(chips_t delta) {
         chips -= delta;
-        commited += delta;
+        committed += delta;
         if (chips == 0) allIn();
     }
     bool commit(chips_t target_bet) {
@@ -72,8 +72,8 @@ private:
 
     chips_t chips = 200; // 玩家拥有的筹码
 
-    chips_t bet = 0;      // 玩家在本轮的下注额
-    chips_t commited = 0; // 玩家在本局的总投入
+    chips_t bet = 0;       // 玩家在本轮的下注额
+    chips_t committed = 0; // 玩家在本局的总投入
 };
 
 template <typename T>

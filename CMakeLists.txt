@@ -53,7 +53,7 @@ add_library(poker_core
         include/core/server/GameModel.h
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
-        
+        include/core/algo/side_pots.h        
 )
 
 target_include_directories(poker_core PUBLIC
@@ -140,6 +140,7 @@ add_executable(poker_test
         test/chips_manager_test.cpp
         test/eval_hand_test.cpp
         test/seat_manager_test.cpp
+        test/side_pots_test.cpp
 )
 
 target_include_directories(poker_test PRIVATE

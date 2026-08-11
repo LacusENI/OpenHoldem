@@ -11,7 +11,7 @@ struct BettingContext {
     chips_t player_bet;
     chips_t round_bet;
     chips_t min_raise_delta;
-    bool can_raise;
+    bool can_raise = true;
 };
 
 struct BettingInput {

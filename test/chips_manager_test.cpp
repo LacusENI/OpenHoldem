@@ -43,6 +43,9 @@ TEST(ChipsManagerTest, DistributePot) {
     SeatManager seat_manager(&player_set);
     ChipsManager chips_manager(&player_set, &pot_manager, &seat_manager);
     player_set.resize(9);
+    for (Player& player : player_set) {
+        player.setChips(0);
+    }
     pot_manager.addChips(100);
     seat_manager.setBtnSeat(2);
     std::vector<seat_t> winners = {1, 2, 3, 4, 6, 7, 8};
