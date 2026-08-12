@@ -119,7 +119,7 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
 void GameModel::moveActingPlayer() {
     action_flow->moveActingPlayer();
 }
-void GameModel::revealHoleCards() {
+void GameModel::revealAllHoleCards() {
     std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
     for (seat_t player : player_set->getActivePlayers()) {
         cards_2_t hole_cards = cards_manager->getHoleCardsAt(player);
@@ -127,13 +127,18 @@ void GameModel::revealHoleCards() {
     }
     event_bus->publish(Event::HoleCardsRevealed{players_with_hole_cards});
 }
-std::vector<Pot> GameModel::computePots() const {
+void GameModel::splitPot() const {
     std::vector<std::pair<seat_t, chips_t>> players_with_committed;
     for (seat_t player : player_set->getPlayingPlayers()) {
         chips_t committed = player_set->playerAt(player).getCommitted();
         players_with_committed.emplace_back(player, committed);
     }
-    return load_side_pots(players_with_committed);
+    std::vector<Pot> pots = load_side_pots(players_with_committed);
+    std::vector<chips_t> pot_chips;
+    for (const Pot& pot : pots) {
+        pot_chips.push_back(pot.chips);
+    }
+    event_bus->publish(Event::PotSplited{.pot_chips = pot_chips});
 }
 std::vector<seat_t> GameModel::comparePlayerHands() {
     auto view = player_set->getAlivePlayers();
@@ -149,7 +154,7 @@ bool GameModel::isBettingRoundEnded() const {
 bool GameModel::isOnlyOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 1;
 }
-bool GameModel::shouldSkipToShowdown() const {
+bool GameModel::isStreetsFinished() const {
     return player_set->getActivePlayerCount() <= 1;
 }
 bool GameModel::isNoOnePlayerAlive() const {

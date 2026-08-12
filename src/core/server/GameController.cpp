@@ -33,7 +33,7 @@ void GameController::handle(const Event::PlayerAction& event) {
         if (game_model->isOnlyOnePlayerAlive()) {
             game_model->changeStage(Stage::SHOWDOWN);
             processShowdownStage();
-        } else if (game_model->shouldSkipToShowdown()) {
+        } else if (game_model->isStreetsFinished()) {
             game_model->changeStage(Stage::SHOWDOWN);
             game_model->dealCommunityCards();
             processShowdownStage();
@@ -69,9 +69,10 @@ void GameController::processPostflopStage() {
 
 void GameController::processShowdownStage() {
     game_model->setCurrentStage(Stage::SHOWDOWN);
-    game_model->revealHoleCards();
+    game_model->revealAllHoleCards();
     auto winners = game_model->comparePlayerHands();
     game_model->setCurrentStage(Stage::SETTLEMENT);
+    game_model->splitPot();
     processSettlementStage(winners);
 }
 

@@ -92,10 +92,10 @@ public:
     /* 移至下一个行动的玩家 */
     void moveActingPlayer();
 
-    /* 揭露玩家底牌 */
-    void revealHoleCards();
+    /* 揭露所有玩家的底牌 */
+    void revealAllHoleCards();
     /* 计算所有的底池 */
-    std::vector<Pot> computePots() const;
+    void splitPot() const;
     /* 比较玩家手牌大小 */
     std::vector<seat_t> comparePlayerHands();
     /* 分配底池给赢家 */
@@ -105,8 +105,8 @@ public:
     bool isBettingRoundEnded() const;
     /* 是否只有一名玩家留有手牌 */
     bool isOnlyOnePlayerAlive() const;
-    /* 是否应该直接跳转至摊牌阶段  */
-    bool shouldSkipToShowdown() const;
+    /* 所有下注轮是否已经结束 */
+    bool isStreetsFinished() const;
     /* 没有任何玩家留在牌局 */
     bool isNoOnePlayerAlive() const;
 };

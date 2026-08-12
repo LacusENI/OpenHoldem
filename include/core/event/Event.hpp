@@ -115,7 +115,14 @@ struct HoleCardsRevealed {
 
 GET_EVENT_NAME(HoleCardsRevealed)
 
+struct PotSplited {
+    std::vector<chips_t> pot_chips;
+};
+
+GET_EVENT_NAME(PotSplited);
+
 struct WinnerDeclared {
+    int pot_index;
     std::vector<seat_t> winners;
 };
 
@@ -132,7 +139,8 @@ using GameEvent =
                  Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
                  Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
                  Event::WaitingForAction, Event::PlayerAction, Event::PlayerActed,
-                 Event::HoleCardsRevealed, Event::WinnerDeclared, Event::GameEnded>;
+                 Event::HoleCardsRevealed, Event::PotSplited, Event::WinnerDeclared,
+                 Event::GameEnded>;
 
 namespace NetworkEvent {
 struct ClientConnected {
