@@ -16,7 +16,9 @@ inline std::vector<Pot> load_side_pots(
     std::vector<std::pair<seat_t, chips_t>> players_with_committed) {
     std::set<chips_t> levels;
     for (auto [_, committed] : players_with_committed) {
-        levels.insert(committed);
+        if (committed > 0) {
+            levels.insert(committed);
+        }
     }
     std::vector<Pot> pots;
     for (chips_t level : levels) {
