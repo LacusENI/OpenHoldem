@@ -1,5 +1,7 @@
 #include "GameModel.h"
 
+#include <algorithm>
+#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -127,18 +129,35 @@ void GameModel::revealAllHoleCards() {
     }
     event_bus->publish(Event::HoleCardsRevealed{players_with_hole_cards});
 }
-void GameModel::splitPot() const {
+void GameModel::splitPot() {
     std::vector<std::pair<seat_t, chips_t>> players_with_committed;
     for (seat_t player : player_set->getPlayingPlayers()) {
         chips_t committed = player_set->playerAt(player).getCommitted();
         players_with_committed.emplace_back(player, committed);
     }
     std::vector<Pot> pots = load_side_pots(players_with_committed);
+    pot_manager->setPots(pots);
     std::vector<chips_t> pot_chips;
     for (const Pot& pot : pots) {
         pot_chips.push_back(pot.chips);
     }
     event_bus->publish(Event::PotSplited{.pot_chips = pot_chips});
+}
+void GameModel::distributePots() {
+    int pot_count = pot_manager->getPots().size();
+    for (int pot_index = pot_count - 1; pot_index >= 0; pot_index--) {
+        const Pot& pot = pot_manager->getPots()[pot_index];
+
+        std::vector<seat_t> contenders;
+        for (seat_t contributor : pot.contributors) {
+            if (player_set->playerAt(contributor).isAlive()) {
+                contenders.push_back(contributor);
+            }
+        }
+        std::vector<seat_t> winners = cards_manager->determineWinners(contenders);
+        chips_manager->distributePot(winners);
+        event_bus->publish(Event::WinnerDeclared{.pot_index = pot_index, .winners = winners});
+    }
 }
 std::vector<seat_t> GameModel::comparePlayerHands() {
     auto view = player_set->getAlivePlayers();

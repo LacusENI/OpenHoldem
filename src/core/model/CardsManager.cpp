@@ -54,10 +54,10 @@ HandValue CardsManager::evaluatePlayerHand(seat_t seat_idx) {
     return algo::eval_hand(seven_cards);
 }
 
-std::vector<seat_t> CardsManager::determineWinners(const std::vector<seat_t>& players) {
+std::vector<seat_t> CardsManager::determineWinners(const std::vector<seat_t>& contenders) {
     std::vector<seat_t> winners;
     HandValue max_hand_value;
-    for (seat_t player_seat : players) {
+    for (seat_t player_seat : contenders) {
         HandValue hand_value = evaluatePlayerHand(player_seat);
         if (hand_value > max_hand_value) {
             winners.clear();

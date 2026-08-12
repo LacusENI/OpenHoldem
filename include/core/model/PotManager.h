@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
+
 #include "GameTypes.hpp"
+#include "side_pots.h"
 
 namespace poker {
 /**
@@ -9,12 +12,16 @@ namespace poker {
 class PotManager {
 private:
     chips_t pot = 0;
+    std::vector<Pot> pots;
 
 public:
     PotManager() = default;
 
     /* 获取底池数额 */
     chips_t getPot() const { return pot; }
+    const std::vector<Pot>& getPots() const { return pots; }
+    void setPots(const std::vector<Pot>& pots) { this->pots = pots; }
+
     /* 向底池投入筹码 */
     void addChips(chips_t amount) { pot += amount; }
     /* 从底池拿取筹码 */

@@ -73,7 +73,7 @@ void GameController::processShowdownStage() {
     auto winners = game_model->comparePlayerHands();
     game_model->setCurrentStage(Stage::SETTLEMENT);
     game_model->splitPot();
-    processSettlementStage(winners);
+    game_model->distributePots();
 }
 
 void GameController::processSettlementStage(std::vector<seat_t> winners) {
