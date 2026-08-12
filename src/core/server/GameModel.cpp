@@ -127,6 +127,14 @@ void GameModel::revealHoleCards() {
     }
     event_bus->publish(Event::HoleCardsRevealed{players_with_hole_cards});
 }
+std::vector<Pot> GameModel::computePots() const {
+    std::vector<std::pair<seat_t, chips_t>> players_with_committed;
+    for (seat_t player : player_set->getPlayingPlayers()) {
+        chips_t committed = player_set->playerAt(player).getCommitted();
+        players_with_committed.emplace_back(player, committed);
+    }
+    return load_side_pots(players_with_committed);
+}
 std::vector<seat_t> GameModel::comparePlayerHands() {
     auto view = player_set->getAlivePlayers();
     std::vector<seat_t> players(view.begin(), view.end());

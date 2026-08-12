@@ -46,17 +46,17 @@ void printEvent(const Event::WinnerDeclared& event) {
 }
 
 void printGameModel(const GameModel& model) {
-    std::cout << std::format(
-        "stage: {} community-cards: {} pot: ${}\n", to_string(model.getCurrentStage()),
-        to_string(model.getCardsManager()->getCommunityCards()), model.getPotManager()->getPot());
+    std::cout << std::format("stage: {} community-cards: {}\n", to_string(model.getCurrentStage()),
+                             to_string(model.getCardsManager()->getCommunityCards()));
+
     std::cout << std::format("round-bet: ${} min-raise: ${}\n",
                              model.getBettingManager()->getRoundBet(),
                              model.getBettingManager()->getRoundBet());
     seat_t player_seat = 0;
     for (const Player& player : *model.getPlayerSet()) {
-        std::cout << std::format("[@P{}] {} {} bet: ${} chips: ${}\n", player_seat,
+        std::cout << std::format("[@P{}] {} {} bet: ${} chips: ${} committed: ${}\n", player_seat,
                                  to_string(player.getHoleCards()), to_string(player.getState()),
-                                 player.getBet(), player.getChips());
+                                 player.getBet(), player.getChips(), player.getCommitted());
         player_seat++;
     }
 }
@@ -128,6 +128,15 @@ int main() {
     event_bus.subscribe<Event::WaitingForAction>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::PlayerActed>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::WinnerDeclared>([](const auto& event) { printEvent(event); });
+    event_bus.subscribe<Event::StageChanged>([&game_model](const auto& event) {
+        if (event.stage == Stage::SHOWDOWN) {
+            std::cout << "[Pot] ";
+            for (const Pot& pot : game_model.computePots()) {
+                std::cout << "$" << pot.chips << " ";
+            }
+            std::cout << "\n";
+        }
+    });
 
     event_bus.subscribe<Event::WaitingForAction>(
         [&event_bus](const auto& event) { event_bus.publish(getPlayerInput(event)); });

@@ -4,6 +4,8 @@
 
 #include "Event.hpp"
 #include "GameTypes.hpp"
+#include "PotManager.h"
+#include "side_pots.h"
 
 namespace poker {
 class EventBus;
@@ -92,6 +94,8 @@ public:
 
     /* 揭露玩家底牌 */
     void revealHoleCards();
+    /* 计算所有的底池 */
+    std::vector<Pot> computePots() const;
     /* 比较玩家手牌大小 */
     std::vector<seat_t> comparePlayerHands();
     /* 分配底池给赢家 */
