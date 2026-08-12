@@ -74,6 +74,7 @@ void GameController::processShowdownStage() {
     game_model->setCurrentStage(Stage::SETTLEMENT);
     game_model->splitPot();
     game_model->distributePots();
+    game_model->finishGame();
 }
 
 void GameController::processSettlementStage(std::vector<seat_t> winners) {

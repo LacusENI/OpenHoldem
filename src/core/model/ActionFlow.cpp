@@ -23,7 +23,8 @@ void ActionFlow::setupToStart(Stage stage) {
     has_incomplete_raise = false;
 }
 void ActionFlow::applyAction(Action action) {
-    if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE) {
+    if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE ||
+        action == Action::ALL_IN_UNDER_RAISE) {
         pending_player_count = player_set->getActivePlayerCount();
         last_aggressor = acting_player;
         has_incomplete_raise = false;

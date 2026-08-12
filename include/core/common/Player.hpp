@@ -38,13 +38,13 @@ public:
     void payChips(chips_t delta) {
         chips -= delta;
         committed += delta;
-        if (chips == 0) allIn();
     }
     bool commit(chips_t target_bet) {
         chips_t delta = target_bet - bet;
         if (delta > chips) return false;
         bet = target_bet;
         payChips(delta);
+        if (chips == 0) allIn();
         return true;
     }
     bool needsToAct(chips_t round_bet) { return isActive() && bet < round_bet; }

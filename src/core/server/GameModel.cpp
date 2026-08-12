@@ -1,6 +1,5 @@
 #include "GameModel.h"
 
-#include <algorithm>
 #include <ranges>
 #include <utility>
 #include <vector>
