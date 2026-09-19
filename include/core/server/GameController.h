@@ -34,9 +34,7 @@ public:
     /* 翻牌后阶段 */
     void processPostflopStage();
     /* 摊牌阶段 */
-    void processShowdownStage();
-    /* 结算阶段 */
-    void processSettlementStage(std::vector<seat_t> winners);
+    void processShowdownStage(); 
 };
 
 } // namespace poker

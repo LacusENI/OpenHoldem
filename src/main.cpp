@@ -15,7 +15,6 @@
 #include "GameTypes.hpp"
 #include "Player.hpp"
 #include "PlayerSet.hpp"
-#include "PotManager.h"
 #include "SeatManager.h"
 
 using namespace poker;
@@ -116,14 +115,13 @@ int main() {
 
     Deck deck;
     PlayerSet player_set;
-    PotManager pot_manager;
     SeatManager seat_manager(&player_set);
     BettingManager betting_manager(&player_set);
     ActionFlow action_flow(&player_set, &seat_manager);
     CardsManager cards_manager(&deck, &player_set);
-    ChipsManager chips_manager(&player_set, &pot_manager, &seat_manager);
+    ChipsManager chips_manager(&player_set, &seat_manager);
     GameModel game_model(&event_bus, &action_flow, &betting_manager, &cards_manager, &chips_manager,
-                         &player_set, &pot_manager, &seat_manager);
+                         &player_set, &seat_manager);
     GameController game_controller(&event_bus, &game_model);
 
     game_controller.subscribeEvent();

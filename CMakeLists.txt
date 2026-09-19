@@ -41,7 +41,6 @@ add_library(poker_core
         include/core/model/BettingManager.h
         include/core/model/CardsManager.h
         include/core/model/ChipsManager.h
-        include/core/model/PotManager.h
         include/core/model/SeatManager.h
         src/core/model/ActionFlow.cpp
         src/core/model/BettingManager.cpp

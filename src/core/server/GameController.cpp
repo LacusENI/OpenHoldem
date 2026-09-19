@@ -1,6 +1,5 @@
 #include "GameController.h"
 
-#include <vector>
 
 #include "Event.hpp"
 #include "EventBus.hpp"
@@ -74,11 +73,6 @@ void GameController::processShowdownStage() {
     game_model->setCurrentStage(Stage::SETTLEMENT);
     game_model->splitPot();
     game_model->distributePots();
-    game_model->finishGame();
-}
-
-void GameController::processSettlementStage(std::vector<seat_t> winners) {
-    game_model->awardPotToWinners(winners);
     game_model->finishGame();
 }
 } // namespace poker

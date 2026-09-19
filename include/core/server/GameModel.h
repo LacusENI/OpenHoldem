@@ -4,7 +4,6 @@
 
 #include "Event.hpp"
 #include "GameTypes.hpp"
-#include "PotManager.h"
 
 namespace poker {
 class EventBus;
@@ -13,7 +12,6 @@ class BettingManager;
 class CardsManager;
 class ChipsManager;
 class PlayerSet;
-class PotManager;
 class SeatManager;
 
 /**
@@ -27,21 +25,19 @@ private:
     CardsManager* cards_manager;
     ChipsManager* chips_manager;
     PlayerSet* player_set;
-    PotManager* pot_manager;
     SeatManager* seat_manager;
     Stage current_stage = Stage::IDLE;
 
 public:
     GameModel(EventBus* event_bus, ActionFlow* action_flow, BettingManager* betting_manager,
               CardsManager* cards_manager, ChipsManager* chips_manager, PlayerSet* player_set,
-              PotManager* pot_manager, SeatManager* seat_manager)
+              SeatManager* seat_manager)
         : event_bus(event_bus),
           action_flow(action_flow),
           betting_manager(betting_manager),
           cards_manager(cards_manager),
           chips_manager(chips_manager),
           player_set(player_set),
-          pot_manager(pot_manager),
           seat_manager(seat_manager) {}
     ~GameModel() = default;
 
@@ -54,7 +50,6 @@ public:
     CardsManager* getCardsManager() const { return cards_manager; }
     ChipsManager* getChipsManager() const { return chips_manager; }
     PlayerSet* getPlayerSet() const { return player_set; }
-    PotManager* getPotManager() const { return pot_manager; }
     SeatManager* getSeatManager() const { return seat_manager; }
 
     /* 改变游戏阶段 */
@@ -99,8 +94,6 @@ public:
     void distributePots();
     /* 比较玩家手牌大小 */
     std::vector<seat_t> comparePlayerHands();
-    /* 分配底池给赢家 */
-    void awardPotToWinners(std::vector<seat_t>& winners);
 
     /* 下注轮是否已结束 */
     bool isBettingRoundEnded() const;
