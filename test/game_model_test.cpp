@@ -8,6 +8,7 @@
 #include "CardsManager.h"
 #include "ChipsManager.h"
 #include "EventBus.hpp"
+#include "GameController.h"
 #include "GameModel.h"
 #include "GameTypes.hpp"
 #include "PlayerSet.hpp"
@@ -106,4 +107,51 @@ TEST(GameModelTest, StartGamePublishesSessionInfo) {
     EXPECT_EQ(1, captured->btn_seat);
     EXPECT_EQ(20, captured->big_blind);
     EXPECT_EQ(3, captured->player_count);
+}
+
+// 无效行动应被拒绝，且不改变任何状态、不切换行动者（P0-3 回归）
+TEST(GameModelTest, InvalidActionIsRejected) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    const seat_t acting = rig.action_flow.getActingPlayer();
+
+    // 低于跟注额且未 all-in，判定为 VOID
+    bool accepted = rig.model.handlePlayerAction(
+        Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
+
+    EXPECT_FALSE(accepted);
+    EXPECT_EQ(acting, rig.action_flow.getActingPlayer());
+    EXPECT_EQ(0, rig.betting_manager.getPlayerBetAt(acting));
+    EXPECT_EQ(1000, rig.chips_manager.getPlayerChipsAt(acting));
+}
+
+// 合法跟注应被接受（P0-3 回归）
+TEST(GameModelTest, ValidActionIsAccepted) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    const seat_t acting = rig.action_flow.getActingPlayer();
+
+    bool accepted = rig.model.handlePlayerAction(
+        Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
+
+    EXPECT_TRUE(accepted);
+    EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(acting));
+}
+
+// 控制器收到无效行动后应重新请求同一玩家，而不是切换行动者（P0-3 回归）
+TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
+    GameRig rig;
+    GameController controller(&rig.event_bus, &rig.model);
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    const seat_t acting = rig.action_flow.getActingPlayer();
+
+    std::vector<seat_t> prompted;
+    rig.event_bus.subscribe<Event::WaitingForAction>(
+        [&prompted](const Event::WaitingForAction& event) { prompted.push_back(event.player); });
+
+    controller.handle(Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
+
+    ASSERT_EQ(1u, prompted.size());
+    EXPECT_EQ(acting, prompted.front());
+    EXPECT_EQ(acting, rig.action_flow.getActingPlayer());
 }

@@ -83,8 +83,8 @@ public:
     void closeBettingRound();
     /* 等待玩家行动 */
     void awaitPlayerAction();
-    /* 处理玩家行动 */
-    void handlePlayerAction(const Event::PlayerAction& event);
+    /* 处理玩家行动；返回该行动是否被接受（无效输入返回 false） */
+    bool handlePlayerAction(const Event::PlayerAction& event);
     /* 移至下一个行动的玩家 */
     void moveActingPlayer();
 

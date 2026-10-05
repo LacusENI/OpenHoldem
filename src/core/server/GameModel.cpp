@@ -95,7 +95,7 @@ void GameModel::awaitPlayerAction() {
                                      .can_raise = can_raise};
     event_bus->publish(event);
 }
-void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
+bool GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     seat_t acting_player = action_flow->getActingPlayer();
 
     if (event.is_fold) {
@@ -103,7 +103,7 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
         action_flow->applyAction(Action::FOLD);
         event_bus->publish(
             Event::PlayerActed{.player = acting_player, .bet = 0, .action = Action::FOLD});
-        return;
+        return true;
     }
     algo::BettingContext context = {.player_chips = chips_manager->getPlayerChipsAt(acting_player),
                                     .player_bet = betting_manager->getPlayerBetAt(acting_player),
@@ -121,8 +121,10 @@ void GameModel::handlePlayerAction(const Event::PlayerAction& event) {
         action_flow->applyAction(result.action);
         event_bus->publish(Event::PlayerActed{
             .player = acting_player, .bet = result.player_bet, .action = result.action});
+        return true;
     }
-    // TODO: 增加输入无效时的信息返回
+    // 无效输入：不改变任何状态，由调用方重新请求该玩家行动
+    return false;
 }
 void GameModel::moveActingPlayer() {
     action_flow->moveActingPlayer();

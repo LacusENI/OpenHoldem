@@ -27,7 +27,11 @@ void GameController::handle(const Event::PlayerJoinRequest& event) {
 }
 
 void GameController::handle(const Event::PlayerAction& event) {
-    game_model->handlePlayerAction(event);
+    if (!game_model->handlePlayerAction(event)) {
+        // 无效行动：保持当前行动者不变，重新请求其行动
+        game_model->awaitPlayerAction();
+        return;
+    }
     if (game_model->isBettingRoundEnded()) {
         if (game_model->isOnlyOnePlayerAlive()) {
             game_model->changeStage(Stage::SHOWDOWN);
