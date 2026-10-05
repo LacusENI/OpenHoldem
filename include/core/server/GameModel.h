@@ -77,6 +77,8 @@ public:
 
     /* 开始下注轮 */
     void startBettingRound();
+    /* 初始化本轮行动顺序（应在盲注投入之后调用） */
+    void startActionRound();
     /* 关闭下注轮 */
     void closeBettingRound();
     /* 等待玩家行动 */

@@ -57,12 +57,14 @@ void GameController::processPreflopStage() {
     game_model->startBettingRound();
     game_model->postSmallBlind();
     game_model->postBigBlind();
+    game_model->startActionRound();
     game_model->awaitPlayerAction();
 }
 
 void GameController::processPostflopStage() {
     game_model->dealCommunityCards();
     game_model->startBettingRound();
+    game_model->startActionRound();
     game_model->awaitPlayerAction();
 }
 

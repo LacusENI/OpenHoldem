@@ -1,5 +1,7 @@
 #include "BettingManager.h"
 
+#include <algorithm>
+
 #include "GameTypes.hpp"
 #include "PlayerSet.hpp"
 
@@ -17,14 +19,19 @@ void BettingManager::setupBetting() {
         this->setPlayerBetAt(seat_idx, 0);
     }
 }
-void BettingManager::applySmallBlind(seat_t sb_seat_idx) {
-    this->setPlayerBetAt(sb_seat_idx, getSmallBlind());
-    this->setRoundBet(getSmallBlind());
-    this->setMinRaiseDelta(getSmallBlind());
+chips_t BettingManager::applySmallBlind(seat_t sb_seat_idx) {
+    chips_t actual = std::min(getSmallBlind(), player_set->playerAt(sb_seat_idx).getChips());
+    this->setPlayerBetAt(sb_seat_idx, actual);
+    this->setRoundBet(std::max(getRoundBet(), actual));
+    this->setMinRaiseDelta(std::max(getMinRaiseDelta(), actual));
+    return actual;
 }
-void BettingManager::applyBigBlind(seat_t bb_seat_idx) {
-    this->setPlayerBetAt(bb_seat_idx, getBigBlind());
-    this->setRoundBet(getBigBlind());
-    this->setMinRaiseDelta(getBigBlind());
+chips_t BettingManager::applyBigBlind(seat_t bb_seat_idx) {
+    chips_t actual = std::min(getBigBlind(), player_set->playerAt(bb_seat_idx).getChips());
+    this->setPlayerBetAt(bb_seat_idx, actual);
+    // 大盲名义额作为本轮的 bring-in，即使大盲玩家筹码不足
+    this->setRoundBet(std::max(getRoundBet(), getBigBlind()));
+    this->setMinRaiseDelta(std::max(getMinRaiseDelta(), getBigBlind()));
+    return actual;
 }
 } // namespace poker

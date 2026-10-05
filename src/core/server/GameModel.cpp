@@ -49,24 +49,30 @@ void GameModel::dealCommunityCards() {
 }
 void GameModel::postSmallBlind() {
     seat_t sb_seat = seat_manager->getSbSeat();
-    chips_t small_blind = betting_manager->getSmallBlind();
-    chips_manager->moveChipsToPot(sb_seat, small_blind);
-    betting_manager->applySmallBlind(sb_seat);
+    chips_t posted = betting_manager->applySmallBlind(sb_seat);
+    chips_manager->moveChipsToPot(sb_seat, posted);
+    if (player_set->playerAt(sb_seat).getChips() == 0) {
+        player_set->playerAt(sb_seat).allIn();
+    }
     event_bus->publish(
-        Event::BlindPosted{.player = sb_seat, .amount = small_blind, .is_big_blind = false});
+        Event::BlindPosted{.player = sb_seat, .amount = posted, .is_big_blind = false});
 }
 void GameModel::postBigBlind() {
     seat_t bb_seat = seat_manager->getBbSeat();
-    chips_t big_blind = betting_manager->getBigBlind();
-    chips_manager->moveChipsToPot(bb_seat, big_blind);
-    betting_manager->applyBigBlind(bb_seat);
+    chips_t posted = betting_manager->applyBigBlind(bb_seat);
+    chips_manager->moveChipsToPot(bb_seat, posted);
+    if (player_set->playerAt(bb_seat).getChips() == 0) {
+        player_set->playerAt(bb_seat).allIn();
+    }
     event_bus->publish(
-        Event::BlindPosted{.player = bb_seat, .amount = big_blind, .is_big_blind = true});
+        Event::BlindPosted{.player = bb_seat, .amount = posted, .is_big_blind = true});
 }
 void GameModel::startBettingRound() {
     betting_manager->setupBetting();
-    action_flow->setupToStart(current_stage);
     event_bus->publish(Event::BettingRoundStarted{});
+}
+void GameModel::startActionRound() {
+    action_flow->setupToStart(current_stage);
 }
 void GameModel::closeBettingRound() {
     betting_manager->setupBetting();

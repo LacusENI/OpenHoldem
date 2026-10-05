@@ -133,11 +133,13 @@ target_link_libraries(presentation PUBLIC
 # 测试
 add_executable(poker_test
         test/include/MockDeck.hpp
+        test/betting_manager_test.cpp
         test/card_test.cpp
         test/cards_manager_test.cpp
         test/chips_calc_test.cpp
         test/chips_manager_test.cpp
         test/eval_hand_test.cpp
+        test/game_model_test.cpp
         test/seat_manager_test.cpp
         test/side_pots_test.cpp
 )

@@ -29,7 +29,9 @@ public:
     void setMinRaiseDelta(chips_t min_raise_delta) { this->min_raise_delta = min_raise_delta; }
 
     void setupBetting();
-    void applySmallBlind(seat_t sb_seat_idx);
-    void applyBigBlind(seat_t bb_seat_idx);
+    /* 执行小盲注，返回实际投入量（筹码不足时投入全部筹码） */
+    chips_t applySmallBlind(seat_t sb_seat_idx);
+    /* 执行大盲注，返回实际投入量（筹码不足时投入全部筹码） */
+    chips_t applyBigBlind(seat_t bb_seat_idx);
 };
 } // namespace poker
