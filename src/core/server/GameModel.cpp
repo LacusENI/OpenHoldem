@@ -23,7 +23,9 @@ void GameModel::joinNewPlayer() {
                                               .player_count = player_set->playerCount()});
 }
 void GameModel::startGame() {
-    event_bus->publish(Event::GameStarted{});
+    event_bus->publish(Event::GameStarted{.btn_seat = seat_manager->getBtnSeat(),
+                                          .big_blind = betting_manager->getBigBlind(),
+                                          .player_count = player_set->playerCount()});
 }
 void GameModel::finishGame() {
     event_bus->publish(Event::GameEnded{});

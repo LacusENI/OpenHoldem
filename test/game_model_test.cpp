@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include <optional>
 #include <vector>
 
 #include "ActionFlow.h"
@@ -86,4 +87,23 @@ TEST(GameModelTest, NormalBlinds) {
     EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(2));
     EXPECT_EQ(10, rig.betting_manager.getRoundBet());
     EXPECT_EQ(3, rig.action_flow.getPendingPlayerCount());
+}
+
+// GameStarted 必须携带真实会话信息，而不是全零（P0-2 回归）
+TEST(GameModelTest, StartGamePublishesSessionInfo) {
+    GameRig rig;
+    rig.player_set.resize(3);
+    rig.seat_manager.setBtnSeat(1);
+    rig.betting_manager.setBigBlind(20);
+
+    std::optional<Event::GameStarted> captured;
+    rig.event_bus.subscribe<Event::GameStarted>(
+        [&captured](const Event::GameStarted& event) { captured = event; });
+
+    rig.model.startGame();
+
+    ASSERT_TRUE(captured.has_value());
+    EXPECT_EQ(1, captured->btn_seat);
+    EXPECT_EQ(20, captured->big_blind);
+    EXPECT_EQ(3, captured->player_count);
 }
