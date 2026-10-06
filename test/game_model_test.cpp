@@ -298,3 +298,26 @@ TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
     EXPECT_EQ(INVALID_SEAT, rig.action_flow.getActingPlayer());
     EXPECT_NO_THROW(rig.model.awaitPlayerAction());
 }
+
+// 无人竞争（只剩一人）时整池直接判给唯一存活者，不切分底池
+TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
+    GameRig rig;
+    GameController controller(&rig.event_bus, &rig.model);
+    rig.startPreflop({1000, 1000, 1000}, 0); // SB=1(5), BB=2(10), UTG=0
+
+    int winners_declared = 0;
+    rig.event_bus.subscribe<Event::WinnerDeclared>(
+        [&winners_declared](const Event::WinnerDeclared&) { ++winners_declared; });
+
+    const Event::PlayerAction fold = {.target_bet = 0, .is_fold = true, .is_all_in = false};
+    controller.handle(fold); // UTG 弃牌
+    controller.handle(fold); // SB 弃牌，只剩 BB
+
+    ASSERT_TRUE(rig.model.isOnlyOnePlayerAlive());
+    // 整池 = 0 + 5 + 10 = 15，全部判给 BB（起始 1000 - 10 + 15 = 1005）
+    EXPECT_EQ(1005, rig.chips_manager.getPlayerChipsAt(2));
+    EXPECT_EQ(995, rig.chips_manager.getPlayerChipsAt(1));
+    EXPECT_EQ(1000, rig.chips_manager.getPlayerChipsAt(0));
+    EXPECT_TRUE(rig.chips_manager.getPots().empty());
+    EXPECT_EQ(1, winners_declared); // 不再有"单人池"产生的多余赢池事件
+}

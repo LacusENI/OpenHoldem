@@ -1,6 +1,5 @@
 #include "GameModel.h"
 
-#include <ranges>
 #include <utility>
 #include <vector>
 
@@ -168,6 +167,14 @@ void GameModel::splitPot() {
         pot_chips.push_back(pot.chips);
     }
     event_bus->publish(Event::PotSplited{.pot_chips = pot_chips});
+}
+void GameModel::settleUncontested() {
+    // 唯一存活玩家直接赢得整池（不划分边池，也不产生"单人池"
+    // 被当作赢池上报的问题）
+    auto alive = player_set->getAlivePlayers();
+    seat_t winner = *alive.begin();
+    chips_manager->awardPotTo(winner);
+    event_bus->publish(Event::WinnerDeclared{.pot_index = 0, .winners = {winner}});
 }
 void GameModel::distributePots() {
     int pot_count = chips_manager->getPots().size();

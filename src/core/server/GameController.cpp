@@ -45,8 +45,10 @@ void GameController::handle(const Event::PlayerAction& event) {
             return;
         }
         if (game_model->isOnlyOnePlayerAlive()) {
-            game_model->changeStage(Stage::SHOWDOWN);
-            processShowdownStage();
+            // 无人竞争：不切分底池，整池直接判给唯一存活玩家
+            game_model->changeStage(Stage::SETTLEMENT);
+            game_model->settleUncontested();
+            game_model->finishGame();
         } else if (game_model->isStreetsFinished()) {
             game_model->changeStage(Stage::SHOWDOWN);
             game_model->dealCommunityCards();

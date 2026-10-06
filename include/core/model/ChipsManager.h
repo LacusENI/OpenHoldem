@@ -27,6 +27,8 @@ public:
     void setPlayerChipsAt(seat_t seat_idx, chips_t player_chips);
 
     void splitThePot();
+    /* 无人竞争时，将全部底池直接判给唯一存活玩家（不切分边池） */
+    void awardPotTo(seat_t winner);
 
     void moveChipsToPot(seat_t player_seat, chips_t chips);
     void moveChipsToPlayer(seat_t player_seat, chips_t chips);

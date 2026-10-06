@@ -26,6 +26,16 @@ void ChipsManager::splitThePot() {
     pots = load_side_pots(players_with_committed);
 }
 
+void ChipsManager::awardPotTo(seat_t winner) {
+    // 汇总全部在局玩家的投入（含弃牌者的死钱），整池判给唯一存活玩家
+    chips_t total = 0;
+    for (seat_t player : player_set->getPlayingPlayers()) {
+        total += player_set->playerAt(player).getCommitted();
+    }
+    clearPots();
+    moveChipsToPlayer(winner, total);
+}
+
 void ChipsManager::moveChipsToPot(seat_t player_seat, chips_t chips) {
     Player& player = player_set->playerAt(player_seat);
     if (chips > player.getChips()) {

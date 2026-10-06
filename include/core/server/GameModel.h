@@ -99,6 +99,8 @@ public:
     void revealAllHoleCards();
     /* 计算所有的底池 */
     void splitPot();
+    /* 无人竞争时结算：整池判给唯一存活玩家 */
+    void settleUncontested();
     /* 瓜分所有的底池 */
     void distributePots();
 
