@@ -104,3 +104,10 @@ TEST(ProcessBettingTest, Fold) {
     BettingResult result = process_betting(context, input);
     EXPECT_EQ(result.action, Action::FOLD);
 }
+
+// 无赢家时不应除零，应返回空分配（P1-2 回归）
+TEST(CalculateAwardsTest, NoWinnersReturnsEmpty) {
+    EXPECT_TRUE(calculate_awards(100, 0).empty());
+    EXPECT_TRUE(calculate_awards(0, 0).empty());
+    EXPECT_TRUE(calculate_awards(100, -1).empty());
+}

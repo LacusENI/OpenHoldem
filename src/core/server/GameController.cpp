@@ -17,13 +17,13 @@ void GameController::subscribeEvent() {
 }
 
 void GameController::handle(const Event::StartGame& event) {
-    game_model->startGame();
+    if (!game_model->startGame()) return;
     game_model->changeStage(Stage::PREFLOP);
     processPreflopStage();
 }
 
 void GameController::startNextHand() {
-    game_model->startNextHand();
+    if (!game_model->startNextHand()) return;
     game_model->changeStage(Stage::PREFLOP);
     processPreflopStage();
 }
@@ -39,6 +39,11 @@ void GameController::handle(const Event::PlayerAction& event) {
         return;
     }
     if (game_model->isBettingRoundEnded()) {
+        // 冗余防御：正常流程至少有一名在局玩家可争夺底池，避免进入无法结算的状态
+        if (game_model->isNoOnePlayerAlive()) {
+            game_model->finishGame();
+            return;
+        }
         if (game_model->isOnlyOnePlayerAlive()) {
             game_model->changeStage(Stage::SHOWDOWN);
             processShowdownStage();

@@ -249,3 +249,38 @@ TEST(GameModelTest, HeadsUpBlindsAndActionOrder) {
     rig.action_flow.setupToStart(Stage::FLOP);
     EXPECT_EQ(1, rig.action_flow.getActingPlayer()); // 翻后大盲先行动
 }
+
+// 在局玩家不足 2 人时不应开局，也不广播 GameStarted（P1-2 回归）
+TEST(GameModelTest, StartGameRejectedWhenFewerThanTwoPlayers) {
+    GameRig rig;
+    rig.seatPlayers({1000, 0}, 0); // 仅 seat0 有筹码
+
+    bool started = false;
+    rig.event_bus.subscribe<Event::GameStarted>([&started](const Event::GameStarted&) {
+        started = true;
+    });
+
+    EXPECT_FALSE(rig.model.startGame());
+    EXPECT_FALSE(rig.model.canStartHand());
+    EXPECT_FALSE(started);
+}
+
+// 只剩一名有筹码玩家时，开始下一手应被拒绝（P1-2 回归）
+TEST(GameModelTest, StartNextHandRejectedWhenOnlyOnePlayerLeft) {
+    GameRig rig;
+    rig.seatPlayers({1000, 0}, 0);
+
+    EXPECT_FALSE(rig.model.startNextHand());
+}
+
+// 全部弃牌时结算不应崩溃（防御，P1-2 回归）
+TEST(GameModelTest, DistributePotWithNoContendersDoesNotCrash) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    for (Player& player : rig.player_set) {
+        player.fold();
+    }
+
+    rig.model.splitPot();
+    EXPECT_NO_THROW(rig.model.distributePots());
+}

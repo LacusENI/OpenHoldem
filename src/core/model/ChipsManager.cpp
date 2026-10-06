@@ -40,6 +40,9 @@ void ChipsManager::moveChipsToPlayer(seat_t player_seat, chips_t chips) {
 }
 
 void ChipsManager::distributePot(chips_t pot_chips, std::vector<seat_t>& winners) {
+    // 防御：无赢家可分（不应发生），直接返回避免除零
+    if (winners.empty()) return;
+
     seat_manager->sortSeats(winners);
     int winners_n = static_cast<int>(winners.size());
     auto awards = algo::calculate_awards(pot_chips, winners_n);

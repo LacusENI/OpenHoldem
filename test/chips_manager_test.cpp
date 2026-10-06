@@ -61,3 +61,20 @@ TEST(ChipsManagerTest, DistributePot) {
     EXPECT_EQ(14, chips_manager.getPlayerChipsAt(6));
     EXPECT_EQ(0, chips_manager.getPlayerChipsAt(5));
 }
+
+// 空赢家分配应安全返回，不改变任何筹码（P1-2 回归）
+TEST(ChipsManagerTest, DistributePotWithNoWinners) {
+    PlayerSet player_set;
+    SeatManager seat_manager(&player_set);
+    ChipsManager chips_manager(&player_set, &seat_manager);
+    player_set.resize(3);
+    for (Player& player : player_set) {
+        player.setChips(0);
+    }
+
+    std::vector<seat_t> winners;
+    EXPECT_NO_THROW(chips_manager.distributePot(100, winners));
+    for (int seat = 0; seat < player_set.playerCount(); ++seat) {
+        EXPECT_EQ(0, chips_manager.getPlayerChipsAt(seat));
+    }
+}

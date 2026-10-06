@@ -63,10 +63,10 @@ public:
     /* 加入新玩家 */
     void joinNewPlayer();
 
-    /* 开始一局游戏（会话开始，初始化第一手牌状态） */
-    void startGame();
-    /* 开始下一手牌：重置牌局状态并轮转按钮 */
-    void startNextHand();
+    /* 开始一局游戏（会话开始，初始化第一手牌状态）；玩家不足 2 人返回 false */
+    bool startGame();
+    /* 开始下一手牌：重置牌局状态并轮转按钮；在局玩家不足 2 人返回 false */
+    bool startNextHand();
     /* 重置为一手牌开始前的状态（不轮转按钮、不发布事件） */
     void resetForNewHand();
     /* 结束本局游戏 */
@@ -112,5 +112,7 @@ public:
     bool isStreetsFinished() const;
     /* 没有任何玩家留在牌局 */
     bool isNoOnePlayerAlive() const;
+    /* 是否满足开始一手牌的条件（至少两名在局玩家） */
+    bool canStartHand() const;
 };
 } // namespace poker

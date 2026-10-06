@@ -22,14 +22,18 @@ void GameModel::joinNewPlayer() {
     event_bus->publish(Event::NewPlayerJoined{.new_seat = player_set->playerCount() - 1,
                                               .player_count = player_set->playerCount()});
 }
-void GameModel::startGame() {
+bool GameModel::startGame() {
     resetForNewHand();
+    if (!canStartHand()) return false;
     publishGameStarted();
+    return true;
 }
-void GameModel::startNextHand() {
+bool GameModel::startNextHand() {
     resetForNewHand();
+    if (!canStartHand()) return false;
     seat_manager->advanceBtnSeat();
     publishGameStarted();
+    return true;
 }
 void GameModel::resetForNewHand() {
     for (Player& player : *player_set) {
@@ -195,5 +199,8 @@ bool GameModel::isStreetsFinished() const {
 }
 bool GameModel::isNoOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 0;
+}
+bool GameModel::canStartHand() const {
+    return player_set->getAlivePlayerCount() >= 2;
 }
 } // namespace poker

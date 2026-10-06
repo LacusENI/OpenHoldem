@@ -68,6 +68,9 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
 }
 
 std::vector<chips_t> calculate_awards(int pot, int winners_n) {
+    // 防御：没有赢家时不应进入分配，避免整数除零
+    if (winners_n <= 0) return {};
+
     const int share = pot / winners_n;
     const int remainder = pot % winners_n;
 
