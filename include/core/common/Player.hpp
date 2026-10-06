@@ -47,7 +47,10 @@ public:
         if (chips == 0) allIn();
         return true;
     }
-    bool needsToAct(chips_t round_bet) { return isActive() && bet < round_bet; }
+    /* 该玩家是否仍需要行动：活跃，且本轮尚未行动或未跟平当前注 */
+    bool needsToAct(chips_t round_bet) const {
+        return isActive() && (!is_acted || bet < round_bet);
+    }
 
     bool isActive() const { return state == State::ACTIVE; }
     bool isAllIn() const { return state == State::ALL_IN; }

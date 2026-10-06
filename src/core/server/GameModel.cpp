@@ -122,7 +122,7 @@ bool GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     seat_t acting_player = action_flow->getActingPlayer();
 
     if (event.is_fold) {
-        player_set->playerAt(acting_player).fold();
+        // 状态变更统一由 ActionFlow::applyAction 处理（含 fold）
         action_flow->applyAction(Action::FOLD);
         event_bus->publish(
             Event::PlayerActed{.player = acting_player, .bet = 0, .action = Action::FOLD});
@@ -150,7 +150,7 @@ bool GameModel::handlePlayerAction(const Event::PlayerAction& event) {
     return false;
 }
 void GameModel::moveActingPlayer() {
-    action_flow->moveActingPlayer();
+    action_flow->moveActingPlayer(betting_manager->getRoundBet());
 }
 void GameModel::revealAllHoleCards() {
     std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
@@ -191,7 +191,7 @@ std::vector<seat_t> GameModel::comparePlayerHands() {
     return cards_manager->determineWinners(players);
 }
 bool GameModel::isBettingRoundEnded() const {
-    return action_flow->isFlowEnded();
+    return action_flow->isFlowEnded(betting_manager->getRoundBet());
 }
 bool GameModel::isOnlyOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 1;

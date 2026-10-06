@@ -37,6 +37,11 @@ struct GameRig {
         seat_manager.setBtnSeat(btn);
     }
 
+    /* 当前仍需行动的玩家数量 */
+    int needsToActCount() const {
+        return action_flow.needsToActCount(betting_manager.getRoundBet());
+    }
+
     /* 执行一手牌的翻前流程：建底 -> 下盲注 -> 排行动顺序 */
     void beginHand() {
         model.setCurrentStage(Stage::PREFLOP);
@@ -64,8 +69,8 @@ TEST(GameModelTest, ShortSmallBlindGoesAllIn) {
     EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(1));
     EXPECT_TRUE(rig.player_set.playerAt(1).isAllIn());
     EXPECT_EQ(10, rig.betting_manager.getRoundBet());
-    EXPECT_EQ(2, rig.action_flow.getPendingPlayerCount());
-    EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(2, rig.needsToActCount());
+    EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.needsToActCount());
 }
 
 // 短筹码大盲：投入全部筹码并 all-in，名义大盲仍为 bring-in
@@ -77,8 +82,8 @@ TEST(GameModelTest, ShortBigBlindGoesAllIn) {
     EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(2));
     EXPECT_TRUE(rig.player_set.playerAt(2).isAllIn());
     EXPECT_EQ(10, rig.betting_manager.getRoundBet());
-    EXPECT_EQ(2, rig.action_flow.getPendingPlayerCount());
-    EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(2, rig.needsToActCount());
+    EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.needsToActCount());
 }
 
 // 0 筹码玩家在开局即为 OUT，不参与盲注且不抛异常（P0-4 语义）
@@ -98,7 +103,7 @@ TEST(GameModelTest, NormalBlinds) {
     EXPECT_EQ(5, rig.betting_manager.getPlayerBetAt(1));
     EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(2));
     EXPECT_EQ(10, rig.betting_manager.getRoundBet());
-    EXPECT_EQ(3, rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(3, rig.needsToActCount());
 }
 
 // GameStarted 必须携带真实会话信息，而不是全零（P0-2 回归）
@@ -212,7 +217,7 @@ TEST(GameModelTest, BustedPlayerBecomesOutAndBlindsSkipHim) {
     EXPECT_EQ(2, rig.seat_manager.getSbSeat());
     EXPECT_EQ(3, rig.seat_manager.getBbSeat());
     EXPECT_EQ(1, rig.seat_manager.getUtgSeat());
-    EXPECT_EQ(3, rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(3, rig.needsToActCount());
 }
 
 // 第二手牌可以正常打完整轮下注（P0-4 回归）
@@ -243,7 +248,7 @@ TEST(GameModelTest, HeadsUpBlindsAndActionOrder) {
     EXPECT_EQ(5, rig.betting_manager.getPlayerBetAt(0));  // 按钮 = 小盲
     EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(1)); // 非按钮 = 大盲
     EXPECT_EQ(10, rig.betting_manager.getRoundBet());
-    EXPECT_EQ(2, rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(2, rig.needsToActCount());
     EXPECT_EQ(0, rig.action_flow.getActingPlayer()); // 翻前按钮/SB 先行动
 
     rig.action_flow.setupToStart(Stage::FLOP);

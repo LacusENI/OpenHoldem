@@ -32,6 +32,9 @@ public:
     /* 寻找当前座位的下一个最近的留在牌局的玩家的座位 */
     seat_t nextAliveSeat(seat_t current) const;
 
+    /* 寻找当前座位之后第一个仍需行动的玩家座位（无则返回 INVALID_SEAT） */
+    seat_t nextSeatNeedsToAct(seat_t current, chips_t round_bet) const;
+
     /* 小盲注的位置（跳过已出局玩家；单挑时按钮位本人即小盲） */
     seat_t getSbSeat() const {
         return isHeadsUp() ? btn_seat : nextAliveSeat(btn_seat);
