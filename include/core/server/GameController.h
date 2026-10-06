@@ -1,9 +1,7 @@
 #pragma once
 
-#include <vector>
 
 #include "Event.hpp"
-#include "GameTypes.hpp"
 
 namespace poker {
 class EventBus;
@@ -31,6 +29,15 @@ public:
 
     /* 开始下一手牌（重置状态并轮转按钮） */
     void startNextHand();
+
+    /* 结束本下注轮：退还未跟注筹码、重置下注状态并发布结束事件 */
+    void finishBettingRound();
+    /* 无人竞争：整池判给唯一存活玩家 */
+    void handleUncontestedPot();
+    /* 已无可继续下注者：直接进入摊牌 */
+    void handleStreetsFinished();
+    /* 进入下一阶段；河牌则进入摊牌 */
+    void advanceToNextStage();
 
     /* 翻牌前阶段 */
     void processPreflopStage();

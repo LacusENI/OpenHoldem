@@ -45,6 +45,14 @@ public:
         if (chips == 0) allIn();
         return true;
     }
+    /* 退还未被跟注的筹码：恢复筹码、本轮下注与总投入，并解除 all-in */
+    void refund(chips_t amount) {
+        if (amount <= 0) return;
+        chips += amount;
+        bet -= amount;
+        committed -= amount;
+        if (state == State::ALL_IN && chips > 0) state = State::ACTIVE;
+    }
     /* 该玩家是否仍需要行动：活跃，且本轮尚未行动或未跟平当前注 */
     bool needsToAct(chips_t round_bet) const {
         return isActive() && (!is_acted || bet < round_bet);

@@ -321,3 +321,50 @@ TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
     EXPECT_TRUE(rig.chips_manager.getPots().empty());
     EXPECT_EQ(1, winners_declared); // 不再有"单人池"产生的多余赢池事件
 }
+
+// 唯一最高注者未被跟注的部分在轮末退还给本人
+TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
+    GameRig rig;
+    rig.seatPlayers({1000, 1000, 1000}, 0);
+
+    // 模拟：seat0 实投 200，seat1 实投 100 并 all-in，seat2 弃牌
+    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.player_set.playerAt(1).allIn();
+    rig.player_set.playerAt(2).fold();
+
+    std::optional<Event::UncalledBetReturned> captured;
+    rig.event_bus.subscribe<Event::UncalledBetReturned>(
+        [&captured](const Event::UncalledBetReturned& event) { captured = event; });
+
+    rig.model.returnUncalledBet();
+
+    ASSERT_TRUE(captured.has_value());
+    EXPECT_EQ(0, captured->player);
+    EXPECT_EQ(100, captured->amount);
+    // seat0 拿回 100：chips 800 -> 900、committed 200 -> 100、bet 200 -> 100
+    EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0));
+    EXPECT_EQ(100, rig.player_set.playerAt(0).getCommitted());
+    EXPECT_EQ(100, rig.betting_manager.getPlayerBetAt(0));
+}
+
+// 结束下注轮：先退还多余筹码，再重置下注状态
+TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
+    GameRig rig;
+    GameController controller(&rig.event_bus, &rig.model);
+    rig.seatPlayers({1000, 1000, 1000}, 0);
+
+    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.player_set.playerAt(1).allIn();
+    rig.player_set.playerAt(2).fold();
+
+    controller.finishBettingRound();
+
+    EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0)); // 退还 100
+    EXPECT_EQ(0, rig.betting_manager.getRoundBet());        // 下注轮已重置
+}

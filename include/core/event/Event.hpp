@@ -131,6 +131,13 @@ struct WinnerDeclared {
 
 GET_EVENT_NAME(WinnerDeclared)
 
+struct UncalledBetReturned {
+    seat_t player;
+    chips_t amount;
+};
+
+GET_EVENT_NAME(UncalledBetReturned)
+
 struct GameEnded {};
 
 GET_EVENT_NAME(GameEnded)
@@ -139,11 +146,11 @@ GET_EVENT_NAME(GameEnded)
 
 using GameEvent =
     std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
-                 Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
-                 Event::CommunityCardsDealt, Event::BettingRoundStarted, Event::BettingRoundEnded,
-                 Event::WaitingForAction, Event::PlayerAction, Event::PlayerActed,
-                 Event::HoleCardsRevealed, Event::PotSplited, Event::WinnerDeclared,
-                 Event::GameEnded>;
+                 Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged,
+                 Event::BlindPosted, Event::CommunityCardsDealt, Event::BettingRoundStarted,
+                 Event::BettingRoundEnded, Event::WaitingForAction, Event::PlayerAction,
+                 Event::PlayerActed, Event::HoleCardsRevealed, Event::PotSplited,
+                 Event::WinnerDeclared, Event::UncalledBetReturned, Event::GameEnded>;
 
 namespace NetworkEvent {
 struct ClientConnected {

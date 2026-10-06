@@ -98,7 +98,14 @@ void GameModel::startActionRound() {
 }
 void GameModel::closeBettingRound() {
     betting_manager->setupBetting();
-    event_bus->publish(Event::BettingRoundEnded{});
+    event_bus->publish(Event::BettingRoundEnded{.stage = current_stage});
+}
+void GameModel::returnUncalledBet() {
+    auto uncalled = betting_manager->findUncalledBet();
+    if (!uncalled) return;
+    player_set->playerAt(uncalled->seat).refund(uncalled->amount);
+    event_bus->publish(
+        Event::UncalledBetReturned{.player = uncalled->seat, .amount = uncalled->amount});
 }
 void GameModel::awaitPlayerAction() {
     if (!action_flow->hasActingPlayer()) return; // 无有效行动者，不可请求行动

@@ -88,6 +88,8 @@ public:
     void startActionRound();
     /* 关闭下注轮 */
     void closeBettingRound();
+    /* 退还被唯一最高下注者未被跟注的多余筹码 */
+    void returnUncalledBet();
     /* 等待玩家行动 */
     void awaitPlayerAction();
     /* 处理玩家行动；返回该行动是否被接受（无效输入返回 false） */

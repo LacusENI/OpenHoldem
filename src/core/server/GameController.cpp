@@ -39,32 +39,53 @@ void GameController::handle(const Event::PlayerAction& event) {
         return;
     }
     if (game_model->isBettingRoundEnded()) {
+        finishBettingRound();
+
         // 冗余防御：正常流程至少有一名在局玩家可争夺底池，避免进入无法结算的状态
         if (game_model->isNoOnePlayerAlive()) {
             game_model->finishGame();
             return;
         }
+
         if (game_model->isOnlyOnePlayerAlive()) {
-            // 无人竞争：不切分底池，整池直接判给唯一存活玩家
-            game_model->changeStage(Stage::SETTLEMENT);
-            game_model->settleUncontested();
-            game_model->finishGame();
+            handleUncontestedPot();
         } else if (game_model->isStreetsFinished()) {
-            game_model->changeStage(Stage::SHOWDOWN);
-            game_model->dealCommunityCards();
-            processShowdownStage();
-        } else { // 进入下一个阶段
-            if (game_model->getCurrentStage() == Stage::RIVER) {
-                game_model->changeStage(Stage::SHOWDOWN);
-                processShowdownStage();
-            } else {
-                game_model->advanceStage();
-                processPostflopStage();
-            }
+            handleStreetsFinished();
+        } else {
+            advanceToNextStage();
         }
     } else {
         game_model->moveActingPlayer();
         game_model->awaitPlayerAction();
+    }
+}
+
+void GameController::finishBettingRound() {
+    // 先处理 Uncalled Bet（依赖本轮的 bet 数据），再重置下注轮状态
+    game_model->returnUncalledBet();
+    game_model->closeBettingRound();
+}
+
+void GameController::handleUncontestedPot() {
+    // 无人竞争：不切分底池，整池直接判给唯一存活玩家
+    game_model->changeStage(Stage::SETTLEMENT);
+    game_model->settleUncontested();
+    game_model->finishGame();
+}
+
+void GameController::handleStreetsFinished() {
+    game_model->changeStage(Stage::SHOWDOWN);
+    game_model->dealCommunityCards();
+    processShowdownStage();
+}
+
+void GameController::advanceToNextStage() {
+    if (game_model->getCurrentStage() == Stage::RIVER) {
+        game_model->changeStage(Stage::SHOWDOWN);
+        processShowdownStage();
+    } else {
+        game_model->advanceStage();
+        processPostflopStage();
     }
 }
 

@@ -52,6 +52,11 @@ void printEvent(const Event::WinnerDeclared& event) {
     std::cout << std::format("[Event] Winner | {}\n", msg);
 }
 
+void printEvent(const Event::UncalledBetReturned& event) {
+    std::cout << std::format("[Event] Uncalled Bet Returned | @P{} ${}\n", event.player,
+                             event.amount);
+}
+
 void printGameModel(const GameModel& model) {
     std::cout << std::format("stage: {} community-cards: {}\n", to_string(model.getCurrentStage()),
                              to_string(model.getCardsManager()->getCommunityCards()));
@@ -135,6 +140,7 @@ int main() {
     event_bus.subscribe<Event::PlayerActed>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::WinnerDeclared>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::PotSplited>([](const auto& event) { printEvent(event); });
+    event_bus.subscribe<Event::UncalledBetReturned>([](const auto& event) { printEvent(event); });
 
     event_bus.subscribe<Event::WaitingForAction>(
         [&event_bus](const auto& event) { event_bus.publish(getPlayerInput(event)); });

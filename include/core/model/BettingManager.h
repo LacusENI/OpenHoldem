@@ -1,9 +1,17 @@
 #pragma once
 
+#include <optional>
+
 #include "GameTypes.hpp"
 
 namespace poker {
 class PlayerSet;
+
+/* 未被跟注的多余下注：应退还给该玩家 */
+struct UncalledBet {
+    seat_t seat;
+    chips_t amount;
+};
 
 class BettingManager {
 private:
@@ -33,5 +41,8 @@ public:
     chips_t applySmallBlind(seat_t sb_seat_idx);
     /* 执行大盲注，返回实际投入量（筹码不足时投入全部筹码） */
     chips_t applyBigBlind(seat_t bb_seat_idx);
+
+    /* 查找本轮唯一最高下注者未被跟注的部分；没有则返回 nullopt */
+    std::optional<UncalledBet> findUncalledBet() const;
 };
 } // namespace poker
