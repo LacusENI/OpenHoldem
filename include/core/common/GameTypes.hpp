@@ -8,6 +8,9 @@ namespace poker {
 using seat_t = int;  // 玩家座位
 using chips_t = int; // 筹码数量
 
+/* 无效座位/行动者标识 */
+inline constexpr seat_t INVALID_SEAT = -1;
+
 enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 
 enum class Action {
@@ -25,6 +28,16 @@ enum class Action {
 
 inline Stage next_stage(Stage stage) {
     return static_cast<Stage>(static_cast<int>(stage) + 1);
+}
+
+/* 是否为翻牌前下注阶段 */
+[[nodiscard]] inline bool isPreflop(Stage stage) {
+    return stage == Stage::PREFLOP;
+}
+
+/* 是否为翻牌后下注阶段（仅 FLOP/TURN/RIVER，不含 IDLE/SHOWDOWN/SETTLEMENT） */
+[[nodiscard]] inline bool isPostflop(Stage stage) {
+    return stage == Stage::FLOP || stage == Stage::TURN || stage == Stage::RIVER;
 }
 
 inline std::string to_string(Stage stage) {

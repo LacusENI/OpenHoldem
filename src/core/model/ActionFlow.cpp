@@ -9,18 +9,19 @@ void ActionFlow::moveActingPlayer() {
     acting_player = seat_manager->nextActiveSeat(acting_player);
 }
 void ActionFlow::setupToStart(Stage stage) {
-    switch (stage) {
-    case Stage::PREFLOP: acting_player = seat_manager->getUtgSeat(); break;
-    case Stage::FLOP:
-    case Stage::TURN:
-    case Stage::RIVER: acting_player = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
-    default: break;
+    if (isPreflop(stage)) {
+        acting_player = seat_manager->getUtgSeat();
+    } else if (isPostflop(stage)) {
+        acting_player = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
+    } else {
+        // 非下注阶段（IDLE/SHOWDOWN/SETTLEMENT）没有行动者
+        acting_player = INVALID_SEAT;
     }
     pending_player_count = player_set->getActivePlayerCount();
     for (Player& player : *player_set) {
         player.setNotActed();
     }
-    last_aggressor = -1;
+    last_aggressor = INVALID_SEAT;
     has_incomplete_raise = false;
 }
 void ActionFlow::applyAction(Action action) {

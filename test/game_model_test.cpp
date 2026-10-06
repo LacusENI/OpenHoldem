@@ -284,3 +284,12 @@ TEST(GameModelTest, DistributePotWithNoContendersDoesNotCrash) {
     rig.model.splitPot();
     EXPECT_NO_THROW(rig.model.distributePots());
 }
+
+// 无有效行动者时请求行动不应访问非法座位（P2-1 回归）
+TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
+    GameRig rig;
+    rig.seatPlayers({1000, 1000, 1000}, 0);
+
+    EXPECT_EQ(INVALID_SEAT, rig.action_flow.getActingPlayer());
+    EXPECT_NO_THROW(rig.model.awaitPlayerAction());
+}

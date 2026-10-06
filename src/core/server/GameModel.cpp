@@ -102,6 +102,8 @@ void GameModel::closeBettingRound() {
     event_bus->publish(Event::BettingRoundEnded{});
 }
 void GameModel::awaitPlayerAction() {
+    if (!action_flow->hasActingPlayer()) return; // 无有效行动者，不可请求行动
+
     seat_t acting_player = action_flow->getActingPlayer();
     chips_t player_chips = chips_manager->getPlayerChipsAt(acting_player);
     chips_t player_bet = betting_manager->getPlayerBetAt(acting_player);
