@@ -234,3 +234,18 @@ TEST(GameModelTest, SecondHandCanBePlayed) {
     ASSERT_EQ(1u, rig.chips_manager.getPots().size());
     EXPECT_EQ(30, rig.chips_manager.getPots()[0].chips);
 }
+
+// 单挑：按钮=小盲投 5、另一人投 10；翻前按钮先行动、翻后大盲先行动（P1-1 回归）
+TEST(GameModelTest, HeadsUpBlindsAndActionOrder) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000}, 0); // btn=0
+
+    EXPECT_EQ(5, rig.betting_manager.getPlayerBetAt(0));  // 按钮 = 小盲
+    EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(1)); // 非按钮 = 大盲
+    EXPECT_EQ(10, rig.betting_manager.getRoundBet());
+    EXPECT_EQ(2, rig.action_flow.getPendingPlayerCount());
+    EXPECT_EQ(0, rig.action_flow.getActingPlayer()); // 翻前按钮/SB 先行动
+
+    rig.action_flow.setupToStart(Stage::FLOP);
+    EXPECT_EQ(1, rig.action_flow.getActingPlayer()); // 翻后大盲先行动
+}

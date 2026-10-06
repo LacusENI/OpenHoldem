@@ -23,7 +23,7 @@ public:
     auto begin() const { return players.begin(); }
     auto end() const { return players.end(); }
     void addNewPlayer() { players.emplace_back(); }
-    int playerCount() { return players.size(); }
+    int playerCount() const { return static_cast<int>(players.size()); }
     void resize(int new_size) { players.resize(new_size); }
     auto getAlivePlayers() {
         return std::views::iota(0, playerCount()) |
@@ -38,11 +38,13 @@ public:
                std::views::filter([this](seat_t seat) { return this->playerAt(seat).isPlaying(); });
     }
     auto getPlayerSeats() { return std::views::iota(0, playerCount()); }
-    int getAlivePlayerCount() {
-        return std::ranges::count_if(players, [](const Player& p) { return p.isAlive(); });
+    int getAlivePlayerCount() const {
+        return static_cast<int>(
+            std::ranges::count_if(players, [](const Player& p) { return p.isAlive(); }));
     }
-    int getActivePlayerCount() {
-        return std::ranges::count_if(players, [](const Player& p) { return p.isActive(); });
+    int getActivePlayerCount() const {
+        return static_cast<int>(
+            std::ranges::count_if(players, [](const Player& p) { return p.isActive(); }));
     }
 };
 } // namespace poker
