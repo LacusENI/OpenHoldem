@@ -1,6 +1,8 @@
 #pragma once
 #include <functional>
 #include <typeindex>
+#include <unordered_map>
+#include <vector>
 
 namespace poker {
 using Handler = std::function<void(const void*)>;

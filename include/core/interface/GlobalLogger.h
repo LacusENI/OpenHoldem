@@ -6,12 +6,12 @@ namespace poker {
 
 class GlobalLogger {
 public:
-    inline static std::function<void(std::string_view)> trace{};
-    inline static std::function<void(std::string_view)> info{};
-    inline static std::function<void(std::string_view)> debug{};
-    inline static std::function<void(std::string_view)> warn{};
-    inline static std::function<void(std::string_view)> error{};
-    inline static std::function<void(std::string_view)> critical{};
+    inline static std::function<void(std::string_view)> trace = [](std::string_view) {};
+    inline static std::function<void(std::string_view)> info = [](std::string_view) {};
+    inline static std::function<void(std::string_view)> debug = [](std::string_view) {};
+    inline static std::function<void(std::string_view)> warn = [](std::string_view) {};
+    inline static std::function<void(std::string_view)> error = [](std::string_view) {};
+    inline static std::function<void(std::string_view)> critical = [](std::string_view) {};
 };
 
 } // namespace poker

@@ -101,8 +101,6 @@ public:
     void splitPot();
     /* 瓜分所有的底池 */
     void distributePots();
-    /* 比较玩家手牌大小 */
-    std::vector<seat_t> comparePlayerHands();
 
     /* 下注轮是否已结束 */
     bool isBettingRoundEnded() const;

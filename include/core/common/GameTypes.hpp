@@ -26,8 +26,12 @@ enum class Action {
     ALL_IN_RAISE
 };
 
+/* 下一阶段；已到末尾（SETTLEMENT）时保持不变，避免产生越界的 Stage 值 */
 inline Stage next_stage(Stage stage) {
-    return static_cast<Stage>(static_cast<int>(stage) + 1);
+    const int next = static_cast<int>(stage) + 1;
+    if (next > static_cast<int>(Stage::SETTLEMENT)) return Stage::SETTLEMENT;
+    if (next < static_cast<int>(Stage::IDLE)) return Stage::IDLE;
+    return static_cast<Stage>(next);
 }
 
 /* 是否为翻牌前下注阶段 */

@@ -28,9 +28,7 @@ public:
     void setChips(chips_t new_chips) { chips = new_chips; }
     chips_t getBet() const { return bet; }
     void setBet(chips_t new_bet) { bet = new_bet; }
-    void resetBet() { bet = 0; }
     chips_t getCommitted() const { return committed; }
-    void setCommitted(chips_t new_commited) { committed = new_commited; }
 
     /* 玩家获取筹码 */
     void winChips(chips_t delta) { chips += delta; }

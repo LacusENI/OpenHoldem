@@ -25,3 +25,12 @@ TEST(StageTest, IsPostflop) {
     EXPECT_FALSE(isPostflop(Stage::SHOWDOWN));
     EXPECT_FALSE(isPostflop(Stage::SETTLEMENT));
 }
+
+// next_stage 正常前进，且不会越界（阶段 0 防御）
+TEST(StageTest, NextStageStaysInRange) {
+    EXPECT_EQ(Stage::PREFLOP, next_stage(Stage::IDLE));
+    EXPECT_EQ(Stage::FLOP, next_stage(Stage::PREFLOP));
+    EXPECT_EQ(Stage::SHOWDOWN, next_stage(Stage::RIVER));
+    EXPECT_EQ(Stage::SETTLEMENT, next_stage(Stage::SHOWDOWN));
+    EXPECT_EQ(Stage::SETTLEMENT, next_stage(Stage::SETTLEMENT)); // 末尾保持
+}

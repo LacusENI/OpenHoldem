@@ -1,6 +1,7 @@
 #include "eval_hand.h"
 
 #include <algorithm>
+#include <array>
 
 namespace poker::internal::eval_hand {
 std::vector<cards_5_t> enum_5_from_7(const cards_7_t& hand7) {
@@ -105,7 +106,7 @@ HandType evalUniqueHandType(const cards_5_t& hand5, const HandCounts& counts) {
  * @return 牌型
  */
 HandType evalPatternHandType(const HandCounts& counts) {
-    const std::vector table = {
+    static constexpr std::array<HandType, 5> table = {
         HandType::ONE_PAIR,   HandType::TWO_PAIR,       HandType::THREE_OF_A_KIND,
         HandType::FULL_HOUSE, HandType::FOUR_OF_A_KIND,
     };

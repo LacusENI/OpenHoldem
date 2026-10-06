@@ -185,11 +185,6 @@ void GameModel::distributePots() {
         event_bus->publish(Event::WinnerDeclared{.pot_index = pot_index, .winners = winners});
     }
 }
-std::vector<seat_t> GameModel::comparePlayerHands() {
-    auto view = player_set->getAlivePlayers();
-    std::vector<seat_t> players(view.begin(), view.end());
-    return cards_manager->determineWinners(players);
-}
 bool GameModel::isBettingRoundEnded() const {
     return action_flow->isFlowEnded(betting_manager->getRoundBet());
 }

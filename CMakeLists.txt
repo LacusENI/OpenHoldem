@@ -142,6 +142,7 @@ add_executable(poker_test
         test/eval_hand_test.cpp
         test/game_model_test.cpp
         test/game_types_test.cpp
+        test/global_logger_test.cpp
         test/seat_manager_test.cpp
         test/side_pots_test.cpp
 )

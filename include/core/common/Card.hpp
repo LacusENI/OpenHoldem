@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 
 #include <magic_enum/magic_enum.hpp>
 
@@ -16,7 +17,7 @@ enum class Suit : uint8_t {
     CLUB,    // 梅花
     DIAMOND, // 方块
     HEART,   // 红心
-    SPADE,   // 红桃
+    SPADE,   // 黑桃
 };
 
 /**
@@ -120,10 +121,16 @@ inline std::string to_string(Rank rank) {
 }
 
 inline std::string to_string(Card card) {
-    static std::vector<std::string> suits = {"_", "c", "d", "h", "s"};
-    static std::vector<std::string> ranks = {"_", "?", "2", "3", "4", "5", "6", "7",
-                                             "8", "9", "T", "J", "Q", "K", "A"};
-    return ranks[static_cast<int>(card.rank)] + suits[static_cast<int>(card.suit)];
+    static constexpr std::array<const char*, 5> suits = {"_", "c", "d", "h", "s"};
+    static constexpr std::array<const char*, 15> ranks = {"_", "?", "2", "3", "4", "5", "6", "7",
+                                                          "8", "9", "T", "J", "Q", "K", "A"};
+    const int rank = static_cast<int>(card.rank);
+    const int suit = static_cast<int>(card.suit);
+    const char* rank_str =
+        (rank >= 0 && rank < static_cast<int>(ranks.size())) ? ranks[rank] : "?";
+    const char* suit_str =
+        (suit >= 0 && suit < static_cast<int>(suits.size())) ? suits[suit] : "_";
+    return std::string(rank_str) + suit_str;
 }
 
 template <std::size_t N>
