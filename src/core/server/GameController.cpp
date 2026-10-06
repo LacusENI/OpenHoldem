@@ -22,6 +22,12 @@ void GameController::handle(const Event::StartGame& event) {
     processPreflopStage();
 }
 
+void GameController::startNextHand() {
+    game_model->startNextHand();
+    game_model->changeStage(Stage::PREFLOP);
+    processPreflopStage();
+}
+
 void GameController::handle(const Event::PlayerJoinRequest& event) {
     game_model->joinNewPlayer();
 }

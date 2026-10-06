@@ -21,6 +21,8 @@ public:
     ~ChipsManager() = default;
 
     const std::vector<Pot>& getPots() const { return pots; }
+    /* 清空所有底池（用于新的一手牌） */
+    void clearPots() { pots.clear(); }
     chips_t getPlayerChipsAt(seat_t seat_idx);
     void setPlayerChipsAt(seat_t seat_idx, chips_t player_chips);
 

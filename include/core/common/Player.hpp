@@ -65,6 +65,15 @@ public:
     /* 玩家出局 */
     void out() { state = State::OUT; }
 
+    /* 重置为一手牌开始时的状态：保留筹码，清空单局数据；无筹码者淘汰 */
+    void resetForNewHand() {
+        bet = 0;
+        committed = 0;
+        is_acted = false;
+        hole_cards = {};
+        state = chips > 0 ? State::ACTIVE : State::OUT;
+    }
+
 private:
     State state = State::ACTIVE; // 玩家状态
     bool is_acted = false;

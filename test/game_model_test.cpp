@@ -28,18 +28,29 @@ struct GameRig {
     GameModel model{&event_bus, &action_flow, &betting_manager, &cards_manager, &chips_manager,
                     &player_set, &seat_manager};
 
-    /* 初始化翻前：设置筹码 -> 建底 -> 下盲注 -> 排行动顺序 */
-    void startPreflop(const std::vector<chips_t>& stacks, seat_t btn) {
+    /* 落座并设置筹码、按钮 */
+    void seatPlayers(const std::vector<chips_t>& stacks, seat_t btn) {
         player_set.resize(static_cast<int>(stacks.size()));
         for (int s = 0; s < player_set.playerCount(); ++s) {
             player_set.playerAt(s).setChips(stacks[s]);
         }
         seat_manager.setBtnSeat(btn);
+    }
+
+    /* 执行一手牌的翻前流程：建底 -> 下盲注 -> 排行动顺序 */
+    void beginHand() {
         model.setCurrentStage(Stage::PREFLOP);
         model.startBettingRound();
         EXPECT_NO_THROW(model.postSmallBlind());
         EXPECT_NO_THROW(model.postBigBlind());
         model.startActionRound();
+    }
+
+    /* 会话开始并打第一手牌 */
+    void startPreflop(const std::vector<chips_t>& stacks, seat_t btn) {
+        seatPlayers(stacks, btn);
+        model.startGame();
+        beginHand();
     }
 };
 } // namespace
@@ -70,12 +81,12 @@ TEST(GameModelTest, ShortBigBlindGoesAllIn) {
     EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.action_flow.getPendingPlayerCount());
 }
 
-// 0 筹码玩家投盲不应抛异常（P0-1 崩溃点回归）
-TEST(GameModelTest, ZeroChipBlindDoesNotThrow) {
+// 0 筹码玩家在开局即为 OUT，不参与盲注且不抛异常（P0-4 语义）
+TEST(GameModelTest, ZeroChipPlayerIsOutAtHandStart) {
     GameRig rig;
     rig.startPreflop({1000, 0, 1000}, 0);
 
-    EXPECT_TRUE(rig.player_set.playerAt(1).isAllIn());
+    EXPECT_TRUE(rig.player_set.playerAt(1).isOut());
     EXPECT_EQ(0, rig.betting_manager.getPlayerBetAt(1));
 }
 
@@ -154,4 +165,72 @@ TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
     ASSERT_EQ(1u, prompted.size());
     EXPECT_EQ(acting, prompted.front());
     EXPECT_EQ(acting, rig.action_flow.getActingPlayer());
+}
+
+// 开始下一手：单局数据清空、按钮轮转（P0-4 回归）
+TEST(GameModelTest, StartNextHandResetsRoundStateAndAdvancesButton) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    const seat_t btn_before = rig.seat_manager.getBtnSeat();
+
+    // 制造一些单手牌状态
+    rig.model.handlePlayerAction(
+        Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
+    rig.cards_manager.setCommunityCards(
+        {Card("Ac"), Card("Kd"), Card("Qh"), Card("Js"), Card("2c")});
+    rig.model.splitPot();
+    ASSERT_FALSE(rig.chips_manager.getPots().empty());
+
+    rig.model.startNextHand();
+
+    // 按钮前进一位
+    EXPECT_EQ((btn_before + 1) % 3, rig.seat_manager.getBtnSeat());
+    // 底池与公共牌清空
+    EXPECT_TRUE(rig.chips_manager.getPots().empty());
+    for (const Card& card : rig.cards_manager.getCommunityCards()) {
+        EXPECT_EQ(Card(), card);
+    }
+    // 单局数据复位
+    for (const Player& player : rig.player_set) {
+        EXPECT_EQ(0, player.getBet());
+        EXPECT_EQ(0, player.getCommitted());
+        EXPECT_FALSE(player.isActed());
+    }
+}
+
+// 淘汰（0 筹码）玩家在下一手出局，盲注跳过该座位（P0-4 回归）
+TEST(GameModelTest, BustedPlayerBecomesOutAndBlindsSkipHim) {
+    GameRig rig;
+    rig.startPreflop({0, 1000, 1000, 1000}, 0); // seat0 无筹码
+    rig.model.startNextHand();
+
+    EXPECT_TRUE(rig.player_set.playerAt(0).isOut());
+    EXPECT_EQ(1, rig.seat_manager.getBtnSeat()); // 按钮从 0 前进到 1
+
+    rig.beginHand();
+    // 4 人桌、seat0 已出局、按钮在 1：SB=2, BB=3, UTG=1
+    EXPECT_EQ(2, rig.seat_manager.getSbSeat());
+    EXPECT_EQ(3, rig.seat_manager.getBbSeat());
+    EXPECT_EQ(1, rig.seat_manager.getUtgSeat());
+    EXPECT_EQ(3, rig.action_flow.getPendingPlayerCount());
+}
+
+// 第二手牌可以正常打完整轮下注（P0-4 回归）
+TEST(GameModelTest, SecondHandCanBePlayed) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    rig.model.startNextHand();
+    rig.beginHand();
+
+    const Event::PlayerAction call = {.target_bet = 10, .is_fold = false, .is_all_in = false};
+    rig.model.handlePlayerAction(call);
+    while (!rig.model.isBettingRoundEnded()) {
+        rig.model.moveActingPlayer();
+        rig.model.handlePlayerAction(call);
+    }
+    EXPECT_TRUE(rig.model.isBettingRoundEnded());
+
+    rig.model.splitPot();
+    ASSERT_EQ(1u, rig.chips_manager.getPots().size());
+    EXPECT_EQ(30, rig.chips_manager.getPots()[0].chips);
 }

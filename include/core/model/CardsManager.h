@@ -22,6 +22,8 @@ public:
 
     cards_5_t getCommunityCards() const { return community_cards; }
     void setCommunityCards(cards_5_t cc) { community_cards = cc; }
+    /* 清空公共牌（用于新的一手牌） */
+    void clearCommunityCards() { community_cards = {}; }
     cards_2_t getHoleCardsAt(seat_t seat_idx) const;
     void setHoleCardsAt(seat_t seat_idx, cards_2_t hole_cards);
 

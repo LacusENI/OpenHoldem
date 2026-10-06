@@ -23,6 +23,23 @@ void GameModel::joinNewPlayer() {
                                               .player_count = player_set->playerCount()});
 }
 void GameModel::startGame() {
+    resetForNewHand();
+    publishGameStarted();
+}
+void GameModel::startNextHand() {
+    resetForNewHand();
+    seat_manager->advanceBtnSeat();
+    publishGameStarted();
+}
+void GameModel::resetForNewHand() {
+    for (Player& player : *player_set) {
+        player.resetForNewHand();
+    }
+    cards_manager->clearCommunityCards();
+    chips_manager->clearPots();
+    betting_manager->setupBetting();
+}
+void GameModel::publishGameStarted() {
     event_bus->publish(Event::GameStarted{.btn_seat = seat_manager->getBtnSeat(),
                                           .big_blind = betting_manager->getBigBlind(),
                                           .player_count = player_set->playerCount()});

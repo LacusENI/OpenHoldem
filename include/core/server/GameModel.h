@@ -28,6 +28,9 @@ private:
     SeatManager* seat_manager;
     Stage current_stage = Stage::IDLE;
 
+    /* 广播当前会话信息（按钮位、大盲、人数） */
+    void publishGameStarted();
+
 public:
     GameModel(EventBus* event_bus, ActionFlow* action_flow, BettingManager* betting_manager,
               CardsManager* cards_manager, ChipsManager* chips_manager, PlayerSet* player_set,
@@ -60,8 +63,12 @@ public:
     /* 加入新玩家 */
     void joinNewPlayer();
 
-    /* 开始一局游戏 */
+    /* 开始一局游戏（会话开始，初始化第一手牌状态） */
     void startGame();
+    /* 开始下一手牌：重置牌局状态并轮转按钮 */
+    void startNextHand();
+    /* 重置为一手牌开始前的状态（不轮转按钮、不发布事件） */
+    void resetForNewHand();
     /* 结束本局游戏 */
     void finishGame();
     /* 洗牌 */

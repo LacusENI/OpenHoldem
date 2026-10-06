@@ -29,6 +29,9 @@ public:
     /* 开始一局游戏 */
     void handle(const Event::StartGame& event);
 
+    /* 开始下一手牌（重置状态并轮转按钮） */
+    void startNextHand();
+
     /* 翻牌前阶段 */
     void processPreflopStage();
     /* 翻牌后阶段 */

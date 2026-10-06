@@ -20,6 +20,7 @@ void ActionFlow::setupToStart(Stage stage) {
     for (Player& player : *player_set) {
         player.setNotActed();
     }
+    last_aggressor = -1;
     has_incomplete_raise = false;
 }
 void ActionFlow::applyAction(Action action) {
