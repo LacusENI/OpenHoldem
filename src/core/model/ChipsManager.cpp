@@ -36,6 +36,12 @@ void ChipsManager::awardPotTo(seat_t winner) {
     moveChipsToPlayer(winner, total);
 }
 
+void ChipsManager::clearCommitted() {
+    for (seat_t seat = 0; seat < player_set.playerCount(); ++seat) {
+        player_set.playerAt(seat).clearCommitted();
+    }
+}
+
 void ChipsManager::moveChipsToPot(seat_t player_seat, chips_t chips) {
     Player& player = player_set.playerAt(player_seat);
     if (chips > player.getChips()) {

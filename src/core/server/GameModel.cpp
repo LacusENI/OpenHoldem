@@ -179,6 +179,7 @@ void GameModel::settleUncontested() {
     auto alive = player_set.getAlivePlayers();
     seat_t winner = *alive.begin();
     chips_manager.awardPotTo(winner);
+    chips_manager.clearCommitted(); // 结算后清零本局投入
     event_bus.publish(Event::WinnerDeclared{.pot_index = 0, .winners = {winner}});
 }
 void GameModel::distributePots() {
@@ -196,6 +197,7 @@ void GameModel::distributePots() {
         chips_manager.distributePot(pot.chips, winners);
         event_bus.publish(Event::WinnerDeclared{.pot_index = pot_index, .winners = winners});
     }
+    chips_manager.clearCommitted(); // 结算后清零本局投入
 }
 bool GameModel::isBettingRoundEnded() const {
     return betting_round.isFlowEnded();

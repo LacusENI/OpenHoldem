@@ -29,6 +29,8 @@ public:
     chips_t getBet() const { return bet; }
     void setBet(chips_t new_bet) { bet = new_bet; }
     chips_t getCommitted() const { return committed; }
+    /* 结算后清零本局投入 */
+    void clearCommitted() { committed = 0; }
 
     /* 玩家获取筹码；若由 all-in 恢复为有筹码则解除 all-in */
     void winChips(chips_t delta) {
