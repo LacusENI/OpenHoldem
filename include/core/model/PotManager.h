@@ -9,16 +9,16 @@ namespace poker {
 class PlayerSet;
 class SeatManager;
 
-class ChipsManager {
+class PotManager {
 private:
     PlayerSet& player_set;
     SeatManager& seat_manager;
     std::vector<Pot> pots;
 
 public:
-    ChipsManager(PlayerSet& player_set, SeatManager& seat_manager)
+    PotManager(PlayerSet& player_set, SeatManager& seat_manager)
         : player_set(player_set), seat_manager(seat_manager) {}
-    ~ChipsManager() = default;
+    ~PotManager() = default;
 
     const std::vector<Pot>& getPots() const { return pots; }
     /* 清空所有底池（用于新的一手牌） */
@@ -32,8 +32,6 @@ public:
     /* 清零所有玩家的本局投入（结算后调用） */
     void clearCommitted();
 
-    void moveChipsToPot(seat_t player_seat, chips_t chips);
-    void moveChipsToPlayer(seat_t player_seat, chips_t chips);
     void distributePot(chips_t pot_chips, std::vector<seat_t>& winners);
 };
 } // namespace poker

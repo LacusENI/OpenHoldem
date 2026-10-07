@@ -9,7 +9,7 @@ namespace poker {
 class EventBus;
 class BettingRound;
 class CardsManager;
-class ChipsManager;
+class PotManager;
 class PlayerSet;
 class SeatManager;
 
@@ -18,7 +18,7 @@ struct GameDependencies {
     EventBus& event_bus;
     BettingRound& betting_round;
     CardsManager& cards_manager;
-    ChipsManager& chips_manager;
+    PotManager& pot_manager;
     PlayerSet& player_set;
     SeatManager& seat_manager;
 };
@@ -31,7 +31,7 @@ private:
     EventBus& event_bus;
     BettingRound& betting_round;
     CardsManager& cards_manager;
-    ChipsManager& chips_manager;
+    PotManager& pot_manager;
     PlayerSet& player_set;
     SeatManager& seat_manager;
     Stage current_stage = Stage::IDLE;
@@ -44,7 +44,7 @@ public:
         : event_bus(deps.event_bus),
           betting_round(deps.betting_round),
           cards_manager(deps.cards_manager),
-          chips_manager(deps.chips_manager),
+          pot_manager(deps.pot_manager),
           player_set(deps.player_set),
           seat_manager(deps.seat_manager) {}
     ~GameModel() = default;
@@ -55,7 +55,7 @@ public:
     EventBus& getEventBus() const { return event_bus; }
     BettingRound& getBettingRound() const { return betting_round; }
     CardsManager& getCardsManager() const { return cards_manager; }
-    ChipsManager& getChipsManager() const { return chips_manager; }
+    PotManager& getPotManager() const { return pot_manager; }
     PlayerSet& getPlayerSet() const { return player_set; }
     SeatManager& getSeatManager() const { return seat_manager; }
 

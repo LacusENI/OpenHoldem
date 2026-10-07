@@ -39,11 +39,11 @@ add_library(poker_core
 
         include/core/model/BettingRound.h
         include/core/model/CardsManager.h
-        include/core/model/ChipsManager.h
+        include/core/model/PotManager.h
         include/core/model/SeatManager.h
         src/core/model/BettingRound.cpp
         src/core/model/CardsManager.cpp
-        src/core/model/ChipsManager.cpp
+        src/core/model/PotManager.cpp
         src/core/model/SeatManager.cpp
         
         include/core/server/GameController.h
@@ -136,13 +136,14 @@ add_executable(poker_test
         test/card_test.cpp
         test/cards_manager_test.cpp
         test/chips_calc_test.cpp
-        test/chips_manager_test.cpp
+        test/pot_manager_test.cpp
         test/deck_test.cpp
         test/eval_hand_test.cpp
         test/game_model_test.cpp
         test/game_types_test.cpp
         test/global_logger_test.cpp
         test/invariants_test.cpp
+        test/player_test.cpp
         test/seat_manager_test.cpp
         test/side_pots_test.cpp
 )

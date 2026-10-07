@@ -109,10 +109,10 @@ TEST(InvariantsTest, SidePotSumEqualsCommitted) {
     players.playerAt(1).commit(50);
     players.playerAt(2).commit(200);
 
-    session.chips_manager.splitThePot();
+    session.pot_manager.splitThePot();
 
     chips_t pot_sum = 0;
-    for (const Pot& pot : session.chips_manager.getPots()) {
+    for (const Pot& pot : session.pot_manager.getPots()) {
         pot_sum += pot.chips;
         EXPECT_FALSE(pot.contributors.empty());
     }

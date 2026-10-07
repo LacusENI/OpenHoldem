@@ -22,7 +22,7 @@ struct GameRig {
     SeatManager& seat_manager = session.seat_manager;
     BettingRound& betting_round = session.betting_round;
     CardsManager& cards_manager = session.cards_manager;
-    ChipsManager& chips_manager = session.chips_manager;
+    PotManager& pot_manager = session.pot_manager;
     GameModel& model = session.model;
 
     /* 落座并设置筹码、按钮 */
@@ -61,7 +61,7 @@ TEST(GameModelTest, ShortSmallBlindGoesAllIn) {
     rig.startPreflop({1000, 3, 1000}, 0); // btn=0, SB=1, BB=2
 
     EXPECT_EQ(3, rig.betting_round.getPlayerBetAt(1));
-    EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(1));
+    EXPECT_EQ(0, rig.pot_manager.getPlayerChipsAt(1));
     EXPECT_TRUE(rig.player_set.playerAt(1).isAllIn());
     EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.needsToActCount());
@@ -74,7 +74,7 @@ TEST(GameModelTest, ShortBigBlindGoesAllIn) {
     rig.startPreflop({1000, 1000, 7}, 0);
 
     EXPECT_EQ(7, rig.betting_round.getPlayerBetAt(2));
-    EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(2));
+    EXPECT_EQ(0, rig.pot_manager.getPlayerChipsAt(2));
     EXPECT_TRUE(rig.player_set.playerAt(2).isAllIn());
     EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.needsToActCount());
@@ -133,7 +133,7 @@ TEST(GameModelTest, InvalidActionIsRejected) {
     EXPECT_FALSE(accepted);
     EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
     EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(acting));
-    EXPECT_EQ(1000, rig.chips_manager.getPlayerChipsAt(acting));
+    EXPECT_EQ(1000, rig.pot_manager.getPlayerChipsAt(acting));
 }
 
 // 合法跟注应被接受（P0-3 回归）
@@ -179,14 +179,14 @@ TEST(GameModelTest, StartNextHandResetsRoundStateAndAdvancesButton) {
     rig.cards_manager.setCommunityCards(
         {Card("Ac"), Card("Kd"), Card("Qh"), Card("Js"), Card("2c")});
     rig.model.splitPot();
-    ASSERT_FALSE(rig.chips_manager.getPots().empty());
+    ASSERT_FALSE(rig.pot_manager.getPots().empty());
 
     rig.model.startNextHand();
 
     // 按钮前进一位
     EXPECT_EQ((btn_before + 1) % 3, rig.seat_manager.getBtnSeat());
     // 底池与公共牌清空
-    EXPECT_TRUE(rig.chips_manager.getPots().empty());
+    EXPECT_TRUE(rig.pot_manager.getPots().empty());
     for (const Card& card : rig.cards_manager.getCommunityCards()) {
         EXPECT_EQ(Card(), card);
     }
@@ -231,8 +231,8 @@ TEST(GameModelTest, SecondHandCanBePlayed) {
     EXPECT_TRUE(rig.model.isBettingRoundEnded());
 
     rig.model.splitPot();
-    ASSERT_EQ(1u, rig.chips_manager.getPots().size());
-    EXPECT_EQ(30, rig.chips_manager.getPots()[0].chips);
+    ASSERT_EQ(1u, rig.pot_manager.getPots().size());
+    EXPECT_EQ(30, rig.pot_manager.getPots()[0].chips);
 }
 
 // 单挑：按钮=小盲投 5、另一人投 10；翻前按钮先行动、翻后大盲先行动（P1-1 回归）
@@ -310,10 +310,10 @@ TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
 
     ASSERT_TRUE(rig.model.isOnlyOnePlayerAlive());
     // 整池 = 0 + 5 + 10 = 15，全部判给 BB（起始 1000 - 10 + 15 = 1005）
-    EXPECT_EQ(1005, rig.chips_manager.getPlayerChipsAt(2));
-    EXPECT_EQ(995, rig.chips_manager.getPlayerChipsAt(1));
-    EXPECT_EQ(1000, rig.chips_manager.getPlayerChipsAt(0));
-    EXPECT_TRUE(rig.chips_manager.getPots().empty());
+    EXPECT_EQ(1005, rig.pot_manager.getPlayerChipsAt(2));
+    EXPECT_EQ(995, rig.pot_manager.getPlayerChipsAt(1));
+    EXPECT_EQ(1000, rig.pot_manager.getPlayerChipsAt(0));
+    EXPECT_TRUE(rig.pot_manager.getPots().empty());
     EXPECT_EQ(1, winners_declared); // 不再有"单人池"产生的多余赢池事件
 }
 
@@ -323,9 +323,9 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
     // 模拟：seat0 实投 200，seat1 实投 100 并 all-in，seat2 弃牌
-    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.player_set.playerAt(0).payChips(200);
     rig.betting_round.setPlayerBetAt(0, 200);
-    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.player_set.playerAt(1).payChips(100);
     rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
@@ -340,7 +340,7 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
     EXPECT_EQ(0, captured->player);
     EXPECT_EQ(100, captured->amount);
     // seat0 拿回 100：chips 800 -> 900、committed 200 -> 100、bet 200 -> 100
-    EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0));
+    EXPECT_EQ(900, rig.pot_manager.getPlayerChipsAt(0));
     EXPECT_EQ(100, rig.player_set.playerAt(0).getCommitted());
     EXPECT_EQ(100, rig.betting_round.getPlayerBetAt(0));
 }
@@ -351,10 +351,10 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
     rig.seatPlayers({200, 1000, 1000}, 0); // seat0 筹码 200
 
     // seat0 全下 200；seat1 全下跟注 100；seat2 弃牌
-    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.player_set.playerAt(0).payChips(200);
     rig.betting_round.setPlayerBetAt(0, 200);
     rig.player_set.playerAt(0).allIn();
-    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.player_set.playerAt(1).payChips(100);
     rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
@@ -364,7 +364,7 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
 
     EXPECT_FALSE(rig.player_set.playerAt(0).isAllIn());
     EXPECT_TRUE(rig.player_set.playerAt(0).isActive());
-    EXPECT_EQ(100, rig.chips_manager.getPlayerChipsAt(0));
+    EXPECT_EQ(100, rig.pot_manager.getPlayerChipsAt(0));
     EXPECT_EQ(100, rig.player_set.playerAt(0).getCommitted());
 }
 
@@ -374,16 +374,16 @@ TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     GameController controller(rig.event_bus, rig.model);
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
-    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.player_set.playerAt(0).payChips(200);
     rig.betting_round.setPlayerBetAt(0, 200);
-    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.player_set.playerAt(1).payChips(100);
     rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
 
     controller.finishBettingRound();
 
-    EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0)); // 退还 100
+    EXPECT_EQ(900, rig.pot_manager.getPlayerChipsAt(0)); // 退还 100
     EXPECT_EQ(0, rig.betting_round.getRoundBet());        // 下注轮已重置
 }
 

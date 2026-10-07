@@ -7,7 +7,7 @@
 #include "BettingRound.h"
 #include "Card.hpp"
 #include "CardsManager.h"
-#include "ChipsManager.h"
+#include "PotManager.h"
 #include "Event.hpp"
 #include "EventBus.hpp"
 #include "GameTypes.hpp"
@@ -38,7 +38,7 @@ void GameModel::resetForNewHand() {
         player.resetForNewHand();
     }
     cards_manager.clearCommunityCards();
-    chips_manager.clearPots();
+    pot_manager.clearPots();
     betting_round.resetBets();
 }
 void GameModel::publishGameStarted() {
@@ -71,14 +71,14 @@ void GameModel::dealCommunityCards() {
 void GameModel::postSmallBlind() {
     seat_t sb_seat = seat_manager.getSbSeat();
     chips_t posted = betting_round.applySmallBlind(sb_seat);
-    chips_manager.moveChipsToPot(sb_seat, posted); // payChips 会在扣至 0 时置 all-in
+    player_set.playerAt(sb_seat).payChips(posted); // payChips 会在扣至 0 时置 all-in
     event_bus.publish(
         Event::BlindPosted{.player = sb_seat, .amount = posted, .is_big_blind = false});
 }
 void GameModel::postBigBlind() {
     seat_t bb_seat = seat_manager.getBbSeat();
     chips_t posted = betting_round.applyBigBlind(bb_seat);
-    chips_manager.moveChipsToPot(bb_seat, posted); // payChips 会在扣至 0 时置 all-in
+    player_set.playerAt(bb_seat).payChips(posted); // payChips 会在扣至 0 时置 all-in
     event_bus.publish(
         Event::BlindPosted{.player = bb_seat, .amount = posted, .is_big_blind = true});
 }
@@ -104,7 +104,7 @@ void GameModel::awaitPlayerAction() {
     if (!betting_round.hasActingPlayer()) return; // 无有效行动者，不可请求行动
 
     seat_t acting_player = betting_round.getActingPlayer();
-    chips_t player_chips = chips_manager.getPlayerChipsAt(acting_player);
+    chips_t player_chips = pot_manager.getPlayerChipsAt(acting_player);
     chips_t player_bet = betting_round.getPlayerBetAt(acting_player);
     chips_t round_bet = betting_round.getRoundBet();
     chips_t min_raise = betting_round.getMinRaise();
@@ -165,8 +165,8 @@ std::vector<seat_t> GameModel::showdownOrder() const {
     return order;
 }
 void GameModel::splitPot() {
-    chips_manager.splitThePot(); 
-    std::vector<Pot> pots = chips_manager.getPots();
+    pot_manager.splitThePot(); 
+    std::vector<Pot> pots = pot_manager.getPots();
     std::vector<chips_t> pot_chips;
     for (const Pot& pot : pots) {
         pot_chips.push_back(pot.chips);
@@ -178,14 +178,14 @@ void GameModel::settleUncontested() {
     // 被当作赢池上报的问题）
     auto alive = player_set.getAlivePlayers();
     seat_t winner = *alive.begin();
-    chips_manager.awardPotTo(winner);
-    chips_manager.clearCommitted(); // 结算后清零本局投入
+    pot_manager.awardPotTo(winner);
+    pot_manager.clearCommitted(); // 结算后清零本局投入
     event_bus.publish(Event::WinnerDeclared{.pot_index = 0, .winners = {winner}});
 }
 void GameModel::distributePots() {
-    int pot_count = chips_manager.getPots().size();
+    int pot_count = pot_manager.getPots().size();
     for (int pot_index = pot_count - 1; pot_index >= 0; pot_index--) {
-        const Pot& pot = chips_manager.getPots()[pot_index];
+        const Pot& pot = pot_manager.getPots()[pot_index];
 
         std::vector<seat_t> contenders;
         for (seat_t contributor : pot.contributors) {
@@ -194,10 +194,10 @@ void GameModel::distributePots() {
             }
         }
         std::vector<seat_t> winners = cards_manager.determineWinners(contenders);
-        chips_manager.distributePot(pot.chips, winners);
+        pot_manager.distributePot(pot.chips, winners);
         event_bus.publish(Event::WinnerDeclared{.pot_index = pot_index, .winners = winners});
     }
-    chips_manager.clearCommitted(); // 结算后清零本局投入
+    pot_manager.clearCommitted(); // 结算后清零本局投入
 }
 bool GameModel::isBettingRoundEnded() const {
     return betting_round.isFlowEnded();
