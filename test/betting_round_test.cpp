@@ -12,8 +12,8 @@ using namespace poker;
 namespace {
 struct RoundRig {
     PlayerSet player_set;
-    SeatManager seat_manager{&player_set};
-    BettingRound betting_round{&player_set, &seat_manager};
+    SeatManager seat_manager{player_set};
+    BettingRound betting_round{player_set, seat_manager};
 
     void setup(const std::vector<chips_t>& stacks, seat_t btn) {
         player_set.resize(static_cast<int>(stacks.size()));

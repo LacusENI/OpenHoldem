@@ -11,11 +11,13 @@ class GameModel;
  * @brief 游戏控制器
  */
 class GameController {
-public:
-    EventBus* event_bus;
-    GameModel* game_model;
+private:
+    EventBus& event_bus;
+    GameModel& game_model;
 
-    explicit GameController(EventBus* event_bus, GameModel* model);
+public:
+    GameController(EventBus& event_bus, GameModel& model)
+        : event_bus(event_bus), game_model(model) {}
     ~GameController() = default;
 
     /* 订阅事件 */

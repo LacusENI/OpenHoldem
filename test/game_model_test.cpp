@@ -3,28 +3,27 @@
 #include <optional>
 #include <vector>
 
-#include "BettingRound.h"
-#include "CardsManager.h"
-#include "ChipsManager.h"
+#include "Event.hpp"
 #include "EventBus.hpp"
-#include "GameController.h"
-#include "GameModel.h"
+#include "GameSession.h"
 #include "GameTypes.hpp"
-#include "PlayerSet.hpp"
-#include "SeatManager.h"
+#include "MockDeck.hpp"
 
 using namespace poker;
 
 namespace {
 struct GameRig {
-    EventBus event_bus;
-    PlayerSet player_set;
-    SeatManager seat_manager{&player_set};
-    BettingRound betting_round{&player_set, &seat_manager};
-    CardsManager cards_manager{nullptr, &player_set}; // 本测试不发牌
-    ChipsManager chips_manager{&player_set, &seat_manager};
-    GameModel model{&event_bus, &betting_round, &cards_manager, &chips_manager, &player_set,
-                    &seat_manager};
+    MockEmptyDeck deck; // 本测试不发牌
+    GameSession session{deck};
+
+    // 便捷别名（指向 session 的成员）
+    EventBus& event_bus = session.event_bus;
+    PlayerSet& player_set = session.player_set;
+    SeatManager& seat_manager = session.seat_manager;
+    BettingRound& betting_round = session.betting_round;
+    CardsManager& cards_manager = session.cards_manager;
+    ChipsManager& chips_manager = session.chips_manager;
+    GameModel& model = session.model;
 
     /* 落座并设置筹码、按钮 */
     void seatPlayers(const std::vector<chips_t>& stacks, seat_t btn) {
@@ -153,7 +152,7 @@ TEST(GameModelTest, ValidActionIsAccepted) {
 // 控制器收到无效行动后应重新请求同一玩家，而不是切换行动者（P0-3 回归）
 TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
     GameRig rig;
-    GameController controller(&rig.event_bus, &rig.model);
+    GameController controller(rig.event_bus, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
 
@@ -298,7 +297,7 @@ TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
 // 无人竞争（只剩一人）时整池直接判给唯一存活者，不切分底池
 TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
     GameRig rig;
-    GameController controller(&rig.event_bus, &rig.model);
+    GameController controller(rig.event_bus, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0); // SB=1(5), BB=2(10), UTG=0
 
     int winners_declared = 0;
@@ -372,7 +371,7 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
 // 结束下注轮：先退还多余筹码，再重置下注状态
 TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     GameRig rig;
-    GameController controller(&rig.event_bus, &rig.model);
+    GameController controller(rig.event_bus, rig.model);
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
     rig.chips_manager.moveChipsToPot(0, 200);

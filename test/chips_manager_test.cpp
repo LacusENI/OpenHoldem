@@ -13,8 +13,8 @@ using namespace poker;
 // 测试转移筹码
 TEST(ChipsManagerTest, MoveChips) {
     PlayerSet player_set;
-    SeatManager seat_manager(&player_set);
-    ChipsManager chips_manager(&player_set, &seat_manager);
+    SeatManager seat_manager(player_set);
+    ChipsManager chips_manager(player_set, seat_manager);
     player_set.resize(2);
     chips_manager.setPlayerChipsAt(0, 20);
     chips_manager.setPlayerChipsAt(1, 50);
@@ -34,8 +34,8 @@ TEST(ChipsManagerTest, MoveChips) {
 // 测试筹码不足时拒绝投入
 TEST(ChipsManagerTest, MoveChipsNotEnough) {
     PlayerSet player_set;
-    SeatManager seat_manager(&player_set);
-    ChipsManager chips_manager(&player_set, &seat_manager);
+    SeatManager seat_manager(player_set);
+    ChipsManager chips_manager(player_set, seat_manager);
     player_set.resize(1);
     chips_manager.setPlayerChipsAt(0, 10);
 
@@ -45,8 +45,8 @@ TEST(ChipsManagerTest, MoveChipsNotEnough) {
 // 测试分配底池计算
 TEST(ChipsManagerTest, DistributePot) {
     PlayerSet player_set;
-    SeatManager seat_manager(&player_set);
-    ChipsManager chips_manager(&player_set, &seat_manager);
+    SeatManager seat_manager(player_set);
+    ChipsManager chips_manager(player_set, seat_manager);
     player_set.resize(9);
     for (Player& player : player_set) {
         player.setChips(0);
@@ -65,8 +65,8 @@ TEST(ChipsManagerTest, DistributePot) {
 // 空赢家分配应安全返回，不改变任何筹码（P1-2 回归）
 TEST(ChipsManagerTest, DistributePotWithNoWinners) {
     PlayerSet player_set;
-    SeatManager seat_manager(&player_set);
-    ChipsManager chips_manager(&player_set, &seat_manager);
+    SeatManager seat_manager(player_set);
+    ChipsManager chips_manager(player_set, seat_manager);
     player_set.resize(3);
     for (Player& player : player_set) {
         player.setChips(0);

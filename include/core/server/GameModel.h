@@ -13,42 +13,51 @@ class ChipsManager;
 class PlayerSet;
 class SeatManager;
 
+/** GameModel 的依赖集合（引用注入；由组合根构造） */
+struct GameDependencies {
+    EventBus& event_bus;
+    BettingRound& betting_round;
+    CardsManager& cards_manager;
+    ChipsManager& chips_manager;
+    PlayerSet& player_set;
+    SeatManager& seat_manager;
+};
+
 /**
  * @brief 游戏领域模型
  */
 class GameModel {
 private:
-    EventBus* event_bus;
-    BettingRound* betting_round;
-    CardsManager* cards_manager;
-    ChipsManager* chips_manager;
-    PlayerSet* player_set;
-    SeatManager* seat_manager;
+    EventBus& event_bus;
+    BettingRound& betting_round;
+    CardsManager& cards_manager;
+    ChipsManager& chips_manager;
+    PlayerSet& player_set;
+    SeatManager& seat_manager;
     Stage current_stage = Stage::IDLE;
 
     /* 广播当前会话信息（按钮位、大盲、人数） */
     void publishGameStarted();
 
 public:
-    GameModel(EventBus* event_bus, BettingRound* betting_round, CardsManager* cards_manager,
-              ChipsManager* chips_manager, PlayerSet* player_set, SeatManager* seat_manager)
-        : event_bus(event_bus),
-          betting_round(betting_round),
-          cards_manager(cards_manager),
-          chips_manager(chips_manager),
-          player_set(player_set),
-          seat_manager(seat_manager) {}
+    explicit GameModel(GameDependencies deps)
+        : event_bus(deps.event_bus),
+          betting_round(deps.betting_round),
+          cards_manager(deps.cards_manager),
+          chips_manager(deps.chips_manager),
+          player_set(deps.player_set),
+          seat_manager(deps.seat_manager) {}
     ~GameModel() = default;
 
     Stage getCurrentStage() const { return current_stage; }
     void setCurrentStage(Stage stage) { current_stage = stage; }
 
-    EventBus* getEventBus() const { return event_bus; }
-    BettingRound* getBettingRound() const { return betting_round; }
-    CardsManager* getCardsManager() const { return cards_manager; }
-    ChipsManager* getChipsManager() const { return chips_manager; }
-    PlayerSet* getPlayerSet() const { return player_set; }
-    SeatManager* getSeatManager() const { return seat_manager; }
+    EventBus& getEventBus() const { return event_bus; }
+    BettingRound& getBettingRound() const { return betting_round; }
+    CardsManager& getCardsManager() const { return cards_manager; }
+    ChipsManager& getChipsManager() const { return chips_manager; }
+    PlayerSet& getPlayerSet() const { return player_set; }
+    SeatManager& getSeatManager() const { return seat_manager; }
 
     /* 改变游戏阶段 */
     void changeStage(Stage new_stage);

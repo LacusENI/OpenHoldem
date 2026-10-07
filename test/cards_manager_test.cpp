@@ -14,7 +14,8 @@ using namespace testing;
 
 TEST(CardsManagerTest, DealCommunityCards) {
     MockDeck mock_deck;
-    CardsManager cards_manager(&mock_deck, nullptr);
+    PlayerSet player_set;
+    CardsManager cards_manager(mock_deck, player_set);
     cards_5_t community_cards = {Card(Rank::TWO, Suit::CLUB), Card(Rank::EIGHT, Suit::DIAMOND),
                                  Card(Rank::ACE, Suit::HEART), Card(Rank::JACK, Suit::SPADE),
                                  Card(Rank::QUEEN, Suit::DIAMOND)};
@@ -40,7 +41,7 @@ TEST(CardsManagerTest, DealCommunityCards) {
 TEST(CardsManagerTest, DealHoleCards) {
     MockDeck mock_deck;
     PlayerSet player_set;
-    CardsManager cards_manager(&mock_deck, &player_set);
+    CardsManager cards_manager(mock_deck, player_set);
     player_set.resize(2);
     cards_2_t hole_cards_1 = {Card(Rank::TWO, Suit::CLUB), Card(Rank::EIGHT, Suit::DIAMOND)};
     cards_2_t hole_cards_2 = {Card(Rank::ACE, Suit::HEART), Card(Rank::JACK, Suit::SPADE)};
@@ -56,7 +57,8 @@ TEST(CardsManagerTest, DealHoleCards) {
 
 TEST(CardsManagerTest, DetermineWinners) {
     PlayerSet player_set;
-    CardsManager cards_manager(nullptr, &player_set);
+    MockEmptyDeck deck;
+    CardsManager cards_manager(deck, player_set);
     player_set.resize(4);
     cards_5_t community_cards = {Card("Ah"), Card("As"), Card("Kd"), Card("Qc"), Card("Jh")};
     cards_manager.setCommunityCards(community_cards);

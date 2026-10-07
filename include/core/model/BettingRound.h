@@ -23,8 +23,8 @@ struct UncalledBet {
  */
 class BettingRound {
 private:
-    PlayerSet* player_set;
-    SeatManager* seat_manager;
+    PlayerSet& player_set;
+    SeatManager& seat_manager;
 
     // --- 金额 ---
     chips_t big_blind = 10;
@@ -40,7 +40,7 @@ private:
     void recordAction(Action action);
 
 public:
-    BettingRound(PlayerSet* player_set, SeatManager* seat_manager)
+    BettingRound(PlayerSet& player_set, SeatManager& seat_manager)
         : player_set(player_set), seat_manager(seat_manager) {}
     ~BettingRound() = default;
 

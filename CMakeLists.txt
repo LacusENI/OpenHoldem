@@ -48,6 +48,7 @@ add_library(poker_core
         
         include/core/server/GameController.h
         include/core/server/GameModel.h
+        include/core/server/GameSession.h
         src/core/server/GameController.cpp
         src/core/server/GameModel.cpp
         include/core/algo/side_pots.h        

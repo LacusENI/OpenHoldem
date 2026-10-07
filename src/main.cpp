@@ -3,18 +3,12 @@
 #include <iostream>
 #include <string>
 
-#include "BettingRound.h"
-#include "CardsManager.h"
-#include "ChipsManager.h"
 #include "Deck.hpp"
 #include "Event.hpp"
 #include "EventBus.hpp"
-#include "GameController.h"
-#include "GameModel.h"
+#include "GameSession.h"
 #include "GameTypes.hpp"
 #include "Player.hpp"
-#include "PlayerSet.hpp"
-#include "SeatManager.h"
 
 using namespace poker;
 
@@ -64,13 +58,13 @@ void printEvent(const Event::HoleCardsRevealed& event) {
 
 void printGameModel(const GameModel& model) {
     std::cout << std::format("stage: {} community-cards: {}\n", to_string(model.getCurrentStage()),
-                             to_string(model.getCardsManager()->getCommunityCards()));
+                             to_string(model.getCardsManager().getCommunityCards()));
 
     std::cout << std::format("round-bet: ${} min-raise: ${}\n",
-                             model.getBettingRound()->getRoundBet(),
-                             model.getBettingRound()->getMinRaise());
+                             model.getBettingRound().getRoundBet(),
+                             model.getBettingRound().getMinRaise());
     seat_t player_seat = 0;
-    for (const Player& player : *model.getPlayerSet()) {
+    for (const Player& player : model.getPlayerSet()) {
         std::cout << std::format("[@P{}] {} {} bet: ${} chips: ${} committed: ${}\n", player_seat,
                                  to_string(player.getHoleCards()), to_string(player.getState()),
                                  player.getBet(), player.getChips(), player.getCommitted());
@@ -121,17 +115,12 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
 }
 
 int main() {
-    EventBus event_bus;
-
     Deck deck;
-    PlayerSet player_set;
-    SeatManager seat_manager(&player_set);
-    BettingRound betting_round(&player_set, &seat_manager);
-    CardsManager cards_manager(&deck, &player_set);
-    ChipsManager chips_manager(&player_set, &seat_manager);
-    GameModel game_model(&event_bus, &betting_round, &cards_manager, &chips_manager, &player_set,
-                         &seat_manager);
-    GameController game_controller(&event_bus, &game_model);
+    GameSession session(deck);
+    EventBus& event_bus = session.event_bus;
+    PlayerSet& player_set = session.player_set;
+    GameModel& game_model = session.model;
+    GameController& game_controller = session.controller;
 
     game_controller.subscribeEvent();
 

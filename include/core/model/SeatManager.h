@@ -9,17 +9,17 @@ namespace poker {
  */
 class SeatManager {
 private:
-    PlayerSet* player_set;
+    PlayerSet& player_set;
     seat_t btn_seat = 0;
 
     /* 本手牌是否只有两名在局玩家（单挑） */
-    [[nodiscard]] bool isHeadsUp() const { return player_set->getAlivePlayerCount() == 2; }
+    [[nodiscard]] bool isHeadsUp() const { return player_set.getAlivePlayerCount() == 2; }
 
 public:
-    SeatManager(PlayerSet* player_set) : player_set(player_set) {}
+    explicit SeatManager(PlayerSet& player_set) : player_set(player_set) {}
     ~SeatManager() = default;
 
-    int playerCount() const { return player_set->playerCount(); }
+    int playerCount() const { return player_set.playerCount(); }
     seat_t getBtnSeat() const { return btn_seat; }
     void setBtnSeat(seat_t new_btn_position) { btn_seat = new_btn_position; }
     /* 按钮移至下一个仍在局的玩家 */

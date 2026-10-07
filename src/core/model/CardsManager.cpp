@@ -13,15 +13,15 @@
 
 namespace poker {
 cards_2_t CardsManager::getHoleCardsAt(seat_t seat_idx) const {
-    return player_set->playerAt(seat_idx).getHoleCards();
+    return player_set.playerAt(seat_idx).getHoleCards();
 }
 
 void CardsManager::setHoleCardsAt(seat_t seat_idx, cards_2_t hole_cards) {
-    player_set->playerAt(seat_idx).setHoleCards(hole_cards);
+    player_set.playerAt(seat_idx).setHoleCards(hole_cards);
 }
 
 void CardsManager::shuffleDeck() {
-    deck->shuffle();
+    deck.shuffle();
 }
 
 void CardsManager::dealCommunityCards(Stage stage) {
@@ -35,14 +35,14 @@ void CardsManager::dealCommunityCards(Stage stage) {
     }
     for (int i = 0; i < size; i++) {
         if (community_cards[i] == Card()) {
-            community_cards[i] = deck->deal();
+            community_cards[i] = deck.deal();
         }
     }
 }
 
 void CardsManager::dealHoleCards() {
-    for (Player& player : *player_set) {
-        player.setHoleCards({deck->deal(), deck->deal()});
+    for (Player& player : player_set) {
+        player.setHoleCards({deck.deal(), deck.deal()});
     }
 }
 

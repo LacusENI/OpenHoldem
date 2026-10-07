@@ -12,7 +12,7 @@ TEST(SeatManagerTest, SortSeats) {
     PlayerSet player_set;
     player_set.resize(7);
 
-    SeatManager seat_manager(&player_set);
+    SeatManager seat_manager(player_set);
     seat_manager.setBtnSeat(3);
 
     std::vector<seat_t> seats = {0, 1, 2, 3, 4, 5, 6};
@@ -27,7 +27,7 @@ TEST(SeatManagerTest, HeadsUpBlindPositions) {
     PlayerSet player_set;
     player_set.resize(2);
 
-    SeatManager seat_manager(&player_set);
+    SeatManager seat_manager(player_set);
     seat_manager.setBtnSeat(0);
 
     EXPECT_EQ(0, seat_manager.getSbSeat());
@@ -41,7 +41,7 @@ TEST(SeatManagerTest, HeadsUpWithEliminatedSeat) {
     player_set.resize(3);
     player_set.playerAt(1).out();
 
-    SeatManager seat_manager(&player_set);
+    SeatManager seat_manager(player_set);
     seat_manager.setBtnSeat(0);
 
     EXPECT_EQ(0, seat_manager.getSbSeat());

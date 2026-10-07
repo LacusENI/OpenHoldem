@@ -11,12 +11,12 @@ class SeatManager;
 
 class ChipsManager {
 private:
-    PlayerSet* player_set;
-    SeatManager* seat_manager;
+    PlayerSet& player_set;
+    SeatManager& seat_manager;
     std::vector<Pot> pots;
 
 public:
-    ChipsManager(PlayerSet* player_set, SeatManager* seat_manager)
+    ChipsManager(PlayerSet& player_set, SeatManager& seat_manager)
         : player_set(player_set), seat_manager(seat_manager) {}
     ~ChipsManager() = default;
 

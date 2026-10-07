@@ -12,12 +12,12 @@ class PlayerSet;
 
 class CardsManager {
 private:
-    IDeck* deck;
-    PlayerSet* player_set;
+    IDeck& deck;
+    PlayerSet& player_set;
     cards_5_t community_cards;
 
 public:
-    CardsManager(IDeck* deck, PlayerSet* player_set) : deck(deck), player_set(player_set) {}
+    CardsManager(IDeck& deck, PlayerSet& player_set) : deck(deck), player_set(player_set) {}
     ~CardsManager() = default;
 
     cards_5_t getCommunityCards() const { return community_cards; }

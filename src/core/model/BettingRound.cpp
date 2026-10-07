@@ -10,23 +10,23 @@
 namespace poker {
 // ===== 金额 / 盲注 =====
 chips_t BettingRound::getPlayerBetAt(seat_t seat_idx) const {
-    return player_set->playerAt(seat_idx).getBet();
+    return player_set.playerAt(seat_idx).getBet();
 }
 
 void BettingRound::setPlayerBetAt(seat_t seat_idx, chips_t player_bet) {
-    player_set->playerAt(seat_idx).setBet(player_bet);
+    player_set.playerAt(seat_idx).setBet(player_bet);
 }
 
 void BettingRound::resetBets() {
     round_bet = 0;
     min_raise_delta = 0;
-    for (seat_t seat_idx : player_set->getPlayerSeats()) {
+    for (seat_t seat_idx : player_set.getPlayerSeats()) {
         setPlayerBetAt(seat_idx, 0);
     }
 }
 
 chips_t BettingRound::applySmallBlind(seat_t sb_seat_idx) {
-    chips_t actual = std::min(getSmallBlind(), player_set->playerAt(sb_seat_idx).getChips());
+    chips_t actual = std::min(getSmallBlind(), player_set.playerAt(sb_seat_idx).getChips());
     setPlayerBetAt(sb_seat_idx, actual);
     round_bet = std::max(round_bet, actual);
     min_raise_delta = std::max(min_raise_delta, actual);
@@ -34,7 +34,7 @@ chips_t BettingRound::applySmallBlind(seat_t sb_seat_idx) {
 }
 
 chips_t BettingRound::applyBigBlind(seat_t bb_seat_idx) {
-    chips_t actual = std::min(getBigBlind(), player_set->playerAt(bb_seat_idx).getChips());
+    chips_t actual = std::min(getBigBlind(), player_set.playerAt(bb_seat_idx).getChips());
     setPlayerBetAt(bb_seat_idx, actual);
     // 大盲名义额作为本轮的 bring-in，即使大盲玩家筹码不足
     round_bet = std::max(round_bet, big_blind);
@@ -48,8 +48,8 @@ std::optional<UncalledBet> BettingRound::findUncalledBet() const {
     int count_max = 0; // 达到 max1 的人数
     seat_t leader = INVALID_SEAT;
 
-    for (seat_t seat = 0; seat < player_set->playerCount(); ++seat) {
-        const Player& player = player_set->playerAt(seat);
+    for (seat_t seat = 0; seat < player_set.playerCount(); ++seat) {
+        const Player& player = player_set.playerAt(seat);
         if (player.isFolded() || player.isOut()) continue; // 弃牌/出局者不计
         const chips_t bet = player.getBet();
         if (bet > max1) {
@@ -73,35 +73,35 @@ std::optional<UncalledBet> BettingRound::findUncalledBet() const {
 // ===== 行动顺序 / 轮次生命周期 =====
 int BettingRound::needsToActCount() const {
     int count = 0;
-    for (const Player& player : *player_set) {
+    for (const Player& player : player_set) {
         if (player.needsToAct(round_bet)) ++count;
     }
     return count;
 }
 
 bool BettingRound::isFlowEnded() const {
-    return needsToActCount() == 0 || player_set->getAlivePlayerCount() == 1;
+    return needsToActCount() == 0 || player_set.getAlivePlayerCount() == 1;
 }
 
 bool BettingRound::canPlayerRaise(seat_t seat) const {
-    const Player& player = player_set->playerAt(seat);
+    const Player& player = player_set.playerAt(seat);
     return !(player.isActed() && has_incomplete_raise);
 }
 
 void BettingRound::moveActingPlayer() {
-    acting_player = seat_manager->nextSeatNeedsToAct(acting_player, round_bet);
+    acting_player = seat_manager.nextSeatNeedsToAct(acting_player, round_bet);
 }
 
 void BettingRound::setupToStart(Stage stage) {
     if (isPreflop(stage)) {
-        acting_player = seat_manager->getUtgSeat();
+        acting_player = seat_manager.getUtgSeat();
     } else if (isPostflop(stage)) {
-        acting_player = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
+        acting_player = seat_manager.nextActiveSeat(seat_manager.getBtnSeat());
     } else {
         // 非下注阶段（IDLE/SHOWDOWN/SETTLEMENT）没有行动者
         acting_player = INVALID_SEAT;
     }
-    for (Player& player : *player_set) {
+    for (Player& player : player_set) {
         player.setNotActed();
     }
     last_aggressor = INVALID_SEAT;
@@ -113,9 +113,9 @@ void BettingRound::recordAction(Action action) {
         last_aggressor = acting_player;
         has_incomplete_raise = false;
     }
-    player_set->playerAt(acting_player).setActed();
+    player_set.playerAt(acting_player).setActed();
     if (action == Action::Fold) {
-        player_set->playerAt(acting_player).fold();
+        player_set.playerAt(acting_player).fold();
     }
     if (action == Action::ShortAllIn) {
         has_incomplete_raise = true;
@@ -132,7 +132,7 @@ std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerA
             .player = player_seat, .bet = 0, .action = Action::Fold, .is_all_in = false};
     }
 
-    const Player& player = player_set->playerAt(player_seat);
+    const Player& player = player_set.playerAt(player_seat);
     algo::BettingContext context = {.player_chips = player.getChips(),
                                     .player_bet = player.getBet(),
                                     .round_bet = round_bet,
@@ -142,7 +142,7 @@ std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerA
     algo::BettingResult result = algo::process_betting(context, input);
     if (!result.isValid()) return std::nullopt;
 
-    player_set->playerAt(player_seat).commit(result.player_bet);
+    player_set.playerAt(player_seat).commit(result.player_bet);
     round_bet = result.round_bet;
     min_raise_delta = result.min_raise_delta;
     recordAction(result.action);
@@ -150,6 +150,6 @@ std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerA
     return Event::PlayerActed{.player = player_seat,
                               .bet = result.player_bet,
                               .action = result.action,
-                              .is_all_in = player_set->playerAt(player_seat).isAllIn()};
+                              .is_all_in = player_set.playerAt(player_seat).isAllIn()};
 }
 } // namespace poker
