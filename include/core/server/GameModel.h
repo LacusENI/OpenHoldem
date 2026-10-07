@@ -7,8 +7,7 @@
 
 namespace poker {
 class EventBus;
-class ActionFlow;
-class BettingManager;
+class BettingRound;
 class CardsManager;
 class ChipsManager;
 class PlayerSet;
@@ -20,8 +19,7 @@ class SeatManager;
 class GameModel {
 private:
     EventBus* event_bus;
-    ActionFlow* action_flow;
-    BettingManager* betting_manager;
+    BettingRound* betting_round;
     CardsManager* cards_manager;
     ChipsManager* chips_manager;
     PlayerSet* player_set;
@@ -32,12 +30,10 @@ private:
     void publishGameStarted();
 
 public:
-    GameModel(EventBus* event_bus, ActionFlow* action_flow, BettingManager* betting_manager,
-              CardsManager* cards_manager, ChipsManager* chips_manager, PlayerSet* player_set,
-              SeatManager* seat_manager)
+    GameModel(EventBus* event_bus, BettingRound* betting_round, CardsManager* cards_manager,
+              ChipsManager* chips_manager, PlayerSet* player_set, SeatManager* seat_manager)
         : event_bus(event_bus),
-          action_flow(action_flow),
-          betting_manager(betting_manager),
+          betting_round(betting_round),
           cards_manager(cards_manager),
           chips_manager(chips_manager),
           player_set(player_set),
@@ -48,8 +44,7 @@ public:
     void setCurrentStage(Stage stage) { current_stage = stage; }
 
     EventBus* getEventBus() const { return event_bus; }
-    ActionFlow* getActionFlow() const { return action_flow; }
-    BettingManager* getBettingManager() const { return betting_manager; }
+    BettingRound* getBettingRound() const { return betting_round; }
     CardsManager* getCardsManager() const { return cards_manager; }
     ChipsManager* getChipsManager() const { return chips_manager; }
     PlayerSet* getPlayerSet() const { return player_set; }

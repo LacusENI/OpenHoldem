@@ -3,8 +3,7 @@
 #include <optional>
 #include <vector>
 
-#include "ActionFlow.h"
-#include "BettingManager.h"
+#include "BettingRound.h"
 #include "CardsManager.h"
 #include "ChipsManager.h"
 #include "EventBus.hpp"
@@ -21,12 +20,11 @@ struct GameRig {
     EventBus event_bus;
     PlayerSet player_set;
     SeatManager seat_manager{&player_set};
-    BettingManager betting_manager{&player_set};
-    ActionFlow action_flow{&player_set, &seat_manager};
+    BettingRound betting_round{&player_set, &seat_manager};
     CardsManager cards_manager{nullptr, &player_set}; // 本测试不发牌
     ChipsManager chips_manager{&player_set, &seat_manager};
-    GameModel model{&event_bus, &action_flow, &betting_manager, &cards_manager, &chips_manager,
-                    &player_set, &seat_manager};
+    GameModel model{&event_bus, &betting_round, &cards_manager, &chips_manager, &player_set,
+                    &seat_manager};
 
     /* 落座并设置筹码、按钮 */
     void seatPlayers(const std::vector<chips_t>& stacks, seat_t btn) {
@@ -38,9 +36,7 @@ struct GameRig {
     }
 
     /* 当前仍需行动的玩家数量 */
-    int needsToActCount() const {
-        return action_flow.needsToActCount(betting_manager.getRoundBet());
-    }
+    int needsToActCount() const { return betting_round.needsToActCount(); }
 
     /* 执行一手牌的翻前流程：建底 -> 下盲注 -> 排行动顺序 */
     void beginHand() {
@@ -65,10 +61,10 @@ TEST(GameModelTest, ShortSmallBlindGoesAllIn) {
     GameRig rig;
     rig.startPreflop({1000, 3, 1000}, 0); // btn=0, SB=1, BB=2
 
-    EXPECT_EQ(3, rig.betting_manager.getPlayerBetAt(1));
+    EXPECT_EQ(3, rig.betting_round.getPlayerBetAt(1));
     EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(1));
     EXPECT_TRUE(rig.player_set.playerAt(1).isAllIn());
-    EXPECT_EQ(10, rig.betting_manager.getRoundBet());
+    EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.needsToActCount());
     EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.needsToActCount());
 }
@@ -78,10 +74,10 @@ TEST(GameModelTest, ShortBigBlindGoesAllIn) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 7}, 0);
 
-    EXPECT_EQ(7, rig.betting_manager.getPlayerBetAt(2));
+    EXPECT_EQ(7, rig.betting_round.getPlayerBetAt(2));
     EXPECT_EQ(0, rig.chips_manager.getPlayerChipsAt(2));
     EXPECT_TRUE(rig.player_set.playerAt(2).isAllIn());
-    EXPECT_EQ(10, rig.betting_manager.getRoundBet());
+    EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.needsToActCount());
     EXPECT_EQ(rig.player_set.getActivePlayerCount(), rig.needsToActCount());
 }
@@ -92,7 +88,7 @@ TEST(GameModelTest, ZeroChipPlayerIsOutAtHandStart) {
     rig.startPreflop({1000, 0, 1000}, 0);
 
     EXPECT_TRUE(rig.player_set.playerAt(1).isOut());
-    EXPECT_EQ(0, rig.betting_manager.getPlayerBetAt(1));
+    EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(1));
 }
 
 // 正常筹码：盲注金额与待行动人数保持原有行为
@@ -100,9 +96,9 @@ TEST(GameModelTest, NormalBlinds) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 1000}, 0);
 
-    EXPECT_EQ(5, rig.betting_manager.getPlayerBetAt(1));
-    EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(2));
-    EXPECT_EQ(10, rig.betting_manager.getRoundBet());
+    EXPECT_EQ(5, rig.betting_round.getPlayerBetAt(1));
+    EXPECT_EQ(10, rig.betting_round.getPlayerBetAt(2));
+    EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(3, rig.needsToActCount());
 }
 
@@ -111,7 +107,7 @@ TEST(GameModelTest, StartGamePublishesSessionInfo) {
     GameRig rig;
     rig.player_set.resize(3);
     rig.seat_manager.setBtnSeat(1);
-    rig.betting_manager.setBigBlind(20);
+    rig.betting_round.setBigBlind(20);
 
     std::optional<Event::GameStarted> captured;
     rig.event_bus.subscribe<Event::GameStarted>(
@@ -129,15 +125,15 @@ TEST(GameModelTest, StartGamePublishesSessionInfo) {
 TEST(GameModelTest, InvalidActionIsRejected) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 1000}, 0);
-    const seat_t acting = rig.action_flow.getActingPlayer();
+    const seat_t acting = rig.betting_round.getActingPlayer();
 
     // 低于跟注额且未 all-in，判定为 VOID
     bool accepted = rig.model.handlePlayerAction(
         Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
 
     EXPECT_FALSE(accepted);
-    EXPECT_EQ(acting, rig.action_flow.getActingPlayer());
-    EXPECT_EQ(0, rig.betting_manager.getPlayerBetAt(acting));
+    EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
+    EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(acting));
     EXPECT_EQ(1000, rig.chips_manager.getPlayerChipsAt(acting));
 }
 
@@ -145,13 +141,13 @@ TEST(GameModelTest, InvalidActionIsRejected) {
 TEST(GameModelTest, ValidActionIsAccepted) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 1000}, 0);
-    const seat_t acting = rig.action_flow.getActingPlayer();
+    const seat_t acting = rig.betting_round.getActingPlayer();
 
     bool accepted = rig.model.handlePlayerAction(
         Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
 
     EXPECT_TRUE(accepted);
-    EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(acting));
+    EXPECT_EQ(10, rig.betting_round.getPlayerBetAt(acting));
 }
 
 // 控制器收到无效行动后应重新请求同一玩家，而不是切换行动者（P0-3 回归）
@@ -159,7 +155,7 @@ TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
     GameRig rig;
     GameController controller(&rig.event_bus, &rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0);
-    const seat_t acting = rig.action_flow.getActingPlayer();
+    const seat_t acting = rig.betting_round.getActingPlayer();
 
     std::vector<seat_t> prompted;
     rig.event_bus.subscribe<Event::WaitingForAction>(
@@ -169,7 +165,7 @@ TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
 
     ASSERT_EQ(1u, prompted.size());
     EXPECT_EQ(acting, prompted.front());
-    EXPECT_EQ(acting, rig.action_flow.getActingPlayer());
+    EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
 }
 
 // 开始下一手：单局数据清空、按钮轮转（P0-4 回归）
@@ -245,14 +241,14 @@ TEST(GameModelTest, HeadsUpBlindsAndActionOrder) {
     GameRig rig;
     rig.startPreflop({1000, 1000}, 0); // btn=0
 
-    EXPECT_EQ(5, rig.betting_manager.getPlayerBetAt(0));  // 按钮 = 小盲
-    EXPECT_EQ(10, rig.betting_manager.getPlayerBetAt(1)); // 非按钮 = 大盲
-    EXPECT_EQ(10, rig.betting_manager.getRoundBet());
+    EXPECT_EQ(5, rig.betting_round.getPlayerBetAt(0));  // 按钮 = 小盲
+    EXPECT_EQ(10, rig.betting_round.getPlayerBetAt(1)); // 非按钮 = 大盲
+    EXPECT_EQ(10, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.needsToActCount());
-    EXPECT_EQ(0, rig.action_flow.getActingPlayer()); // 翻前按钮/SB 先行动
+    EXPECT_EQ(0, rig.betting_round.getActingPlayer()); // 翻前按钮/SB 先行动
 
-    rig.action_flow.setupToStart(Stage::FLOP);
-    EXPECT_EQ(1, rig.action_flow.getActingPlayer()); // 翻后大盲先行动
+    rig.betting_round.setupToStart(Stage::FLOP);
+    EXPECT_EQ(1, rig.betting_round.getActingPlayer()); // 翻后大盲先行动
 }
 
 // 在局玩家不足 2 人时不应开局，也不广播 GameStarted（P1-2 回归）
@@ -295,7 +291,7 @@ TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
     GameRig rig;
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
-    EXPECT_EQ(INVALID_SEAT, rig.action_flow.getActingPlayer());
+    EXPECT_EQ(INVALID_SEAT, rig.betting_round.getActingPlayer());
     EXPECT_NO_THROW(rig.model.awaitPlayerAction());
 }
 
@@ -329,9 +325,9 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
 
     // 模拟：seat0 实投 200，seat1 实投 100 并 all-in，seat2 弃牌
     rig.chips_manager.moveChipsToPot(0, 200);
-    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.betting_round.setPlayerBetAt(0, 200);
     rig.chips_manager.moveChipsToPot(1, 100);
-    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
 
@@ -347,7 +343,7 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
     // seat0 拿回 100：chips 800 -> 900、committed 200 -> 100、bet 200 -> 100
     EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0));
     EXPECT_EQ(100, rig.player_set.playerAt(0).getCommitted());
-    EXPECT_EQ(100, rig.betting_manager.getPlayerBetAt(0));
+    EXPECT_EQ(100, rig.betting_round.getPlayerBetAt(0));
 }
 
 // 退款使 all-in 玩家解除 all-in（退回后仍有筹码）
@@ -357,10 +353,10 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
 
     // seat0 全下 200；seat1 全下跟注 100；seat2 弃牌
     rig.chips_manager.moveChipsToPot(0, 200);
-    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.betting_round.setPlayerBetAt(0, 200);
     rig.player_set.playerAt(0).allIn();
     rig.chips_manager.moveChipsToPot(1, 100);
-    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
     ASSERT_TRUE(rig.player_set.playerAt(0).isAllIn());
@@ -380,16 +376,16 @@ TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
     rig.chips_manager.moveChipsToPot(0, 200);
-    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.betting_round.setPlayerBetAt(0, 200);
     rig.chips_manager.moveChipsToPot(1, 100);
-    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.betting_round.setPlayerBetAt(1, 100);
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
 
     controller.finishBettingRound();
 
     EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0)); // 退还 100
-    EXPECT_EQ(0, rig.betting_manager.getRoundBet());        // 下注轮已重置
+    EXPECT_EQ(0, rig.betting_round.getRoundBet());        // 下注轮已重置
 }
 
 // 摊牌顺序：河牌轮无人下注时，从按钮左侧第一个活跃玩家开始顺时针
@@ -410,8 +406,8 @@ TEST(GameModelTest, ShowdownOrderStartsAtLastAggressor) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 1000}, 0);
 
-    rig.action_flow.setActingPlayer(2);
-    rig.action_flow.applyAction(Action::RAISE); // 记录 last_aggressor = 2
+    rig.betting_round.setActingPlayer(2);
+    rig.betting_round.applyAction(Action::RAISE); // 记录 last_aggressor = 2
     std::vector<seat_t> order = rig.model.showdownOrder();
 
     ASSERT_EQ(3u, order.size());

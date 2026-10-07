@@ -3,8 +3,7 @@
 #include <iostream>
 #include <string>
 
-#include "ActionFlow.h"
-#include "BettingManager.h"
+#include "BettingRound.h"
 #include "CardsManager.h"
 #include "ChipsManager.h"
 #include "Deck.hpp"
@@ -68,8 +67,8 @@ void printGameModel(const GameModel& model) {
                              to_string(model.getCardsManager()->getCommunityCards()));
 
     std::cout << std::format("round-bet: ${} min-raise: ${}\n",
-                             model.getBettingManager()->getRoundBet(),
-                             model.getBettingManager()->getRoundBet());
+                             model.getBettingRound()->getRoundBet(),
+                             model.getBettingRound()->getMinRaise());
     seat_t player_seat = 0;
     for (const Player& player : *model.getPlayerSet()) {
         std::cout << std::format("[@P{}] {} {} bet: ${} chips: ${} committed: ${}\n", player_seat,
@@ -127,12 +126,11 @@ int main() {
     Deck deck;
     PlayerSet player_set;
     SeatManager seat_manager(&player_set);
-    BettingManager betting_manager(&player_set);
-    ActionFlow action_flow(&player_set, &seat_manager);
+    BettingRound betting_round(&player_set, &seat_manager);
     CardsManager cards_manager(&deck, &player_set);
     ChipsManager chips_manager(&player_set, &seat_manager);
-    GameModel game_model(&event_bus, &action_flow, &betting_manager, &cards_manager, &chips_manager,
-                         &player_set, &seat_manager);
+    GameModel game_model(&event_bus, &betting_round, &cards_manager, &chips_manager, &player_set,
+                         &seat_manager);
     GameController game_controller(&event_bus, &game_model);
 
     game_controller.subscribeEvent();
