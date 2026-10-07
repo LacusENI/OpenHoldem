@@ -108,7 +108,7 @@ void GameController::processPostflopStage() {
 
 void GameController::processShowdownStage() {
     game_model->setCurrentStage(Stage::SHOWDOWN);
-    game_model->revealAllHoleCards();
+    game_model->revealHoleCards();
     game_model->setCurrentStage(Stage::SETTLEMENT);
     game_model->splitPot();
     game_model->distributePots();

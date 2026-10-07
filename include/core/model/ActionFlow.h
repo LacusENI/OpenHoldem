@@ -24,6 +24,8 @@ public:
     void setActingPlayer(seat_t player) { acting_player = player; }
     /* 当前是否存在有效的行动者 */
     [[nodiscard]] bool hasActingPlayer() const { return acting_player != INVALID_SEAT; }
+    /* 本轮最后一个激进者（下注/加注者）；无则 INVALID_SEAT */
+    [[nodiscard]] seat_t getLastAggressor() const { return last_aggressor; }
     /* 当前仍需行动的玩家数量 */
     [[nodiscard]] int needsToActCount(chips_t round_bet) const;
     bool hasIncompleteRaise() const { return has_incomplete_raise; }

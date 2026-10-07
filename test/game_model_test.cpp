@@ -350,6 +350,29 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
     EXPECT_EQ(100, rig.betting_manager.getPlayerBetAt(0));
 }
 
+// 退款使 all-in 玩家解除 all-in（退回后仍有筹码）
+TEST(GameModelTest, RefundLiftsAllInStatus) {
+    GameRig rig;
+    rig.seatPlayers({200, 1000, 1000}, 0); // seat0 筹码 200
+
+    // seat0 全下 200；seat1 全下跟注 100；seat2 弃牌
+    rig.chips_manager.moveChipsToPot(0, 200);
+    rig.betting_manager.setPlayerBetAt(0, 200);
+    rig.player_set.playerAt(0).allIn();
+    rig.chips_manager.moveChipsToPot(1, 100);
+    rig.betting_manager.setPlayerBetAt(1, 100);
+    rig.player_set.playerAt(1).allIn();
+    rig.player_set.playerAt(2).fold();
+    ASSERT_TRUE(rig.player_set.playerAt(0).isAllIn());
+
+    rig.model.returnUncalledBet(); // 退 200 - 100 = 100
+
+    EXPECT_FALSE(rig.player_set.playerAt(0).isAllIn());
+    EXPECT_TRUE(rig.player_set.playerAt(0).isActive());
+    EXPECT_EQ(100, rig.chips_manager.getPlayerChipsAt(0));
+    EXPECT_EQ(100, rig.player_set.playerAt(0).getCommitted());
+}
+
 // 结束下注轮：先退还多余筹码，再重置下注状态
 TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     GameRig rig;
@@ -367,4 +390,70 @@ TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
 
     EXPECT_EQ(900, rig.chips_manager.getPlayerChipsAt(0)); // 退还 100
     EXPECT_EQ(0, rig.betting_manager.getRoundBet());        // 下注轮已重置
+}
+
+// 摊牌顺序：河牌轮无人下注时，从按钮左侧第一个活跃玩家开始顺时针
+TEST(GameModelTest, ShowdownOrderStartsLeftOfButtonWhenNoAggressor) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0); // btn=0 -> 左侧第一个活跃 = 1
+
+    std::vector<seat_t> order = rig.model.showdownOrder();
+
+    ASSERT_EQ(3u, order.size());
+    EXPECT_EQ(1, order[0]);
+    EXPECT_EQ(2, order[1]);
+    EXPECT_EQ(0, order[2]);
+}
+
+// 摊牌顺序：从河牌轮最后激进者开始顺时针
+TEST(GameModelTest, ShowdownOrderStartsAtLastAggressor) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+
+    rig.action_flow.setActingPlayer(2);
+    rig.action_flow.applyAction(Action::RAISE); // 记录 last_aggressor = 2
+    std::vector<seat_t> order = rig.model.showdownOrder();
+
+    ASSERT_EQ(3u, order.size());
+    EXPECT_EQ(2, order[0]);
+    EXPECT_EQ(0, order[1]);
+    EXPECT_EQ(1, order[2]);
+}
+
+// 非全下摊牌：按顺序逐个摊牌，每次事件只含一名玩家
+TEST(GameModelTest, RevealOnePlayerPerEventWhenNoAllIn) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+
+    std::vector<seat_t> revealed;
+    rig.event_bus.subscribe<Event::HoleCardsRevealed>(
+        [&revealed](const Event::HoleCardsRevealed& event) {
+            ASSERT_EQ(1u, event.players_with_hole_cards.size());
+            revealed.push_back(event.players_with_hole_cards.front().first);
+        });
+
+    rig.model.revealHoleCards();
+
+    ASSERT_EQ(3u, revealed.size());
+    EXPECT_EQ(1, revealed[0]); // 按钮左侧
+    EXPECT_EQ(2, revealed[1]);
+    EXPECT_EQ(0, revealed[2]);
+}
+
+// 全下摊牌：一次性摊开全部在局玩家（含 ALL_IN）
+TEST(GameModelTest, RevealAllAtOnceWhenAllIn) {
+    GameRig rig;
+    rig.startPreflop({1000, 1000, 1000}, 0);
+    rig.player_set.playerAt(1).allIn();
+
+    std::vector<size_t> event_sizes;
+    rig.event_bus.subscribe<Event::HoleCardsRevealed>(
+        [&event_sizes](const Event::HoleCardsRevealed& event) {
+            event_sizes.push_back(event.players_with_hole_cards.size());
+        });
+
+    rig.model.revealHoleCards();
+
+    ASSERT_EQ(1u, event_sizes.size());
+    EXPECT_EQ(3u, event_sizes[0]); // ALL_IN 玩家也被摊开（修复漏牌问题）
 }

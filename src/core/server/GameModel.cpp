@@ -160,11 +160,40 @@ void GameModel::moveActingPlayer() {
 }
 void GameModel::revealAllHoleCards() {
     std::vector<std::pair<seat_t, cards_2_t>> players_with_hole_cards;
-    for (seat_t player : player_set->getActivePlayers()) {
+    for (seat_t player : player_set->getAlivePlayers()) {
         cards_2_t hole_cards = cards_manager->getHoleCardsAt(player);
         players_with_hole_cards.push_back({player, hole_cards});
     }
     event_bus->publish(Event::HoleCardsRevealed{players_with_hole_cards});
+}
+void GameModel::revealHoleCardsInOrder() {
+    for (seat_t seat : showdownOrder()) {
+        cards_2_t hole_cards = cards_manager->getHoleCardsAt(seat);
+        event_bus->publish(Event::HoleCardsRevealed{{{seat, hole_cards}}});
+    }
+}
+void GameModel::revealHoleCards() {
+    if (hasAllInPlayer()) {
+        revealAllHoleCards(); // 全下摊牌：一次全部摊开
+    } else {
+        revealHoleCardsInOrder(); // 非全下摊牌：按顺序逐个亮出
+    }
+}
+std::vector<seat_t> GameModel::showdownOrder() const {
+    std::vector<seat_t> order;
+    // 起始：河牌轮最后激进者；若本轮无人下注，则按钮左侧第一个活跃玩家
+    seat_t first = action_flow->getLastAggressor();
+    if (first == INVALID_SEAT) {
+        first = seat_manager->nextActiveSeat(seat_manager->getBtnSeat());
+    }
+    if (first == INVALID_SEAT) return order;
+
+    seat_t seat = first;
+    do {
+        if (player_set->playerAt(seat).isAlive()) order.push_back(seat);
+        seat = seat_manager->nextSeat(seat);
+    } while (seat != first);
+    return order;
 }
 void GameModel::splitPot() {
     chips_manager->splitThePot(); 
@@ -210,6 +239,12 @@ bool GameModel::isStreetsFinished() const {
 }
 bool GameModel::isNoOnePlayerAlive() const {
     return player_set->getAlivePlayerCount() == 0;
+}
+bool GameModel::hasAllInPlayer() const {
+    for (seat_t seat = 0; seat < player_set->playerCount(); ++seat) {
+        if (player_set->playerAt(seat).isAllIn()) return true;
+    }
+    return false;
 }
 bool GameModel::canStartHand() const {
     return player_set->getAlivePlayerCount() >= 2;

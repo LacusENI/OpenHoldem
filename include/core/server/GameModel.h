@@ -97,8 +97,14 @@ public:
     /* 移至下一个行动的玩家 */
     void moveActingPlayer();
 
-    /* 揭露所有玩家的底牌 */
+    /* 揭露所有玩家的底牌（全下摊牌：一次全部摊开） */
     void revealAllHoleCards();
+    /* 按摊牌顺序逐个揭露底牌（非全下摊牌，每次只摊一人） */
+    void revealHoleCardsInOrder();
+    /* 摊牌亮牌：存在全下玩家时一次全亮，否则按摊牌顺序逐个亮出 */
+    void revealHoleCards();
+    /* 摊牌顺序：自最后激进者（无则按钮左侧）起顺时针的在局玩家 */
+    std::vector<seat_t> showdownOrder() const;
     /* 计算所有的底池 */
     void splitPot();
     /* 无人竞争时结算：整池判给唯一存活玩家 */
@@ -114,6 +120,8 @@ public:
     bool isStreetsFinished() const;
     /* 没有任何玩家留在牌局 */
     bool isNoOnePlayerAlive() const;
+    /* 是否存在仍在牌局的 all-in 玩家 */
+    bool hasAllInPlayer() const;
     /* 是否满足开始一手牌的条件（至少两名在局玩家） */
     bool canStartHand() const;
 };
