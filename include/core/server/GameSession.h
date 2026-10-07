@@ -28,7 +28,7 @@ struct GameSession {
 
     explicit GameSession(IDeck& deck)
         : cards_manager(deck, player_set),
-          model(GameDependencies{event_bus, betting_round, cards_manager, pot_manager, player_set,
+          model(GameDependencies{betting_round, cards_manager, pot_manager, player_set,
                                  seat_manager}),
           controller(event_bus, model) {}
 

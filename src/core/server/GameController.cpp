@@ -1,5 +1,7 @@
 #include "GameController.h"
 
+#include <optional>
+
 #include "Event.hpp"
 #include "EventBus.hpp"
 #include "GameModel.h"
@@ -13,28 +15,35 @@ void GameController::subscribeEvent() {
 }
 
 void GameController::handle(const Event::StartGame& event) {
-    if (!game_model.startGame()) return;
+    std::optional<Event::GameStarted> started = game_model.startGame();
+    if (!started) return;
+    event_bus.publish(*started);
     enterStage(Stage::PREFLOP);
 }
 
 void GameController::startNextHand() {
-    if (!game_model.startNextHand()) return;
+    std::optional<Event::GameStarted> started = game_model.startNextHand();
+    if (!started) return;
+    event_bus.publish(*started);
     enterStage(Stage::PREFLOP);
 }
 
 void GameController::handle(const Event::PlayerJoinRequest& event) {
-    game_model.joinNewPlayer();
+    event_bus.publish(game_model.joinNewPlayer());
 }
 
 void GameController::handle(const Event::PlayerAction& event) {
-    if (!game_model.handlePlayerAction(event)) {
+    std::optional<Event::PlayerActed> acted = game_model.handlePlayerAction(event);
+    if (!acted) {
         // 无效行动：保持当前行动者不变，重新请求其行动
-        game_model.awaitPlayerAction();
+        if (auto waiting = game_model.awaitPlayerAction()) event_bus.publish(*waiting);
         return;
     }
+    event_bus.publish(*acted);
+
     if (!game_model.isBettingRoundEnded()) {
         game_model.moveActingPlayer();
-        game_model.awaitPlayerAction();
+        if (auto waiting = game_model.awaitPlayerAction()) event_bus.publish(*waiting);
         return;
     }
 
@@ -42,7 +51,7 @@ void GameController::handle(const Event::PlayerAction& event) {
 
     switch (decideAfterBettingRound()) {
     case AfterRound::HandOver:
-        game_model.finishGame(); // 冗余防御：无人在局
+        event_bus.publish(game_model.finishGame()); // 冗余防御：无人在局
         break;
     case AfterRound::UncontestedSettle:
         enterUncontestedSettle();
@@ -57,15 +66,15 @@ void GameController::handle(const Event::PlayerAction& event) {
 }
 
 GameController::AfterRound GameController::decideAfterBettingRound() const {
-    if (game_model.isNoOnePlayerAlive()) return AfterRound::HandOver;             // 防御
-    if (game_model.isOnlyOnePlayerAlive()) return AfterRound::UncontestedSettle;  // 无人竞争
-    if (game_model.isStreetsFinished()) return AfterRound::RunoutShowdown;        // 已无可下注者
+    if (game_model.isNoOnePlayerAlive()) return AfterRound::HandOver;            // 防御
+    if (game_model.isOnlyOnePlayerAlive()) return AfterRound::UncontestedSettle; // 无人竞争
+    if (game_model.isStreetsFinished()) return AfterRound::RunoutShowdown;       // 已无可下注者
     if (game_model.getCurrentStage() == Stage::RIVER) return AfterRound::RunoutShowdown;
     return AfterRound::NextStreet;
 }
 
 void GameController::enterStage(Stage stage) {
-    game_model.changeStage(stage); // 发布 StageChanged
+    event_bus.publish(game_model.changeStage(stage)); // 发布 StageChanged
     switch (stage) {
     case Stage::PREFLOP: enterPreflop(); break;
     case Stage::FLOP:
@@ -78,43 +87,43 @@ void GameController::enterStage(Stage stage) {
 
 void GameController::enterPreflop() {
     game_model.shuffleDeck();
-    game_model.dealHoleCards();
-    game_model.startBettingRound();
-    game_model.postSmallBlind();
-    game_model.postBigBlind();
+    for (const auto& event : game_model.dealHoleCards()) event_bus.publish(event);
+    event_bus.publish(game_model.startBettingRound());
+    event_bus.publish(game_model.postSmallBlind());
+    event_bus.publish(game_model.postBigBlind());
     game_model.startActionRound();
-    game_model.awaitPlayerAction();
+    if (auto waiting = game_model.awaitPlayerAction()) event_bus.publish(*waiting);
 }
 
 void GameController::enterPostflop() {
-    game_model.dealCommunityCards();
-    game_model.startBettingRound();
+    event_bus.publish(game_model.dealCommunityCards());
+    event_bus.publish(game_model.startBettingRound());
     game_model.startActionRound();
-    game_model.awaitPlayerAction();
+    if (auto waiting = game_model.awaitPlayerAction()) event_bus.publish(*waiting);
 }
 
 void GameController::enterShowdown() {
-    game_model.dealCommunityCards(); // 补发剩余公共牌（已满 5 张则空操作）
-    game_model.revealHoleCards();
+    event_bus.publish(game_model.dealCommunityCards()); // 补发剩余公共牌（已满则空操作）
+    for (const auto& event : game_model.revealHoleCards()) event_bus.publish(event);
     enterSettlement();
 }
 
 void GameController::enterSettlement() {
-    game_model.changeStage(Stage::SETTLEMENT);
-    game_model.splitPot();
-    game_model.distributePots();
-    game_model.finishGame();
+    event_bus.publish(game_model.changeStage(Stage::SETTLEMENT));
+    event_bus.publish(game_model.splitPot());
+    for (const auto& event : game_model.distributePots()) event_bus.publish(event);
+    event_bus.publish(game_model.finishGame());
 }
 
 void GameController::enterUncontestedSettle() {
-    game_model.changeStage(Stage::SETTLEMENT);
-    game_model.settleUncontested();
-    game_model.finishGame();
+    event_bus.publish(game_model.changeStage(Stage::SETTLEMENT));
+    event_bus.publish(game_model.settleUncontested());
+    event_bus.publish(game_model.finishGame());
 }
 
 void GameController::finishBettingRound() {
     // 先处理 Uncalled Bet（依赖本轮的 bet 数据），再重置下注轮状态
-    game_model.returnUncalledBet();
-    game_model.closeBettingRound();
+    if (auto uncalled = game_model.returnUncalledBet()) event_bus.publish(*uncalled);
+    event_bus.publish(game_model.closeBettingRound());
 }
 } // namespace poker

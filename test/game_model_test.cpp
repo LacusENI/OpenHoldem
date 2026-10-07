@@ -108,11 +108,7 @@ TEST(GameModelTest, StartGamePublishesSessionInfo) {
     rig.seat_manager.setBtnSeat(1);
     rig.betting_round.setBigBlind(20);
 
-    std::optional<Event::GameStarted> captured;
-    rig.event_bus.subscribe<Event::GameStarted>(
-        [&captured](const Event::GameStarted& event) { captured = event; });
-
-    rig.model.startGame();
+    std::optional<Event::GameStarted> captured = rig.model.startGame();
 
     ASSERT_TRUE(captured.has_value());
     EXPECT_EQ(1, captured->btn_seat);
@@ -126,11 +122,11 @@ TEST(GameModelTest, InvalidActionIsRejected) {
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
 
-    // 低于跟注额且未 all-in，判定为 VOID
-    bool accepted = rig.model.handlePlayerAction(
+    // 低于跟注额且未 all-in，判定为无效
+    std::optional<Event::PlayerActed> accepted = rig.model.handlePlayerAction(
         Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
 
-    EXPECT_FALSE(accepted);
+    EXPECT_FALSE(accepted.has_value());
     EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
     EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(acting));
     EXPECT_EQ(1000, rig.pot_manager.getPlayerChipsAt(acting));
@@ -142,10 +138,10 @@ TEST(GameModelTest, ValidActionIsAccepted) {
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
 
-    bool accepted = rig.model.handlePlayerAction(
+    std::optional<Event::PlayerActed> accepted = rig.model.handlePlayerAction(
         Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
 
-    EXPECT_TRUE(accepted);
+    EXPECT_TRUE(accepted.has_value());
     EXPECT_EQ(10, rig.betting_round.getPlayerBetAt(acting));
 }
 
@@ -250,19 +246,14 @@ TEST(GameModelTest, HeadsUpBlindsAndActionOrder) {
     EXPECT_EQ(1, rig.betting_round.getActingPlayer()); // 翻后大盲先行动
 }
 
-// 在局玩家不足 2 人时不应开局，也不广播 GameStarted（P1-2 回归）
+// 在局玩家不足 2 人时不应开局（startGame 返回空，不产生 GameStarted）
 TEST(GameModelTest, StartGameRejectedWhenFewerThanTwoPlayers) {
     GameRig rig;
     rig.seatPlayers({1000, 0}, 0); // 仅 seat0 有筹码
 
-    bool started = false;
-    rig.event_bus.subscribe<Event::GameStarted>([&started](const Event::GameStarted&) {
-        started = true;
-    });
-
-    EXPECT_FALSE(rig.model.startGame());
+    std::optional<Event::GameStarted> started = rig.model.startGame();
+    EXPECT_FALSE(started.has_value());
     EXPECT_FALSE(rig.model.canStartHand());
-    EXPECT_FALSE(started);
 }
 
 // 只剩一名有筹码玩家时，开始下一手应被拒绝（P1-2 回归）
@@ -330,11 +321,7 @@ TEST(GameModelTest, ReturnUncalledBetRefundsLeader) {
     rig.player_set.playerAt(1).allIn();
     rig.player_set.playerAt(2).fold();
 
-    std::optional<Event::UncalledBetReturned> captured;
-    rig.event_bus.subscribe<Event::UncalledBetReturned>(
-        [&captured](const Event::UncalledBetReturned& event) { captured = event; });
-
-    rig.model.returnUncalledBet();
+    std::optional<Event::UncalledBetReturned> captured = rig.model.returnUncalledBet();
 
     ASSERT_TRUE(captured.has_value());
     EXPECT_EQ(0, captured->player);
@@ -422,16 +409,14 @@ TEST(GameModelTest, RevealOnePlayerPerEventWhenNoAllIn) {
     GameRig rig;
     rig.startPreflop({1000, 1000, 1000}, 0);
 
+    std::vector<Event::HoleCardsRevealed> events = rig.model.revealHoleCards();
+
+    ASSERT_EQ(3u, events.size());
     std::vector<seat_t> revealed;
-    rig.event_bus.subscribe<Event::HoleCardsRevealed>(
-        [&revealed](const Event::HoleCardsRevealed& event) {
-            ASSERT_EQ(1u, event.players_with_hole_cards.size());
-            revealed.push_back(event.players_with_hole_cards.front().first);
-        });
-
-    rig.model.revealHoleCards();
-
-    ASSERT_EQ(3u, revealed.size());
+    for (const Event::HoleCardsRevealed& event : events) {
+        ASSERT_EQ(1u, event.players_with_hole_cards.size());
+        revealed.push_back(event.players_with_hole_cards.front().first);
+    }
     EXPECT_EQ(1, revealed[0]); // 按钮左侧
     EXPECT_EQ(2, revealed[1]);
     EXPECT_EQ(0, revealed[2]);
@@ -443,16 +428,10 @@ TEST(GameModelTest, RevealAllAtOnceWhenAllIn) {
     rig.startPreflop({1000, 1000, 1000}, 0);
     rig.player_set.playerAt(1).allIn();
 
-    std::vector<size_t> event_sizes;
-    rig.event_bus.subscribe<Event::HoleCardsRevealed>(
-        [&event_sizes](const Event::HoleCardsRevealed& event) {
-            event_sizes.push_back(event.players_with_hole_cards.size());
-        });
+    std::vector<Event::HoleCardsRevealed> events = rig.model.revealHoleCards();
 
-    rig.model.revealHoleCards();
-
-    ASSERT_EQ(1u, event_sizes.size());
-    EXPECT_EQ(3u, event_sizes[0]); // ALL_IN 玩家也被摊开（修复漏牌问题）
+    ASSERT_EQ(1u, events.size());
+    EXPECT_EQ(3u, events[0].players_with_hole_cards.size()); // ALL_IN 玩家也被摊开
 }
 
 // BettingRoundStarted 携带当前阶段
@@ -460,16 +439,11 @@ TEST(GameModelTest, BettingRoundStartedCarriesStage) {
     GameRig rig;
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
-    std::vector<Stage> stages;
-    rig.event_bus.subscribe<Event::BettingRoundStarted>(
-        [&stages](const Event::BettingRoundStarted& event) { stages.push_back(event.stage); });
-
     rig.model.setCurrentStage(Stage::FLOP);
-    rig.model.startBettingRound();
+    Event::BettingRoundStarted on_flop = rig.model.startBettingRound();
     rig.model.setCurrentStage(Stage::RIVER);
-    rig.model.startBettingRound();
+    Event::BettingRoundStarted on_river = rig.model.startBettingRound();
 
-    ASSERT_EQ(2u, stages.size());
-    EXPECT_EQ(Stage::FLOP, stages[0]);
-    EXPECT_EQ(Stage::RIVER, stages[1]);
+    EXPECT_EQ(Stage::FLOP, on_flop.stage);
+    EXPECT_EQ(Stage::RIVER, on_river.stage);
 }
