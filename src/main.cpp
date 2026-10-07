@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <exception>
 #include <format>
 #include <iostream>
@@ -114,8 +115,15 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
     }
 }
 
-int main() {
-    Deck deck;
+int main(int argc, char** argv) {
+    std::uint32_t seed = Deck::randomSeed();
+    if (argc > 1) {
+        seed = static_cast<std::uint32_t>(std::stoul(argv[1]));
+    }
+    Deck deck(seed);
+    std::cout << std::format("[Demo] deck seed = {} (可用 ./poker {} 复现)\n", deck.getSeed(),
+                             deck.getSeed());
+
     GameSession session(deck);
     EventBus& event_bus = session.event_bus;
     PlayerSet& player_set = session.player_set;
@@ -145,8 +153,7 @@ int main() {
     event_bus.publish(Event::PlayerJoinRequest{});
     event_bus.publish(Event::PlayerJoinRequest{});
 
-    std::random_device rd;
-    std::mt19937 gen(rd());
+    std::mt19937 gen(seed); // 与牌堆同一种子，便于整体复现
     std::uniform_int_distribution<int> dis(100, 300);
     for (Player& player : player_set) {
         player.setChips(dis(gen));

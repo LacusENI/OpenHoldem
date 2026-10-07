@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <vector>
 
 #include "Deck.hpp"
@@ -14,7 +15,7 @@
 using namespace poker;
 
 namespace {
-/* 用真实牌堆跑完整一手，以便覆盖发牌与摊牌 */
+/* 用真实（可播种）牌堆跑完整一手，以便覆盖发牌与摊牌 */
 struct InvariantRig {
     Deck deck;
     GameSession session{deck};
@@ -24,6 +25,8 @@ struct InvariantRig {
     BettingRound& betting = session.betting_round;
     GameModel& model = session.model;
     GameController& controller = session.controller;
+
+    explicit InvariantRig(std::uint32_t seed) : deck(seed) {}
 
     /* 恒真不变量 */
     void checkInvariants(chips_t total) const {
@@ -43,18 +46,16 @@ struct InvariantRig {
         EXPECT_EQ(betting.getRoundBet(), max_bet); // I3 round_bet 为最高注
     }
 };
-} // namespace
 
-// 打完整一手（含摊牌）：过程中筹码守恒、下注/状态自洽；结算后 committed 清零
-TEST(InvariantsTest, FullHandConservesChipsAndClearsCommitted) {
-    InvariantRig rig;
+/* 以指定种子打完整一手（自动跟注/过牌），期间与结算后校验不变量 */
+void runFullHand(std::uint32_t seed) {
+    InvariantRig rig(seed);
     rig.controller.subscribeEvent();
 
     const chips_t total = 3000;
     bool ended = false;
     rig.event_bus.subscribe<Event::WaitingForAction>([&](const Event::WaitingForAction& e) {
         rig.checkInvariants(total);
-        // 一律跟注/过牌，驱动至摊牌
         rig.event_bus.publish(Event::PlayerAction{
             .target_bet = e.round_bet, .is_fold = false, .is_all_in = false});
     });
@@ -72,17 +73,24 @@ TEST(InvariantsTest, FullHandConservesChipsAndClearsCommitted) {
     rig.event_bus.publish(Event::StartGame{});
 
     EXPECT_TRUE(ended);
-    // 结算后：committed 归零，筹码全部回到栈里（已由 checkInvariants 覆盖守恒）
     chips_t committed_sum = 0;
     for (seat_t s = 0; s < rig.players.playerCount(); ++s) {
         committed_sum += rig.players.playerAt(s).getCommitted();
     }
-    EXPECT_EQ(0, committed_sum);
+    EXPECT_EQ(0, committed_sum); // 结算后 committed 清零
+}
+} // namespace
+
+// 多组固定种子下打完整一手（含摊牌）：筹码守恒、下注/状态自洽、结算后 committed 清零
+TEST(InvariantsTest, FullHandConservesChipsAndClearsCommitted) {
+    for (std::uint32_t seed : {1u, 2u, 3u, 42u, 123u, 777u, 2024u, 99991u}) {
+        runFullHand(seed);
+    }
 }
 
 // 边池切分守恒：Σ pot.chips == Σ committed
 TEST(InvariantsTest, SidePotSumEqualsCommitted) {
-    Deck deck;
+    Deck deck(1);
     GameSession session(deck);
     PlayerSet& players = session.player_set;
     players.resize(3);

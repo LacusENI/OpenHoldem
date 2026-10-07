@@ -137,6 +137,7 @@ add_executable(poker_test
         test/cards_manager_test.cpp
         test/chips_calc_test.cpp
         test/chips_manager_test.cpp
+        test/deck_test.cpp
         test/eval_hand_test.cpp
         test/game_model_test.cpp
         test/game_types_test.cpp
