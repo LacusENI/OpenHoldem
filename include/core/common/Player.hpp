@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cassert>
 #include <string>
 
 #include <magic_enum/magic_enum.hpp>
@@ -39,6 +40,7 @@ public:
     }
     /* 玩家支付筹码；扣至 0 且原为活跃则进入 all-in */
     void payChips(chips_t delta) {
+        assert(delta <= chips && "payChips: 筹码不足");
         chips -= delta;
         committed += delta;
         if (chips == 0 && state == State::ACTIVE) allIn();
@@ -53,6 +55,7 @@ public:
     /* 退还未被跟注的筹码：恢复筹码、本轮下注与总投入，并解除 all-in */
     void refund(chips_t amount) {
         if (amount <= 0) return;
+        assert(amount <= bet && amount <= committed && "refund: 退款超过投入");
         bet -= amount;
         committed -= amount;
         winChips(amount);

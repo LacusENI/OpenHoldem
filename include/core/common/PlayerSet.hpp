@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <ranges>
 #include <vector>
 
@@ -16,8 +17,14 @@ public:
     PlayerSet() = default;
     ~PlayerSet() = default;
 
-    const Player& playerAt(seat_t seat_idx) const { return players[seat_idx]; }
-    Player& playerAt(seat_t seat_idx) { return players[seat_idx]; }
+    const Player& playerAt(seat_t seat_idx) const {
+        assert(seat_idx >= 0 && seat_idx < playerCount() && "playerAt: 座位越界");
+        return players[seat_idx];
+    }
+    Player& playerAt(seat_t seat_idx) {
+        assert(seat_idx >= 0 && seat_idx < playerCount() && "playerAt: 座位越界");
+        return players[seat_idx];
+    }
     auto begin() { return players.begin(); }
     auto end() { return players.end(); }
     auto begin() const { return players.begin(); }
