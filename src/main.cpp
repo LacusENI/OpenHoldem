@@ -31,8 +31,8 @@ void printEvent(const Event::WaitingForAction& event) {
 }
 
 void printEvent(const Event::PlayerActed& event) {
-    std::cout << std::format("[Event] Player Acted | @P{} ${} {}\n", event.player, event.bet,
-                             to_string(event.action));
+    std::cout << std::format("[Event] Player Acted | @P{} ${} {}{}\n", event.player, event.bet,
+                             to_string(event.action), event.is_all_in ? " (all-in)" : "");
 }
 
 void printEvent(const Event::PotSplited& event) {

@@ -150,8 +150,9 @@ TEST(BettingRoundTest, PostflopCheckAroundEndsFlow) {
     EXPECT_FALSE(rig.betting_round.isFlowEnded()); // round_bet 为 0 也要行动
     EXPECT_EQ(3, rig.betting_round.needsToActCount());
 
+    const Event::PlayerAction check = {.target_bet = 0, .is_fold = false, .is_all_in = false};
     for (int acted = 0; acted < 3; ++acted) {
-        rig.betting_round.applyAction(Action::CHECK);
+        EXPECT_TRUE(rig.betting_round.applyAction(check).has_value());
         if (rig.betting_round.isFlowEnded()) break;
         rig.betting_round.moveActingPlayer();
     }
@@ -164,22 +165,21 @@ TEST(BettingRoundTest, RaiseReopensForOthers) {
     RoundRig rig;
     rig.setup(3, 0); // SB=1 BB=2 UTG=0
     rig.betting_round.setupToStart(Stage::PREFLOP);
+    rig.betting_round.setRoundBet(10); // 代表大盲 bring-in
     EXPECT_EQ(0, rig.betting_round.getActingPlayer());
 
-    rig.player_set.playerAt(0).setBet(30);
-    rig.betting_round.setRoundBet(30);
-    rig.betting_round.applyAction(Action::RAISE);
+    const Event::PlayerAction call = {.target_bet = 30, .is_fold = false, .is_all_in = false};
+    EXPECT_TRUE(rig.betting_round.applyAction(call).has_value()); // 0 加注至 30
+    EXPECT_EQ(30, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.betting_round.needsToActCount());
 
     rig.betting_round.moveActingPlayer();
     EXPECT_EQ(1, rig.betting_round.getActingPlayer());
-    rig.player_set.playerAt(1).setBet(30);
-    rig.betting_round.applyAction(Action::CALL);
+    EXPECT_TRUE(rig.betting_round.applyAction(call).has_value());
 
     rig.betting_round.moveActingPlayer();
     EXPECT_EQ(2, rig.betting_round.getActingPlayer());
-    rig.player_set.playerAt(2).setBet(30);
-    rig.betting_round.applyAction(Action::CALL);
+    EXPECT_TRUE(rig.betting_round.applyAction(call).has_value());
 
     EXPECT_EQ(0, rig.betting_round.needsToActCount());
     EXPECT_TRUE(rig.betting_round.isFlowEnded());
@@ -195,4 +195,53 @@ TEST(BettingRoundTest, FlowEndsWithSinglePlayerAlive) {
     rig.player_set.playerAt(2).fold();
 
     EXPECT_TRUE(rig.betting_round.isFlowEnded());
+}
+
+// ===== 处理玩家行动 =====
+
+// 全下行动：返回的 PlayerActed 标记 is_all_in，且玩家状态变为 ALL_IN
+TEST(BettingRoundTest, ApplyActionReportsAllIn) {
+    RoundRig rig;
+    rig.setup({1000, 100, 1000}, 0); // seat1 只有 100
+    rig.betting_round.setupToStart(Stage::PREFLOP);
+    rig.betting_round.setRoundBet(10);
+    rig.betting_round.setActingPlayer(1);
+
+    auto acted = rig.betting_round.applyAction(
+        Event::PlayerAction{.target_bet = 100, .is_fold = false, .is_all_in = false});
+
+    ASSERT_TRUE(acted.has_value());
+    EXPECT_TRUE(acted->is_all_in);
+    EXPECT_TRUE(rig.player_set.playerAt(1).isAllIn());
+}
+
+// 普通跟注：is_all_in 为 false
+TEST(BettingRoundTest, ApplyActionCallIsNotAllIn) {
+    RoundRig rig;
+    rig.setup({1000, 1000, 1000}, 0);
+    rig.betting_round.setupToStart(Stage::PREFLOP);
+    rig.betting_round.setRoundBet(10);
+    rig.betting_round.setActingPlayer(1);
+
+    auto acted = rig.betting_round.applyAction(
+        Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
+
+    ASSERT_TRUE(acted.has_value());
+    EXPECT_FALSE(acted->is_all_in);
+    EXPECT_EQ(Action::CALL, acted->action);
+}
+
+// 无效目标：返回 nullopt，不改变下注额
+TEST(BettingRoundTest, ApplyActionRejectsInvalidTarget) {
+    RoundRig rig;
+    rig.setup(3, 0);
+    rig.betting_round.setupToStart(Stage::PREFLOP);
+    rig.betting_round.setRoundBet(10);
+    rig.betting_round.setActingPlayer(1);
+
+    auto acted = rig.betting_round.applyAction(
+        Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
+
+    EXPECT_FALSE(acted.has_value());
+    EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(1));
 }

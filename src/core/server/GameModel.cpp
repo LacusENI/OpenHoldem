@@ -1,5 +1,6 @@
 #include "GameModel.h"
 
+#include <optional>
 #include <utility>
 #include <vector>
 
@@ -12,7 +13,6 @@
 #include "GameTypes.hpp"
 #include "PlayerSet.hpp"
 #include "SeatManager.h"
-#include "chips_calc.h"
 
 namespace poker {
 void GameModel::joinNewPlayer() {
@@ -124,35 +124,11 @@ void GameModel::awaitPlayerAction() {
     event_bus->publish(event);
 }
 bool GameModel::handlePlayerAction(const Event::PlayerAction& event) {
-    seat_t acting_player = betting_round->getActingPlayer();
-
-    if (event.is_fold) {
-        // 状态变更统一由 BettingRound::applyAction 处理（含 fold）
-        betting_round->applyAction(Action::FOLD);
-        event_bus->publish(
-            Event::PlayerActed{.player = acting_player, .bet = 0, .action = Action::FOLD});
-        return true;
-    }
-    algo::BettingContext context = {.player_chips = chips_manager->getPlayerChipsAt(acting_player),
-                                    .player_bet = betting_round->getPlayerBetAt(acting_player),
-                                    .round_bet = betting_round->getRoundBet(),
-                                    .min_raise_delta = betting_round->getMinRaiseDelta(),
-                                    .can_raise = betting_round->canPlayerRaise(acting_player)};
-    algo::BettingInput input = {.target_bet = event.target_bet, .is_fold = event.is_fold};
-    algo::BettingResult result = algo::process_betting(context, input);
-
-    if (result.isValid()) {
-        chips_manager->moveChipsToPot(acting_player, result.bet_delta);
-        betting_round->setPlayerBetAt(acting_player, result.player_bet);
-        betting_round->setMinRaiseDelta(result.min_raise_delta);
-        betting_round->setRoundBet(result.round_bet);
-        betting_round->applyAction(result.action);
-        event_bus->publish(Event::PlayerActed{
-            .player = acting_player, .bet = result.player_bet, .action = result.action});
-        return true;
-    }
-    // 无效输入：不改变任何状态，由调用方重新请求该玩家行动
-    return false;
+    // 行动的处理（构建下注上下文、落子、更新行动顺序）由 BettingRound 负责
+    std::optional<Event::PlayerActed> acted = betting_round->applyAction(event);
+    if (!acted) return false; // 无效输入：由调用方重新请求该玩家行动
+    event_bus->publish(*acted);
+    return true;
 }
 void GameModel::moveActingPlayer() {
     betting_round->moveActingPlayer();

@@ -5,6 +5,7 @@
 #include "Player.hpp"
 #include "PlayerSet.hpp"
 #include "SeatManager.h"
+#include "chips_calc.h"
 
 namespace poker {
 // ===== 金额 / 盲注 =====
@@ -107,7 +108,7 @@ void BettingRound::setupToStart(Stage stage) {
     has_incomplete_raise = false;
 }
 
-void BettingRound::applyAction(Action action) {
+void BettingRound::recordAction(Action action) {
     if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE ||
         action == Action::ALL_IN_UNDER_RAISE) {
         last_aggressor = acting_player;
@@ -123,5 +124,36 @@ void BettingRound::applyAction(Action action) {
     if (action == Action::ALL_IN_UNDER_RAISE) {
         has_incomplete_raise = true;
     }
+}
+
+std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerAction& event) {
+    const seat_t player_seat = acting_player;
+    if (!hasActingPlayer()) return std::nullopt;
+
+    if (event.is_fold) {
+        recordAction(Action::FOLD);
+        return Event::PlayerActed{
+            .player = player_seat, .bet = 0, .action = Action::FOLD, .is_all_in = false};
+    }
+
+    const Player& player = player_set->playerAt(player_seat);
+    algo::BettingContext context = {.player_chips = player.getChips(),
+                                    .player_bet = player.getBet(),
+                                    .round_bet = round_bet,
+                                    .min_raise_delta = min_raise_delta,
+                                    .can_raise = canPlayerRaise(player_seat)};
+    algo::BettingInput input = {.target_bet = event.target_bet, .is_fold = event.is_fold};
+    algo::BettingResult result = algo::process_betting(context, input);
+    if (!result.isValid()) return std::nullopt;
+
+    player_set->playerAt(player_seat).commit(result.player_bet);
+    round_bet = result.round_bet;
+    min_raise_delta = result.min_raise_delta;
+    recordAction(result.action);
+
+    return Event::PlayerActed{.player = player_seat,
+                              .bet = result.player_bet,
+                              .action = result.action,
+                              .is_all_in = player_set->playerAt(player_seat).isAllIn()};
 }
 } // namespace poker

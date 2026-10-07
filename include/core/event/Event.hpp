@@ -108,6 +108,7 @@ struct PlayerActed {
     seat_t player;
     chips_t bet;
     Action action;
+    bool is_all_in;
 };
 
 GET_EVENT_NAME(PlayerActed)

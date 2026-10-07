@@ -407,7 +407,9 @@ TEST(GameModelTest, ShowdownOrderStartsAtLastAggressor) {
     rig.startPreflop({1000, 1000, 1000}, 0);
 
     rig.betting_round.setActingPlayer(2);
-    rig.betting_round.applyAction(Action::RAISE); // 记录 last_aggressor = 2
+    // 2 加注至 30，记录 last_aggressor = 2
+    rig.betting_round.applyAction(
+        Event::PlayerAction{.target_bet = 30, .is_fold = false, .is_all_in = false});
     std::vector<seat_t> order = rig.model.showdownOrder();
 
     ASSERT_EQ(3u, order.size());

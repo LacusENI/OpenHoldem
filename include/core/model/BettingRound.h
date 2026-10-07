@@ -2,6 +2,7 @@
 
 #include <optional>
 
+#include "Event.hpp"
 #include "GameTypes.hpp"
 
 namespace poker {
@@ -34,6 +35,9 @@ private:
     seat_t acting_player = INVALID_SEAT;
     seat_t last_aggressor = INVALID_SEAT;
     bool has_incomplete_raise = false;
+
+    /* 记录已分类行动对行动顺序的影响（acted / 玩家状态 / 是否完整加注） */
+    void recordAction(Action action);
 
 public:
     BettingRound(PlayerSet* player_set, SeatManager* seat_manager)
@@ -82,7 +86,8 @@ public:
     void moveActingPlayer();
     /* 初始化本轮起始行动者并清空 acted 标记（应在盲注投入之后调用） */
     void setupToStart(Stage stage);
-    /* 记录一次行动：更新 acted / 玩家状态 / 是否完整加注 */
-    void applyAction(Action action);
+    /* 处理当前行动者的一次行动：构建下注上下文、落子筹码与下注额、更新行动顺序；
+       无效输入返回 nullopt，否则返回可供广播的 PlayerActed */
+    std::optional<Event::PlayerActed> applyAction(const Event::PlayerAction& event);
 };
 } // namespace poker
