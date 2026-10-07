@@ -1,19 +1,34 @@
 #pragma once
 
-
 #include "Event.hpp"
+#include "GameTypes.hpp"
 
 namespace poker {
 class EventBus;
 class GameModel;
 
 /**
- * @brief 游戏控制器
+ * @brief 游戏控制器（状态机）
+ * @details 阶段迁移：下注轮结束时由纯决策函数决定去向，再统一经 enterStage 进入。
  */
 class GameController {
 private:
     EventBus& event_bus;
     GameModel& game_model;
+
+    /* 下注轮结束后的去向（纯决策结果） */
+    enum class AfterRound { HandOver, UncontestedSettle, RunoutShowdown, NextStreet };
+
+    /* 纯决策：只读模型状态，不产生副作用 */
+    AfterRound decideAfterBettingRound() const;
+
+    /* 进入某阶段的唯一入口（设置 stage 并派发副作用） */
+    void enterStage(Stage stage);
+    void enterPreflop();
+    void enterPostflop();
+    void enterShowdown();
+    void enterSettlement();
+    void enterUncontestedSettle();
 
 public:
     GameController(EventBus& event_bus, GameModel& model)
@@ -34,19 +49,6 @@ public:
 
     /* 结束本下注轮：退还未跟注筹码、重置下注状态并发布结束事件 */
     void finishBettingRound();
-    /* 无人竞争：整池判给唯一存活玩家 */
-    void handleUncontestedPot();
-    /* 已无可继续下注者：直接进入摊牌 */
-    void handleStreetsFinished();
-    /* 进入下一阶段；河牌则进入摊牌 */
-    void advanceToNextStage();
-
-    /* 翻牌前阶段 */
-    void processPreflopStage();
-    /* 翻牌后阶段 */
-    void processPostflopStage();
-    /* 摊牌阶段 */
-    void processShowdownStage(); 
 };
 
 } // namespace poker

@@ -54,6 +54,9 @@ void runFullHand(std::uint32_t seed) {
 
     const chips_t total = 3000;
     bool ended = false;
+    std::vector<Stage> stages;
+    rig.event_bus.subscribe<Event::StageChanged>(
+        [&](const Event::StageChanged& s) { stages.push_back(s.stage); });
     rig.event_bus.subscribe<Event::WaitingForAction>([&](const Event::WaitingForAction& e) {
         rig.checkInvariants(total);
         rig.event_bus.publish(Event::PlayerAction{
@@ -78,6 +81,11 @@ void runFullHand(std::uint32_t seed) {
         committed_sum += rig.players.playerAt(s).getCommitted();
     }
     EXPECT_EQ(0, committed_sum); // 结算后 committed 清零
+
+    // 状态机：完整一手应依次经过 PREFLOP→FLOP→TURN→RIVER→SHOWDOWN→SETTLEMENT
+    const std::vector<Stage> expected = {Stage::PREFLOP,  Stage::FLOP,      Stage::TURN,
+                                         Stage::RIVER,    Stage::SHOWDOWN,  Stage::SETTLEMENT};
+    EXPECT_EQ(expected, stages);
 }
 } // namespace
 
