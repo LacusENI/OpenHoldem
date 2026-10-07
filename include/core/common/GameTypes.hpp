@@ -14,16 +14,14 @@ inline constexpr seat_t INVALID_SEAT = -1;
 enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 
 enum class Action {
-    VOID,
-    CALL,
-    CHECK,
-    RAISE,
-    BET,
-    FOLD,
-    ALL_IN_UNDER_CALL,
-    ALL_IN_CALL,
-    ALL_IN_UNDER_RAISE,
-    ALL_IN_RAISE
+    Void,
+    Fold,
+    Check,
+    Call,
+    Bet,
+    Raise,
+    Undercall,  // 全下但不足跟注额
+    ShortAllIn  // 全下但未达到最小加注额
 };
 
 /* 下一阶段；已到末尾（SETTLEMENT）时保持不变，避免产生越界的 Stage 值 */

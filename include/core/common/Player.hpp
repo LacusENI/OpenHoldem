@@ -30,28 +30,30 @@ public:
     void setBet(chips_t new_bet) { bet = new_bet; }
     chips_t getCommitted() const { return committed; }
 
-    /* 玩家获取筹码 */
-    void winChips(chips_t delta) { chips += delta; }
-    /* 玩家支付筹码 */
+    /* 玩家获取筹码；若由 all-in 恢复为有筹码则解除 all-in */
+    void winChips(chips_t delta) {
+        chips += delta;
+        if (state == State::ALL_IN && chips > 0) state = State::ACTIVE;
+    }
+    /* 玩家支付筹码；扣至 0 且原为活跃则进入 all-in */
     void payChips(chips_t delta) {
         chips -= delta;
         committed += delta;
+        if (chips == 0 && state == State::ACTIVE) allIn();
     }
     bool commit(chips_t target_bet) {
         chips_t delta = target_bet - bet;
         if (delta > chips) return false;
         bet = target_bet;
         payChips(delta);
-        if (chips == 0) allIn();
         return true;
     }
     /* 退还未被跟注的筹码：恢复筹码、本轮下注与总投入，并解除 all-in */
     void refund(chips_t amount) {
         if (amount <= 0) return;
-        chips += amount;
         bet -= amount;
         committed -= amount;
-        if (state == State::ALL_IN && chips > 0) state = State::ACTIVE;
+        winChips(amount);
     }
     /* 该玩家是否仍需要行动：活跃，且本轮尚未行动或未跟平当前注 */
     bool needsToAct(chips_t round_bet) const {

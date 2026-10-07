@@ -90,17 +90,15 @@ void ClientController::handle(const Event::PlayerActed& event) {
     GlobalLogger::debug("[ClientController] EventListener(PlayerActed)");
     PlayerStatus player_state;
     switch (event.action) {
-    case Action::CALL: player_state = PlayerStatus::CALLED; break;
-    case Action::CHECK: player_state = PlayerStatus::CHECKED; break;
-    case Action::RAISE: player_state = PlayerStatus::RAISED; break;
-    case Action::BET: player_state = PlayerStatus::BET; break;
-    case Action::FOLD: player_state = PlayerStatus::FOLDED; break;
-    case Action::ALL_IN_UNDER_CALL:
-    case Action::ALL_IN_UNDER_RAISE:
-    case Action::ALL_IN_CALL:
-    case Action::ALL_IN_RAISE: player_state = PlayerStatus::ALL_IN; break;
+    case Action::Call: player_state = PlayerStatus::CALLED; break;
+    case Action::Check: player_state = PlayerStatus::CHECKED; break;
+    case Action::Raise: player_state = PlayerStatus::RAISED; break;
+    case Action::Bet: player_state = PlayerStatus::BET; break;
+    case Action::Fold: player_state = PlayerStatus::FOLDED; break;
     default: player_state = PlayerStatus::IDLE;
     }
+    // all-in 由玩家状态表达（Action 不再区分完整 all-in）
+    if (event.is_all_in) player_state = PlayerStatus::ALL_IN;
     client_model->player_states[event.player] = player_state;
     chips_t delta = event.bet - client_model->player_bets[event.player];
     client_model->pot += delta;

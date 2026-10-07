@@ -109,19 +109,15 @@ void BettingRound::setupToStart(Stage stage) {
 }
 
 void BettingRound::recordAction(Action action) {
-    if (action == Action::RAISE || action == Action::BET || action == Action::ALL_IN_RAISE ||
-        action == Action::ALL_IN_UNDER_RAISE) {
+    if (action == Action::Raise || action == Action::Bet || action == Action::ShortAllIn) {
         last_aggressor = acting_player;
         has_incomplete_raise = false;
     }
     player_set->playerAt(acting_player).setActed();
-    if (action == Action::FOLD) {
+    if (action == Action::Fold) {
         player_set->playerAt(acting_player).fold();
-    } else if (action == Action::ALL_IN_CALL || action == Action::ALL_IN_RAISE ||
-               action == Action::ALL_IN_UNDER_CALL || action == Action::ALL_IN_UNDER_RAISE) {
-        player_set->playerAt(acting_player).allIn();
     }
-    if (action == Action::ALL_IN_UNDER_RAISE) {
+    if (action == Action::ShortAllIn) {
         has_incomplete_raise = true;
     }
 }
@@ -131,9 +127,9 @@ std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerA
     if (!hasActingPlayer()) return std::nullopt;
 
     if (event.is_fold) {
-        recordAction(Action::FOLD);
+        recordAction(Action::Fold);
         return Event::PlayerActed{
-            .player = player_seat, .bet = 0, .action = Action::FOLD, .is_all_in = false};
+            .player = player_seat, .bet = 0, .action = Action::Fold, .is_all_in = false};
     }
 
     const Player& player = player_set->playerAt(player_seat);

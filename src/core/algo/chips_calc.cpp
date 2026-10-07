@@ -25,20 +25,19 @@ struct BettingAction {
 };
 
 Action get_action(BettingAction betting) {
+    using enum Action;
+    // 仅"不足额全下"是动作层面的特殊：不足跟注（Undercall）与不足最小加注（ShortAllIn）
     if (betting.isAllIn()) {
-        if (betting.isIncompleteCall()) return Action::ALL_IN_UNDER_CALL;
-        if (betting.isCompleteCall()) return Action::ALL_IN_CALL;
-        if (!betting.can_raise) return Action::VOID;
-        if (betting.isIncompleteRaise()) return Action::ALL_IN_UNDER_RAISE;
-        if (betting.isCompleteRaise()) return Action::ALL_IN_RAISE;
+        if (betting.isIncompleteCall()) return Undercall;
+        if (betting.isIncompleteRaise()) return betting.can_raise ? ShortAllIn : Void;
     }
     if (betting.isCompleteCall()) {
-        return betting.player_bet == betting.round_bet ? Action::CHECK : Action::CALL;
+        return betting.player_bet == betting.round_bet ? Check : Call;
     }
     if (betting.isCompleteRaise() && betting.can_raise) {
-        return betting.round_bet == 0 ? Action::BET : Action::RAISE;
+        return betting.round_bet == 0 ? Bet : Raise;
     }
-    return Action::VOID;
+    return Void;
 }
 
 BettingResult process_betting(BettingAction betting) {
@@ -48,7 +47,7 @@ BettingResult process_betting(BettingAction betting) {
     result.round_bet = std::max(betting.round_bet, betting.target_bet);
     result.min_raise_delta = std::max(betting.min_raise_delta, betting.raiseDelta());
     result.action = get_action(betting);
-    result.is_target_bet_valid = result.action != Action::VOID;
+    result.is_target_bet_valid = result.action != Action::Void;
     result.has_sufficient_chips = betting.isChipsEnough();
     return result;
 }
@@ -63,7 +62,7 @@ BettingResult process_betting(BettingContext context, BettingInput input) {
         .can_raise = context.can_raise,
     };
     BettingResult result = process_betting(betting);
-    if (input.is_fold) result.action = Action::FOLD;
+    if (input.is_fold) result.action = Action::Fold;
     return result;
 }
 

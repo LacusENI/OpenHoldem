@@ -71,20 +71,14 @@ void GameModel::dealCommunityCards() {
 void GameModel::postSmallBlind() {
     seat_t sb_seat = seat_manager->getSbSeat();
     chips_t posted = betting_round->applySmallBlind(sb_seat);
-    chips_manager->moveChipsToPot(sb_seat, posted);
-    if (player_set->playerAt(sb_seat).getChips() == 0) {
-        player_set->playerAt(sb_seat).allIn();
-    }
+    chips_manager->moveChipsToPot(sb_seat, posted); // payChips 会在扣至 0 时置 all-in
     event_bus->publish(
         Event::BlindPosted{.player = sb_seat, .amount = posted, .is_big_blind = false});
 }
 void GameModel::postBigBlind() {
     seat_t bb_seat = seat_manager->getBbSeat();
     chips_t posted = betting_round->applyBigBlind(bb_seat);
-    chips_manager->moveChipsToPot(bb_seat, posted);
-    if (player_set->playerAt(bb_seat).getChips() == 0) {
-        player_set->playerAt(bb_seat).allIn();
-    }
+    chips_manager->moveChipsToPot(bb_seat, posted); // payChips 会在扣至 0 时置 all-in
     event_bus->publish(
         Event::BlindPosted{.player = bb_seat, .amount = posted, .is_big_blind = true});
 }

@@ -228,7 +228,7 @@ TEST(BettingRoundTest, ApplyActionCallIsNotAllIn) {
 
     ASSERT_TRUE(acted.has_value());
     EXPECT_FALSE(acted->is_all_in);
-    EXPECT_EQ(Action::CALL, acted->action);
+    EXPECT_EQ(Action::Call, acted->action);
 }
 
 // 无效目标：返回 nullopt，不改变下注额
