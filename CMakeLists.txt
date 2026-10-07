@@ -22,8 +22,10 @@ add_library(poker_core
 
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
+        include/core/algo/new_chips_calc.h
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
+        src/core/algo/new_chips_calc.cpp
         
         include/core/client/ClientModel.h
         include/core/client/ClientController.h
@@ -143,6 +145,7 @@ add_executable(poker_test
         test/game_types_test.cpp
         test/global_logger_test.cpp
         test/invariants_test.cpp
+        test/new_chips_calc_test.cpp
         test/player_test.cpp
         test/seat_manager_test.cpp
         test/side_pots_test.cpp
