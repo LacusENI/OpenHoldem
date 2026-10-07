@@ -454,3 +454,22 @@ TEST(GameModelTest, RevealAllAtOnceWhenAllIn) {
     ASSERT_EQ(1u, event_sizes.size());
     EXPECT_EQ(3u, event_sizes[0]); // ALL_IN 玩家也被摊开（修复漏牌问题）
 }
+
+// BettingRoundStarted 携带当前阶段
+TEST(GameModelTest, BettingRoundStartedCarriesStage) {
+    GameRig rig;
+    rig.seatPlayers({1000, 1000, 1000}, 0);
+
+    std::vector<Stage> stages;
+    rig.event_bus.subscribe<Event::BettingRoundStarted>(
+        [&stages](const Event::BettingRoundStarted& event) { stages.push_back(event.stage); });
+
+    rig.model.setCurrentStage(Stage::FLOP);
+    rig.model.startBettingRound();
+    rig.model.setCurrentStage(Stage::RIVER);
+    rig.model.startBettingRound();
+
+    ASSERT_EQ(2u, stages.size());
+    EXPECT_EQ(Stage::FLOP, stages[0]);
+    EXPECT_EQ(Stage::RIVER, stages[1]);
+}

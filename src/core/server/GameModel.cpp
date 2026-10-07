@@ -84,7 +84,7 @@ void GameModel::postBigBlind() {
 }
 void GameModel::startBettingRound() {
     betting_round.resetBets();
-    event_bus.publish(Event::BettingRoundStarted{});
+    event_bus.publish(Event::BettingRoundStarted{.stage = current_stage});
 }
 void GameModel::startActionRound() {
     betting_round.setupToStart(current_stage);
