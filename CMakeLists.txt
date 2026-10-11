@@ -22,7 +22,6 @@ add_library(poker_core
 
         include/core/algo/chips_calc.h
         include/core/algo/eval_hand.h
-        include/core/algo/new_chips_calc.h
         include/core/algo/side_pots.h        
         src/core/algo/chips_calc.cpp
         src/core/algo/eval_hand.cpp
