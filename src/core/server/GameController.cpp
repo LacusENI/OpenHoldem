@@ -14,7 +14,7 @@ void GameController::subscribeEvent() {
     event_bus.subscribe<Event::PlayerAction>(&GameController::handle, this);
 }
 
-void GameController::handle(const Event::StartGame& event) {
+void GameController::handle(const Event::StartGame& _) {
     std::optional<Event::GameStarted> started = game_model.startGame();
     if (!started) return;
     event_bus.publish(*started);
@@ -28,7 +28,7 @@ void GameController::startNextHand() {
     enterStage(Stage::PREFLOP);
 }
 
-void GameController::handle(const Event::PlayerJoinRequest& event) {
+void GameController::handle(const Event::PlayerJoinRequest& _) {
     event_bus.publish(game_model.joinNewPlayer());
 }
 
@@ -75,14 +75,14 @@ GameController::AfterRound GameController::decideAfterBettingRound() const {
 
 void GameController::enterStage(Stage stage) {
     event_bus.publish(game_model.changeStage(stage)); // 发布 StageChanged
-    switch (stage) {
-    case Stage::PREFLOP: enterPreflop(); break;
-    case Stage::FLOP:
-    case Stage::TURN:
-    case Stage::RIVER: enterPostflop(); break;
-    case Stage::SHOWDOWN: enterShowdown(); break;
-    default: break; // SETTLEMENT 由各自的结算方法负责
+    if (isPreflop(stage)) {
+        enterPreflop();
+    } else if (isPostflop(stage)) {
+        enterPostflop();
+    } else if (stage == Stage::SHOWDOWN) {
+        enterShowdown();
     }
+    // SETTLEMENT 由各自的结算方法负责
 }
 
 void GameController::enterPreflop() {
