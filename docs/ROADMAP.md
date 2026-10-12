@@ -34,6 +34,11 @@
 
 - [ ] **显式出站端口 `ClientGateway`**：`GameController` 显式 `broadcast/sendTo`；删除 `ServerIoAdapter`；`EventBus` 仅入站。见 `docs/design/client-gateway.md`（`DECISIONS.md` 0011，Proposed）。
 - [ ] 序列化（`EventSerializer`）与最新 `Event` 字段对齐。
+- [ ] **结构化事件日志（JSON 化）**：把 `logging::EventLogger` 与 demo 中手写的 `printEvent` 重载，统一为"序列化 `GameEvent` 再打印"（复用 `serializeEvent`），消除逐事件格式串、避免字段漂移。
+  - 前置：`EventSerializer` 对齐（上一项）且序列化对 demo 可用——目前它在 `application` 且编译不过，demo 只链 `poker_core`。
+  - 建议随出站端口 `ClientGateway` 一并做成 `LoggingGateway` / sink，而非单独重订阅总线；泛型订阅需一张与 `GameEvent` variant 同源的类型列表。
+  - 边界：`presentation`（`ConsoleView`/`Formatter`）是给人看的界面，**保留专用格式化**，不 JSON 化。
+  - 性能：事件频率低，nlohmann/json 开销可忽略；只需对日志按级别短路，避免热路径无条件序列化。
 - [ ] 修复/重写 `src/server_main.cpp`、`src/client_main.cpp`（现为旧代码）。
 - [ ] 修复 `presentation`（`ConsoleView`/`Formatter`，旧 `Action` 命名）。
 - [ ] CMake 选项化（核心 / 应用 / 测试目标分离）+ CI。
