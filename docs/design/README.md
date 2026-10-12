@@ -23,6 +23,7 @@
 | [`reopen-betting.md`](reopen-betting.md) | 重开下注（TDA 47）：规则、易错例、算法 | 结论已定（实现待做） | ROADMAP P0 |
 | [`client-gateway.md`](client-gateway.md) | 显式出站端口 `ClientGateway` | Proposed | DECISIONS 0011 |
 | [`event-protocol.md`](event-protocol.md) | 事件协议修订：按方向拆分 + 去派生字段 | Proposed | DECISIONS 0011 / 0012 |
+| [`state-composition.md`](state-composition.md) | 状态组合化（拆分类组件 / 函数式核心） | **未来方向（暂缓）** | ROADMAP P5 |
 | （待补）`player-intent-model.md` | 显式玩家行动模型 / `betting.h` | Proposed | DECISIONS 0012 |
 
 > 注：`player-intent-model` 目前只在 `DECISIONS.md` 与对话中，后续按需整理成正式提案。
