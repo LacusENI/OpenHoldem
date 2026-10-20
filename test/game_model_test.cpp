@@ -125,8 +125,8 @@ TEST(GameModelTest, InvalidActionIsRejected) {
     const seat_t acting = rig.betting_round.getActingPlayer();
 
     // 低于跟注额且未 all-in，判定为无效
-    std::optional<Event::PlayerActed> accepted = rig.model.handlePlayerAction(
-        Command::SubmitAction{.target_bet = 1, .is_fold = false});
+    std::optional<Event::PlayerActed> accepted =
+        rig.model.handlePlayerAction(Command::SubmitAction{.target_bet = 1, .is_fold = false});
 
     EXPECT_FALSE(accepted.has_value());
     EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
@@ -140,8 +140,8 @@ TEST(GameModelTest, ValidActionIsAccepted) {
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
 
-    std::optional<Event::PlayerActed> accepted = rig.model.handlePlayerAction(
-        Command::SubmitAction{.target_bet = 10, .is_fold = false});
+    std::optional<Event::PlayerActed> accepted =
+        rig.model.handlePlayerAction(Command::SubmitAction{.target_bet = 10, .is_fold = false});
 
     EXPECT_TRUE(accepted.has_value());
     EXPECT_EQ(10, rig.betting_round.getPlayerBetAt(acting));
@@ -150,7 +150,7 @@ TEST(GameModelTest, ValidActionIsAccepted) {
 // 控制器收到无效行动后应重新请求同一玩家，而不是切换行动者（P0-3 回归）
 TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
     GameRig rig;
-    GameController controller(rig.event_bus, rig.client_gateway, rig.model);
+    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
 
@@ -172,8 +172,7 @@ TEST(GameModelTest, StartNextHandResetsRoundStateAndAdvancesButton) {
     const seat_t btn_before = rig.seat_manager.getBtnSeat();
 
     // 制造一些单手牌状态
-    rig.model.handlePlayerAction(
-        Command::SubmitAction{.target_bet = 10, .is_fold = false});
+    rig.model.handlePlayerAction(Command::SubmitAction{.target_bet = 10, .is_fold = false});
     rig.cards_manager.setCommunityCards(
         {Card("Ac"), Card("Kd"), Card("Qh"), Card("Js"), Card("2c")});
     rig.model.splitPot();
@@ -290,7 +289,7 @@ TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
 // 无人竞争（只剩一人）时整池直接判给唯一存活者，不切分底池
 TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
     GameRig rig;
-    GameController controller(rig.event_bus, rig.client_gateway, rig.model);
+    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0); // SB=1(5), BB=2(10), UTG=0
 
     int winners_declared = 0;
@@ -360,7 +359,7 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
 // 结束下注轮：先退还多余筹码，再重置下注状态
 TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     GameRig rig;
-    GameController controller(rig.event_bus, rig.client_gateway, rig.model);
+    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
     rig.player_set.playerAt(0).payChips(200);
@@ -373,7 +372,7 @@ TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
     controller.finishBettingRound();
 
     EXPECT_EQ(900, rig.pot_manager.getPlayerChipsAt(0)); // 退还 100
-    EXPECT_EQ(0, rig.betting_round.getRoundBet());        // 下注轮已重置
+    EXPECT_EQ(0, rig.betting_round.getRoundBet());       // 下注轮已重置
 }
 
 // 摊牌顺序：河牌轮无人下注时，从按钮左侧第一个活跃玩家开始顺时针
@@ -396,8 +395,7 @@ TEST(GameModelTest, ShowdownOrderStartsAtLastAggressor) {
 
     rig.betting_round.setActingPlayer(2);
     // 2 加注至 30，记录 last_aggressor = 2
-    rig.betting_round.applyAction(
-        Command::SubmitAction{.target_bet = 30, .is_fold = false});
+    rig.betting_round.applyAction(Command::SubmitAction{.target_bet = 30, .is_fold = false});
     std::vector<seat_t> order = rig.model.showdownOrder();
 
     ASSERT_EQ(3u, order.size());

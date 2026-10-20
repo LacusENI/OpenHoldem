@@ -1,7 +1,5 @@
 #pragma once
 
-#include <memory>
-
 #include "ClientGateway.h"
 #include "Event.hpp"
 #include "GameTypes.hpp"
@@ -11,10 +9,10 @@ class EventBus;
 class GameModel;
 
 /**
- * @brief 游戏控制器（状态机）
+ * @brief 服务器游戏控制器（状态机）
  * @details 阶段迁移：下注轮结束时由纯决策函数决定去向，再统一经 enterStage 进入。
  */
-class GameController {
+class ServerController {
 private:
     EventBus& event_bus;
     ClientGateway& client_gateway;
@@ -35,10 +33,9 @@ private:
     void enterUncontestedSettle();
 
 public:
-    GameController(EventBus& event_bus, ClientGateway& client_gateway,
-                   GameModel& model)
+    ServerController(EventBus& event_bus, ClientGateway& client_gateway, GameModel& model)
         : event_bus(event_bus), client_gateway(client_gateway), game_model(model) {}
-    ~GameController() = default;
+    ~ServerController() = default;
 
     /* 订阅事件 */
     void subscribeEvent();

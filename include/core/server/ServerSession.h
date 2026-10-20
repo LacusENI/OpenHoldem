@@ -1,13 +1,11 @@
 #pragma once
 
-#include <memory>
-
 #include "BettingRound.h"
 #include "CardsManager.h"
 #include "ClientGateway.h"
 #include "Deck.hpp"
 #include "EventBus.hpp"
-#include "GameController.h"
+#include "ServerController.h"
 #include "GameModel.h"
 #include "PlayerSet.hpp"
 #include "PotManager.h"
@@ -27,7 +25,7 @@ struct GameSession {
     CardsManager cards_manager;
     PotManager pot_manager{player_set, seat_manager};
     GameModel model;
-    GameController controller;
+    ServerController controller;
 
     GameSession(IDeck& deck, ClientGateway& client_gateway)
         : cards_manager(deck, player_set),

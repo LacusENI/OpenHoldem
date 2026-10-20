@@ -46,11 +46,11 @@ add_library(poker_core
         src/core/model/PotManager.cpp
         src/core/model/SeatManager.cpp
         
-        include/core/server/GameController.h
         include/core/server/GameModel.h
-        include/core/server/GameSession.h
-        src/core/server/GameController.cpp
+        include/core/server/ServerController.h
+        include/core/server/ServerSession.h
         src/core/server/GameModel.cpp
+        src/core/server/ServerController.cpp
         include/core/interface/Logger.h
         include/core/interface/ClientGateway.h
 )

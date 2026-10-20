@@ -28,7 +28,7 @@ int main() {
     PotManager pot_manager;
     SeatManager seat_manager;
     GameModel game_model(&event_bus, &deck, &betting_round, &pot_manager, &seat_manager);
-    GameController game_controller(&event_bus, &game_model);
+    ServerController game_controller(&event_bus, &game_model);
     ServerIoAdapter io_adapter(&event_bus);
 
     network::ServerNetwork network(&event_bus);
@@ -37,13 +37,6 @@ int main() {
     event_logger.subscribeEvent();
     io_adapter.subscribeEvent();
     game_controller.subscribeEvent();
-
-    GlobalLogger::trace = [](std::string_view message) { spdlog::trace(message); };
-    GlobalLogger::info = [](std::string_view message) { spdlog::info(message); };
-    GlobalLogger::debug = [](std::string_view message) { spdlog::debug(message); };
-    GlobalLogger::warn = [](std::string_view message) { spdlog::warn(message); };
-    GlobalLogger::error = [](std::string_view message) { spdlog::error(message); };
-    GlobalLogger::critical = [](std::string_view message) { spdlog::critical(message); };
 
     io_adapter.sendToAllClient = [&network](const GameEvent& event) {
         std::string message = serializeEvent(event);
@@ -57,7 +50,8 @@ int main() {
     bool connected = false;
     for (int i = 0; i < 5; i++) {
         if (network.start(port)) {
-            spdlog::info(std::format("[Server] 服务端已启动，正在等待客户端连接 (端口 {})...", port));
+            spdlog::info(
+                std::format("[Server] 服务端已启动，正在等待客户端连接 (端口 {})...", port));
             connected = true;
             break;
         }

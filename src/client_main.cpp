@@ -1,4 +1,3 @@
-#include <chrono>
 #include <thread>
 
 #include <SFML/Network.hpp>
@@ -40,13 +39,6 @@ int main() {
         std::string message = serializeEvent(event);
         network.sendMessage(message);
     };
-
-    GlobalLogger::trace = [](std::string_view message) { spdlog::trace(message); };
-    GlobalLogger::info = [](std::string_view message) { spdlog::info(message); };
-    GlobalLogger::debug = [](std::string_view message) { spdlog::debug(message); };
-    GlobalLogger::warn = [](std::string_view message) { spdlog::warn(message); };
-    GlobalLogger::error = [](std::string_view message) { spdlog::error(message); };
-    GlobalLogger::critical = [](std::string_view message) { spdlog::critical(message); };
 
     if (network.connect(host, port)) {
         spdlog::info("[Client] 成功连接到服务端！");

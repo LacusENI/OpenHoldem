@@ -2,15 +2,13 @@
 #include <exception>
 #include <format>
 #include <iostream>
-#include <memory>
 #include <string>
-#include <utility>
 
 #include "ClientGateway.h"
 #include "Deck.hpp"
 #include "Event.hpp"
 #include "EventBus.hpp"
-#include "GameSession.h"
+#include "ServerSession.h"
 #include "GameTypes.hpp"
 #include "Player.hpp"
 
@@ -122,7 +120,7 @@ int main(int argc, char** argv) {
     EventBus& event_bus = session.event_bus;
     PlayerSet& player_set = session.player_set;
     GameModel& game_model = session.model;
-    GameController& game_controller = session.controller;
+    ServerController& game_controller = session.controller;
 
     game_controller.subscribeEvent();
 
