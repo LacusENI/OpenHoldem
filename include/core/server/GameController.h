@@ -1,5 +1,8 @@
 #pragma once
 
+#include <memory>
+
+#include "ClientGateway.h"
 #include "Event.hpp"
 #include "GameTypes.hpp"
 
@@ -14,6 +17,7 @@ class GameModel;
 class GameController {
 private:
     EventBus& event_bus;
+    ClientGateway& client_gateway;
     GameModel& game_model;
 
     /* 下注轮结束后的去向（纯决策结果） */
@@ -31,18 +35,19 @@ private:
     void enterUncontestedSettle();
 
 public:
-    GameController(EventBus& event_bus, GameModel& model)
-        : event_bus(event_bus), game_model(model) {}
+    GameController(EventBus& event_bus, ClientGateway& client_gateway,
+                   GameModel& model)
+        : event_bus(event_bus), client_gateway(client_gateway), game_model(model) {}
     ~GameController() = default;
 
     /* 订阅事件 */
     void subscribeEvent();
     /* 处理玩家加入请求 */
-    void handle(const Event::PlayerJoinRequest& event);
+    void handle(const Command::JoinRequest&);
     /* 处理玩家输入 */
-    void handle(const Event::PlayerAction& event);
+    void handle(const Command::SubmitAction&);
     /* 开始一局游戏 */
-    void handle(const Event::StartGame& event);
+    void handle(const Command::StartGame&);
 
     /* 开始下一手牌（重置状态并轮转按钮） */
     void startNextHand();

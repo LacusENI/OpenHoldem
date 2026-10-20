@@ -88,6 +88,6 @@ public:
     void setupToStart(Stage stage);
     /* 处理当前行动者的一次行动：构建下注上下文、落子筹码与下注额、更新行动顺序；
        无效输入返回 nullopt，否则返回可供广播的 PlayerActed */
-    std::optional<Event::PlayerActed> applyAction(const Event::PlayerAction& event);
+    std::optional<Event::PlayerActed> applyAction(const Command::SubmitAction& event);
 };
 } // namespace poker

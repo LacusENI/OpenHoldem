@@ -14,10 +14,10 @@
 #include "SeatManager.h"
 
 namespace poker {
-Event::NewPlayerJoined GameModel::joinNewPlayer() {
+Event::PlayerJoined GameModel::joinNewPlayer() {
     player_set.addNewPlayer();
-    return Event::NewPlayerJoined{.new_seat = player_set.playerCount() - 1,
-                                  .player_count = player_set.playerCount()};
+    return Event::PlayerJoined{.seat = player_set.playerCount() - 1,
+                               .player_count = player_set.playerCount()};
 }
 std::optional<Event::GameStarted> GameModel::startGame() {
     resetForNewHand();
@@ -77,16 +77,14 @@ Event::BlindPosted GameModel::postBigBlind() {
     player_set.playerAt(bb_seat).payChips(posted); // payChips 会在扣至 0 时置 all-in
     return Event::BlindPosted{.player = bb_seat, .amount = posted, .is_big_blind = true};
 }
-Event::BettingRoundStarted GameModel::startBettingRound() {
+void GameModel::startBettingRound() {
     betting_round.resetBets();
-    return Event::BettingRoundStarted{.stage = current_stage};
 }
 void GameModel::startActionRound() {
     betting_round.setupToStart(current_stage);
 }
-Event::BettingRoundEnded GameModel::closeBettingRound() {
+void GameModel::closeBettingRound() {
     betting_round.resetBets();
-    return Event::BettingRoundEnded{.stage = current_stage};
 }
 std::optional<Event::UncalledBetReturned> GameModel::returnUncalledBet() {
     auto uncalled = betting_round.findUncalledBet();
@@ -94,17 +92,18 @@ std::optional<Event::UncalledBetReturned> GameModel::returnUncalledBet() {
     player_set.playerAt(uncalled->seat).refund(uncalled->amount);
     return Event::UncalledBetReturned{.player = uncalled->seat, .amount = uncalled->amount};
 }
-std::optional<Event::WaitingForAction> GameModel::awaitPlayerAction() {
+std::optional<Event::TurnStarted> GameModel::awaitPlayerAction() {
     if (!betting_round.hasActingPlayer()) return std::nullopt; // 无有效行动者
     seat_t acting_player = betting_round.getActingPlayer();
-    return Event::WaitingForAction{.player = acting_player,
-                                   .player_chips = pot_manager.getPlayerChipsAt(acting_player),
-                                   .player_bet = betting_round.getPlayerBetAt(acting_player),
-                                   .round_bet = betting_round.getRoundBet(),
-                                   .min_raise = betting_round.getMinRaise(),
-                                   .can_raise = betting_round.canPlayerRaise(acting_player)};
+    return Event::TurnStarted{.player = acting_player,
+                              .player_chips = pot_manager.getPlayerChipsAt(acting_player),
+                              .player_bet = betting_round.getPlayerBetAt(acting_player),
+                              .round_bet = betting_round.getRoundBet(),
+                              .min_raise = betting_round.getMinRaise(),
+                              .can_raise = betting_round.canPlayerRaise(acting_player)};
 }
-std::optional<Event::PlayerActed> GameModel::handlePlayerAction(const Event::PlayerAction& event) {
+std::optional<Event::PlayerActed> GameModel::handlePlayerAction(
+    const Command::SubmitAction& event) {
     return betting_round.applyAction(event);
 }
 void GameModel::moveActingPlayer() {
@@ -145,24 +144,24 @@ std::vector<seat_t> GameModel::showdownOrder() const {
     } while (seat != first);
     return order;
 }
-Event::PotSplited GameModel::splitPot() {
+void GameModel::splitPot() {
     pot_manager.splitThePot();
-    std::vector<chips_t> pot_chips;
-    for (const Pot& pot : pot_manager.getPots()) {
-        pot_chips.push_back(pot.chips);
-    }
-    return Event::PotSplited{.pot_chips = pot_chips};
 }
-Event::WinnerDeclared GameModel::settleUncontested() {
+Event::PotAwarded GameModel::settleUncontested() {
     // 唯一存活玩家直接赢得整池（不划分边池）
     auto alive = player_set.getAlivePlayers();
     seat_t winner = *alive.begin();
+    // 整池 = 所有在局玩家（含弃牌者的死钱）的本局投入，须在 awardPotTo 清空底池前汇总
+    chips_t total = 0;
+    for (seat_t seat : player_set.getPlayingPlayers()) {
+        total += player_set.playerAt(seat).getCommitted();
+    }
     pot_manager.awardPotTo(winner);
     pot_manager.clearCommitted(); // 结算后清零本局投入
-    return Event::WinnerDeclared{.pot_index = 0, .winners = {winner}};
+    return Event::PotAwarded{.pot_index = 0, .chips = total, .award_to = {winner}};
 }
-std::vector<Event::WinnerDeclared> GameModel::distributePots() {
-    std::vector<Event::WinnerDeclared> events;
+std::vector<Event::PotAwarded> GameModel::distributePots() {
+    std::vector<Event::PotAwarded> events;
     int pot_count = pot_manager.getPots().size();
     for (int pot_index = pot_count - 1; pot_index >= 0; pot_index--) {
         const Pot& pot = pot_manager.getPots()[pot_index];
@@ -175,7 +174,8 @@ std::vector<Event::WinnerDeclared> GameModel::distributePots() {
         }
         std::vector<seat_t> winners = cards_manager.determineWinners(contenders);
         pot_manager.distributePot(pot.chips, winners);
-        events.push_back(Event::WinnerDeclared{.pot_index = pot_index, .winners = winners});
+        events.push_back(
+            Event::PotAwarded{.pot_index = pot_index, .chips = pot.chips, .award_to = winners});
     }
     pot_manager.clearCommitted(); // 结算后清零本局投入
     return events;

@@ -1,5 +1,4 @@
 #pragma once
-#include <string>
 #include <string_view>
 #include <type_traits>
 #include <variant>
@@ -14,34 +13,38 @@
     }
 
 namespace poker {
+namespace Command {
+struct JoinRequest {
+    unsigned uid = 0; // 用户ID（保留字段）
+};
+struct SubmitAction {
+    chips_t target_bet;
+    bool is_fold;
+};
+struct StartGame {
+    chips_t big_blind;     // 大盲注金额
+    chips_t initial_chips; // 每名玩家初始筹码
+};
+} // namespace Command
+
 namespace Event {
-struct PlayerJoinRequest {
-    std::string player_name;
+struct JoinResponse {
+    unsigned uid = 0; // 用户ID（保留字段）
+    seat_t seat;      // 给玩家分配的座位号
 };
 
-GET_EVENT_NAME(PlayerJoinRequest)
-
-struct NewPlayerJoined {
-    seat_t new_seat;
+struct PlayerJoined {
+    unsigned uid = 0; // 用户ID（保留字段）
+    seat_t seat;
     int player_count;
 };
 
-GET_EVENT_NAME(NewPlayerJoined)
-
-struct PlayerJoinResponse {
-    seat_t player_seat;
-};
-
-GET_EVENT_NAME(PlayerJoinResponse)
-
-struct StartGame {};
-
-GET_EVENT_NAME(StartGame)
+GET_EVENT_NAME(PlayerJoined)
 
 struct GameStarted {
-    seat_t btn_seat;
-    chips_t big_blind;
-    int player_count;
+    seat_t btn_seat;   // 按钮位
+    chips_t big_blind; // 大盲注
+    int player_count;  // 玩家数量
 };
 
 GET_EVENT_NAME(GameStarted)
@@ -73,19 +76,7 @@ struct CommunityCardsDealt {
 
 GET_EVENT_NAME(CommunityCardsDealt)
 
-struct BettingRoundStarted {
-    Stage stage;
-};
-
-GET_EVENT_NAME(BettingRoundStarted)
-
-struct BettingRoundEnded {
-    Stage stage;
-};
-
-GET_EVENT_NAME(BettingRoundEnded)
-
-struct WaitingForAction {
+struct TurnStarted {
     seat_t player;
     chips_t player_chips;
     chips_t player_bet;
@@ -94,15 +85,7 @@ struct WaitingForAction {
     bool can_raise;
 };
 
-GET_EVENT_NAME(WaitingForAction)
-
-struct PlayerAction {
-    chips_t target_bet;
-    bool is_fold;
-    bool is_all_in;
-};
-
-GET_EVENT_NAME(PlayerAction)
+GET_EVENT_NAME(TurnStarted)
 
 struct PlayerActed {
     seat_t player;
@@ -119,18 +102,11 @@ struct HoleCardsRevealed {
 
 GET_EVENT_NAME(HoleCardsRevealed)
 
-struct PotSplited {
-    std::vector<chips_t> pot_chips;
-};
-
-GET_EVENT_NAME(PotSplited);
-
-struct WinnerDeclared {
+struct PotAwarded {
     int pot_index;
-    std::vector<seat_t> winners;
+    chips_t chips;
+    std::vector<seat_t> award_to;
 };
-
-GET_EVENT_NAME(WinnerDeclared)
 
 struct UncalledBetReturned {
     seat_t player;
@@ -145,13 +121,11 @@ GET_EVENT_NAME(GameEnded)
 
 } // namespace Event
 
-using GameEvent =
-    std::variant<Event::PlayerJoinRequest, Event::NewPlayerJoined, Event::PlayerJoinResponse,
-                 Event::GameStarted, Event::HoleCardsDealt, Event::StageChanged,
-                 Event::BlindPosted, Event::CommunityCardsDealt, Event::BettingRoundStarted,
-                 Event::BettingRoundEnded, Event::WaitingForAction, Event::PlayerAction,
-                 Event::PlayerActed, Event::HoleCardsRevealed, Event::PotSplited,
-                 Event::WinnerDeclared, Event::UncalledBetReturned, Event::GameEnded>;
+using GameEvent = std::variant<Event::PlayerJoined, Event::JoinResponse, Event::GameStarted,
+                               Event::HoleCardsDealt, Event::StageChanged, Event::BlindPosted,
+                               Event::CommunityCardsDealt, Event::TurnStarted, Event::PlayerActed,
+                               Event::HoleCardsRevealed, Event::PotAwarded,
+                               Event::UncalledBetReturned, Event::GameEnded>;
 
 namespace NetworkEvent {
 struct ClientConnected {

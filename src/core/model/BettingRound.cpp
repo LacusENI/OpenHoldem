@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cassert>
 
+#include "Event.hpp"
 #include "Player.hpp"
 #include "PlayerSet.hpp"
 #include "SeatManager.h"
@@ -123,7 +124,7 @@ void BettingRound::recordAction(Action action) {
     }
 }
 
-std::optional<Event::PlayerActed> BettingRound::applyAction(const Event::PlayerAction& event) {
+std::optional<Event::PlayerActed> BettingRound::applyAction(const Command::SubmitAction& event) {
     assert(hasActingPlayer() && "applyAction: 无当前行动者");
     const seat_t player_seat = acting_player;
     if (!hasActingPlayer()) return std::nullopt;

@@ -2,8 +2,11 @@
 #include <exception>
 #include <format>
 #include <iostream>
+#include <memory>
 #include <string>
+#include <utility>
 
+#include "ClientGateway.h"
 #include "Deck.hpp"
 #include "Event.hpp"
 #include "EventBus.hpp"
@@ -17,7 +20,7 @@ void printEvent(const Event::BlindPosted& event) {
     std::cout << std::format("[Event] Blind Posted | @P{} ${}\n", event.player, event.amount);
 }
 
-void printEvent(const Event::WaitingForAction& event) {
+void printEvent(const Event::TurnStarted& event) {
     std::cout << std::format(
         "[Event] Waiting For Action | "
         "@P{} chips:${} bet:${} round-bet:${} min-raise:${} can-raise:{}\n",
@@ -30,20 +33,12 @@ void printEvent(const Event::PlayerActed& event) {
                              to_string(event.action), event.is_all_in ? " (all-in)" : "");
 }
 
-void printEvent(const Event::PotSplited& event) {
-    std::cout << "[Event] Pot Splited | ";
-    for (chips_t chips : event.pot_chips) {
-        std::cout << "$" << chips << " ";
-    }
-    std::cout << "\n";
-}
-
-void printEvent(const Event::WinnerDeclared& event) {
+void printEvent(const Event::PotAwarded event) {
     std::string msg;
-    for (seat_t player : event.winners) {
+    for (seat_t player : event.award_to) {
         msg += std::format("@P{} ", player);
     }
-    std::cout << std::format("[Event] Winner | {}\n", msg);
+    std::cout << std::format("[Event] PotAwared | {} ${} {}\n", event.pot_index, event.chips, msg);
 }
 
 void printEvent(const Event::UncalledBetReturned& event) {
@@ -73,13 +68,13 @@ void printGameModel(const GameModel& model) {
     }
 }
 
-Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
+Command::SubmitAction getPlayerInput(const Event::TurnStarted& event) {
     while (true) {
         std::cout << std::format("@P{} >>> ", event.player);
         std::string input;
         std::cin >> input;
         if (input == "f") {
-            return Event::PlayerAction{.target_bet = 0, .is_fold = true, .is_all_in = false};
+            return {.target_bet = 0, .is_fold = true};
         } else {
             try {
                 int target_bet = std::stoi(input);
@@ -93,8 +88,7 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
                     continue;
                 }
                 if (target_bet - event.player_bet == event.player_chips) {
-                    return Event::PlayerAction{
-                        .target_bet = target_bet, .is_fold = false, .is_all_in = true};
+                    return {.target_bet = target_bet, .is_fold = false};
                 }
                 if (target_bet < event.round_bet) {
                     std::cout << std::format("Under the call(${}).\n", event.round_bet);
@@ -106,8 +100,7 @@ Event::PlayerAction getPlayerInput(const Event::WaitingForAction& event) {
                 }
                 if (target_bet == event.round_bet ||
                     (target_bet > event.round_bet && target_bet >= event.min_raise)) {
-                    return Event::PlayerAction{
-                        .target_bet = target_bet, .is_fold = false, .is_all_in = false};
+                    return {.target_bet = target_bet, .is_fold = false};
                 }
             } catch (const std::exception& e) {
             }
@@ -124,7 +117,8 @@ int main(int argc, char** argv) {
     std::cout << std::format("[Demo] deck seed = {} (可用 ./poker {} 复现)\n", deck.getSeed(),
                              deck.getSeed());
 
-    GameSession session(deck);
+    ClientGateway client_gateway;
+    GameSession session(deck, client_gateway);
     EventBus& event_bus = session.event_bus;
     PlayerSet& player_set = session.player_set;
     GameModel& game_model = session.model;
@@ -132,26 +126,25 @@ int main(int argc, char** argv) {
 
     game_controller.subscribeEvent();
 
-    event_bus.subscribe<Event::WaitingForAction>(
+    event_bus.subscribe<Event::TurnStarted>(
         [&game_model](const auto& _) { printGameModel(game_model); });
     event_bus.subscribe<Event::GameEnded>(
         [&game_model](const auto& _) { printGameModel(game_model); });
     event_bus.subscribe<Event::BlindPosted>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::WaitingForAction>([](const auto& event) { printEvent(event); });
+    event_bus.subscribe<Event::TurnStarted>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::PlayerActed>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::WinnerDeclared>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::PotSplited>([](const auto& event) { printEvent(event); });
+    event_bus.subscribe<Event::PotAwarded>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::UncalledBetReturned>([](const auto& event) { printEvent(event); });
     event_bus.subscribe<Event::HoleCardsRevealed>([](const auto& event) { printEvent(event); });
 
-    event_bus.subscribe<Event::WaitingForAction>(
+    event_bus.subscribe<Event::TurnStarted>(
         [&event_bus](const auto& event) { event_bus.publish(getPlayerInput(event)); });
 
-    event_bus.publish(Event::PlayerJoinRequest{});
-    event_bus.publish(Event::PlayerJoinRequest{});
-    event_bus.publish(Event::PlayerJoinRequest{});
-    event_bus.publish(Event::PlayerJoinRequest{});
-    event_bus.publish(Event::PlayerJoinRequest{});
+    event_bus.publish(Command::JoinRequest{});
+    event_bus.publish(Command::JoinRequest{});
+    event_bus.publish(Command::JoinRequest{});
+    event_bus.publish(Command::JoinRequest{});
+    event_bus.publish(Command::JoinRequest{});
 
     std::mt19937 gen(seed); // 与牌堆同一种子，便于整体复现
     std::uniform_int_distribution<int> dis(100, 300);
@@ -159,7 +152,7 @@ int main(int argc, char** argv) {
         player.setChips(dis(gen));
     }
 
-    event_bus.publish(Event::StartGame{});
+    event_bus.publish(Command::StartGame{});
 
     return 0;
 }

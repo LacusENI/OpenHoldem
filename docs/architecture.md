@@ -1,8 +1,6 @@
 # ARCHITECTURE
 
-> OpenHoldem（`refactor/v9` / `demo-v9`）架构地图。
-> 本文只做"地图"：分层、模块职责、依赖方向、数据流、不变量、构建目标。
-> 决策的**理由**见 `docs/DECISIONS.md`；待办见 `docs/ROADMAP.md`。
+> OpenHoldem 架构地图
 
 ## 1. 总览与分层
 

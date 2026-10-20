@@ -150,7 +150,7 @@ TEST(BettingRoundTest, PostflopCheckAroundEndsFlow) {
     EXPECT_FALSE(rig.betting_round.isFlowEnded()); // round_bet 为 0 也要行动
     EXPECT_EQ(3, rig.betting_round.needsToActCount());
 
-    const Event::PlayerAction check = {.target_bet = 0, .is_fold = false, .is_all_in = false};
+    const Command::SubmitAction check = {.target_bet = 0, .is_fold = false};
     for (int acted = 0; acted < 3; ++acted) {
         EXPECT_TRUE(rig.betting_round.applyAction(check).has_value());
         if (rig.betting_round.isFlowEnded()) break;
@@ -168,7 +168,7 @@ TEST(BettingRoundTest, RaiseReopensForOthers) {
     rig.betting_round.setRoundBet(10); // 代表大盲 bring-in
     EXPECT_EQ(0, rig.betting_round.getActingPlayer());
 
-    const Event::PlayerAction call = {.target_bet = 30, .is_fold = false, .is_all_in = false};
+    const Command::SubmitAction call = {.target_bet = 30, .is_fold = false};
     EXPECT_TRUE(rig.betting_round.applyAction(call).has_value()); // 0 加注至 30
     EXPECT_EQ(30, rig.betting_round.getRoundBet());
     EXPECT_EQ(2, rig.betting_round.needsToActCount());
@@ -208,7 +208,7 @@ TEST(BettingRoundTest, ApplyActionReportsAllIn) {
     rig.betting_round.setActingPlayer(1);
 
     auto acted = rig.betting_round.applyAction(
-        Event::PlayerAction{.target_bet = 100, .is_fold = false, .is_all_in = false});
+        Command::SubmitAction{.target_bet = 100, .is_fold = false});
 
     ASSERT_TRUE(acted.has_value());
     EXPECT_TRUE(acted->is_all_in);
@@ -224,7 +224,7 @@ TEST(BettingRoundTest, ApplyActionCallIsNotAllIn) {
     rig.betting_round.setActingPlayer(1);
 
     auto acted = rig.betting_round.applyAction(
-        Event::PlayerAction{.target_bet = 10, .is_fold = false, .is_all_in = false});
+        Command::SubmitAction{.target_bet = 10, .is_fold = false});
 
     ASSERT_TRUE(acted.has_value());
     EXPECT_FALSE(acted->is_all_in);
@@ -240,7 +240,7 @@ TEST(BettingRoundTest, ApplyActionRejectsInvalidTarget) {
     rig.betting_round.setActingPlayer(1);
 
     auto acted = rig.betting_round.applyAction(
-        Event::PlayerAction{.target_bet = 1, .is_fold = false, .is_all_in = false});
+        Command::SubmitAction{.target_bet = 1, .is_fold = false});
 
     EXPECT_FALSE(acted.has_value());
     EXPECT_EQ(0, rig.betting_round.getPlayerBetAt(1));

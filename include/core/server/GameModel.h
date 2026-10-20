@@ -60,7 +60,7 @@ public:
     Event::StageChanged advanceStage() { return changeStage(next_stage(current_stage)); }
 
     /* 加入新玩家 */
-    Event::NewPlayerJoined joinNewPlayer();
+    Event::PlayerJoined joinNewPlayer();
 
     /* 开始一局游戏（会话开始，初始化第一手牌状态）；玩家不足 2 人返回 nullopt */
     std::optional<Event::GameStarted> startGame();
@@ -82,17 +82,17 @@ public:
     Event::BlindPosted postBigBlind();
 
     /* 开始下注轮 */
-    Event::BettingRoundStarted startBettingRound();
+    void startBettingRound();
     /* 初始化本轮行动顺序（应在盲注投入之后调用） */
     void startActionRound();
     /* 关闭下注轮 */
-    Event::BettingRoundEnded closeBettingRound();
+    void closeBettingRound();
     /* 退还被唯一最高下注者未被跟注的多余筹码；无则返回 nullopt */
     std::optional<Event::UncalledBetReturned> returnUncalledBet();
     /* 等待玩家行动；无有效行动者返回 nullopt */
-    std::optional<Event::WaitingForAction> awaitPlayerAction();
+    std::optional<Event::TurnStarted> awaitPlayerAction();
     /* 处理玩家行动；无效输入返回 nullopt */
-    std::optional<Event::PlayerActed> handlePlayerAction(const Event::PlayerAction& event);
+    std::optional<Event::PlayerActed> handlePlayerAction(const Command::SubmitAction& event);
     /* 移至下一个行动的玩家 */
     void moveActingPlayer();
 
@@ -105,11 +105,11 @@ public:
     /* 摊牌顺序：自最后激进者（无则按钮左侧）起顺时针的在局玩家 */
     std::vector<seat_t> showdownOrder() const;
     /* 计算所有的底池 */
-    Event::PotSplited splitPot();
+    void splitPot();
     /* 无人竞争时结算：整池判给唯一存活玩家 */
-    Event::WinnerDeclared settleUncontested();
+    Event::PotAwarded settleUncontested();
     /* 瓜分所有的底池 */
-    std::vector<Event::WinnerDeclared> distributePots();
+    std::vector<Event::PotAwarded> distributePots();
 
     /* 下注轮是否已结束 */
     bool isBettingRoundEnded() const;
