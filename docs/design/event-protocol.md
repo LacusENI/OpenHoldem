@@ -24,3 +24,6 @@
 - `PotsAwarded {pot_index, amount, award_to}` — 合并原 `PotSplited`（`pot_chips`）+ `WinnerDeclared`（`pot_index`, `winners`），每个底池一条。
 - `BettingRoundEnded {stage}` — 候选删除（改由客户端从事实流派生）。
 - `BettingRoundStarted {stage}` - 候选删除
+
+> 当前状态：
+> 除了 `Event::TurnStarted` 保留了字段，其余均已落实

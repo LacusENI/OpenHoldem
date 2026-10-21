@@ -2,7 +2,7 @@
 
 > OpenHoldem 架构地图
 
-## 1. 总览与分层
+## 总览与分层
 
 ```
 core/
@@ -18,6 +18,37 @@ application/
     network/  # 网络 (依赖 SFML/Network)
     presentation/  # 表现层 
     serialization/  # 序列化 (依赖 nlohmann/json)
+```
+
+## 简略类图（服务器）
+
+```mermaid
+classDiagram
+    class EventBus {
+        +subscribe() void
+        +publish() void
+    }
+    class ClientGateway {
+        +boardcast() void
+        +sendto() void
+    }
+    class ServerController {
+        +handle() void
+    }
+    ServerController ..> EventBus
+    ServerController ..> ClientGateway
+    ServerController ..> GameModel
+    GameModel ..> BettingRound
+    GameModel ..> CardsManager
+    GameModel ..> PlayerSet
+    GameModel ..> PotManager
+    GameModel ..> SeatManager
+    BettingRound ..> PlayerSet
+    BettingRound ..> SeatManager
+    CardsManager ..> PlayerSet
+    PotManager ..> PlayerSet
+    SeatManager ..> PlayerSet
+    PlayerSet *-- Player
 ```
 
 ## 2. 核心运行时对象（服务端）

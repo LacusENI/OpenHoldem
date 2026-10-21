@@ -96,7 +96,7 @@ std::optional<Event::TurnStarted> GameModel::awaitPlayerAction() {
     if (!betting_round.hasActingPlayer()) return std::nullopt; // 无有效行动者
     seat_t acting_player = betting_round.getActingPlayer();
     return Event::TurnStarted{.player = acting_player,
-                              .player_chips = pot_manager.getPlayerChipsAt(acting_player),
+                              .player_chips = player_set.playerAt(acting_player).getChips(),
                               .player_bet = betting_round.getPlayerBetAt(acting_player),
                               .round_bet = betting_round.getRoundBet(),
                               .min_raise = betting_round.getMinRaise(),
