@@ -34,9 +34,6 @@ add_library(poker_core
         include/core/event/Event.hpp
         include/core/event/EventBus.hpp
 
-        include/core/interface/ClientIoAdapter.h
-        include/core/interface/ServerIoAdapter.h
-
         include/core/model/BettingRound.h
         include/core/model/CardsManager.h
         include/core/model/PotManager.h
@@ -53,6 +50,7 @@ add_library(poker_core
         src/core/server/ServerController.cpp
         include/core/interface/Logger.h
         include/core/interface/ClientGateway.h
+        include/core/interface/ServerGateway.h
 )
 
 target_include_directories(poker_core PUBLIC

@@ -2,20 +2,50 @@
 #include <exception>
 #include <format>
 #include <iostream>
+#include <queue>
 #include <string>
+#include <type_traits>
+#include <variant>
 
 #include "ClientGateway.h"
 #include "Deck.hpp"
 #include "Event.hpp"
 #include "EventBus.hpp"
-#include "ServerSession.h"
 #include "GameTypes.hpp"
 #include "Player.hpp"
+#include "ServerSession.h"
 
 using namespace poker;
 
+void printEvent(const Event::GameStarted& event) {
+    std::cout << std::format("[Event] Game Started | btn:@P{} bb:${} players:{}\n", event.btn_seat,
+                             event.big_blind, event.player_count);
+}
+
+void printEvent(const Event::PlayerJoined& event) {
+    std::cout << std::format("[Event] Player Joined | @P{} players:{}\n", event.seat,
+                             event.player_count);
+}
+
+void printEvent(const Event::JoinResponse& event) {
+    std::cout << std::format("[Event] Join Response | seat:@P{}\n", event.seat);
+}
+
+void printEvent(const Event::StageChanged& event) {
+    std::cout << std::format("[Event] Stage Changed | {}\n", to_string(event.stage));
+}
+
 void printEvent(const Event::BlindPosted& event) {
     std::cout << std::format("[Event] Blind Posted | @P{} ${}\n", event.player, event.amount);
+}
+
+void printEvent(const Event::HoleCardsDealt& event) {
+    std::cout << std::format("[Event] Hole Cards Dealt | @P{} {}\n", event.player_seat,
+                             to_string(event.hole_cards));
+}
+
+void printEvent(const Event::CommunityCardsDealt& event) {
+    std::cout << std::format("[Event] Community Cards | {}\n", to_string(event.community_cards));
 }
 
 void printEvent(const Event::TurnStarted& event) {
@@ -31,12 +61,12 @@ void printEvent(const Event::PlayerActed& event) {
                              to_string(event.action), event.is_all_in ? " (all-in)" : "");
 }
 
-void printEvent(const Event::PotAwarded event) {
+void printEvent(const Event::PotAwarded& event) {
     std::string msg;
     for (seat_t player : event.award_to) {
         msg += std::format("@P{} ", player);
     }
-    std::cout << std::format("[Event] PotAwared | {} ${} {}\n", event.pot_index, event.chips, msg);
+    std::cout << std::format("[Event] Pot Awarded | {} ${} {}\n", event.pot_index, event.chips, msg);
 }
 
 void printEvent(const Event::UncalledBetReturned& event) {
@@ -49,6 +79,12 @@ void printEvent(const Event::HoleCardsRevealed& event) {
         std::cout << std::format("[Event] Reveal | @P{} {}\n", seat, to_string(cards));
     }
 }
+
+void printEvent(const Event::GameEnded&) { std::cout << "[Event] Game Ended\n"; }
+
+/* 兜底：未专门格式化的事件不打印 */
+template <typename T>
+void printEvent(const T&) {}
 
 void printGameModel(const GameModel& model) {
     std::cout << std::format("stage: {} community-cards: {}\n", to_string(model.getCurrentStage()),
@@ -106,6 +142,48 @@ Command::SubmitAction getPlayerInput(const Event::TurnStarted& event) {
     }
 }
 
+/**
+ * @brief 控制台出站实现
+ * @details 广播/单传都直接打印；轮到玩家行动时先读入，再把动作入队，
+ *          由 main 的循环统一 publish，避免在事件回调里同步重入。
+ */
+class ConsoleClientGateway final : public ClientGateway {
+public:
+    void broadcast(const GameEvent& event) override {
+        std::visit([](const auto& e) { printEvent(e); }, event);
+    }
+
+    void sendTo(seat_t seat, const GameEvent& event) override {
+        (void)seat;
+        std::visit(
+            [this](const auto& e) {
+                using T = std::decay_t<decltype(e)>;
+                if constexpr (std::is_same_v<T, Event::TurnStarted>) {
+                    if (model != nullptr) printGameModel(*model);
+                    printEvent(e);
+                    pending.push(getPlayerInput(e));
+                } else {
+                    printEvent(e);
+                }
+            },
+            event);
+    }
+
+    void setModel(const GameModel* value) { model = value; }
+
+    [[nodiscard]] bool hasPending() const { return !pending.empty(); }
+
+    Command::SubmitAction popPending() {
+        Command::SubmitAction action = pending.front();
+        pending.pop();
+        return action;
+    }
+
+private:
+    const GameModel* model = nullptr;
+    std::queue<Command::SubmitAction> pending;
+};
+
 int main(int argc, char** argv) {
     std::uint32_t seed = Deck::randomSeed();
     if (argc > 1) {
@@ -115,28 +193,15 @@ int main(int argc, char** argv) {
     std::cout << std::format("[Demo] deck seed = {} (可用 ./poker {} 复现)\n", deck.getSeed(),
                              deck.getSeed());
 
-    ClientGateway client_gateway;
+    ConsoleClientGateway client_gateway;
     GameSession session(deck, client_gateway);
+    client_gateway.setModel(&session.model);
+
     EventBus& event_bus = session.event_bus;
     PlayerSet& player_set = session.player_set;
-    GameModel& game_model = session.model;
-    ServerController& game_controller = session.controller;
+    ServerController& server_controller = session.controller;
 
-    game_controller.subscribeEvent();
-
-    event_bus.subscribe<Event::TurnStarted>(
-        [&game_model](const auto& _) { printGameModel(game_model); });
-    event_bus.subscribe<Event::GameEnded>(
-        [&game_model](const auto& _) { printGameModel(game_model); });
-    event_bus.subscribe<Event::BlindPosted>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::TurnStarted>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::PlayerActed>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::PotAwarded>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::UncalledBetReturned>([](const auto& event) { printEvent(event); });
-    event_bus.subscribe<Event::HoleCardsRevealed>([](const auto& event) { printEvent(event); });
-
-    event_bus.subscribe<Event::TurnStarted>(
-        [&event_bus](const auto& event) { event_bus.publish(getPlayerInput(event)); });
+    server_controller.subscribeEvent();
 
     event_bus.publish(Command::JoinRequest{});
     event_bus.publish(Command::JoinRequest{});
@@ -151,6 +216,11 @@ int main(int argc, char** argv) {
     }
 
     event_bus.publish(Command::StartGame{});
+
+    // 动作由 gateway 入队，这里统一发布；避免在事件回调里同步重入。
+    while (client_gateway.hasPending()) {
+        event_bus.publish(client_gateway.popPending());
+    }
 
     return 0;
 }
