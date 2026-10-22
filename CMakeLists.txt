@@ -29,6 +29,7 @@ add_library(poker_core
         include/core/client/ClientModel.h
         include/core/client/ClientController.h
         include/core/client/ClientView.h
+        include/core/client/NullClientView.h
         src/core/client/ClientController.cpp
 
         include/core/event/Event.hpp
@@ -49,8 +50,10 @@ add_library(poker_core
         src/core/server/GameModel.cpp
         src/core/server/ServerController.cpp
         include/core/interface/Logger.h
-        include/core/interface/ClientGateway.h
-        include/core/interface/ServerGateway.h
+        include/core/interface/IClient.h
+        include/core/interface/IServer.h
+        include/core/interface/ClientHub.h
+        include/core/interface/LocalLink.h
 )
 
 target_include_directories(poker_core PUBLIC

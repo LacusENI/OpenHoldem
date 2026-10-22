@@ -1,23 +1,33 @@
 #pragma once
 
-#include "ClientGateway.h"
-#include "Event.hpp"
-#include "GameTypes.hpp"
+#include "ClientHub.h"
+#include "IServer.h"
 
 namespace poker {
-class EventBus;
 class GameModel;
 
 /**
  * @brief 服务器游戏控制器（状态机）
- * @details 阶段迁移：下注轮结束时由纯决策函数决定去向，再统一经 enterStage 进入。
+ * @details 实现 IServer（接收客户端命令），通过 ClientHub 出站。
+ *          阶段迁移：下注轮结束时由纯决策函数决定去向，再统一经 enterStage 进入。
  */
-class ServerController {
-private:
-    EventBus& event_bus;
-    ClientGateway& client_gateway;
-    GameModel& game_model;
+class ServerController : public IServer {
+public:
+    ServerController(ClientHub& client_hub, GameModel& model)
+        : client_hub(client_hub), game_model(model) {}
+    ~ServerController() override = default;
 
+    void onJoin(IClient& client, const Command::JoinRequest& command) override;
+    void onStart(const Command::StartGame& command) override;
+    void onSubmit(const Command::SubmitAction& command) override;
+
+    /* 开始下一手牌（重置状态并轮转按钮） */
+    void startNextHand();
+
+    /* 结束本下注轮：退还未跟注筹码、重置下注状态 */
+    void finishBettingRound();
+
+private:
     /* 下注轮结束后的去向（纯决策结果） */
     enum class AfterRound { HandOver, UncontestedSettle, RunoutShowdown, NextStreet };
 
@@ -32,25 +42,7 @@ private:
     void enterSettlement();
     void enterUncontestedSettle();
 
-public:
-    ServerController(EventBus& event_bus, ClientGateway& client_gateway, GameModel& model)
-        : event_bus(event_bus), client_gateway(client_gateway), game_model(model) {}
-    ~ServerController() = default;
-
-    /* 订阅事件 */
-    void subscribeEvent();
-    /* 处理玩家加入请求 */
-    void handle(const Command::JoinRequest&);
-    /* 处理玩家输入 */
-    void handle(const Command::SubmitAction&);
-    /* 开始一局游戏 */
-    void handle(const Command::StartGame&);
-
-    /* 开始下一手牌（重置状态并轮转按钮） */
-    void startNextHand();
-
-    /* 结束本下注轮：退还未跟注筹码、重置下注状态并发布结束事件 */
-    void finishBettingRound();
+    ClientHub& client_hub;
+    GameModel& game_model;
 };
-
 } // namespace poker

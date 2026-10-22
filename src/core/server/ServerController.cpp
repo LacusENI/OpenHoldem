@@ -3,54 +3,50 @@
 #include <optional>
 
 #include "Event.hpp"
-#include "EventBus.hpp"
 #include "GameModel.h"
 #include "GameTypes.hpp"
+#include "IClient.h"
 
 namespace poker {
-void ServerController::subscribeEvent() {
-    event_bus.subscribe<Command::JoinRequest>(&ServerController::handle, this);
-    event_bus.subscribe<Command::StartGame>(&ServerController::handle, this);
-    event_bus.subscribe<Command::SubmitAction>(&ServerController::handle, this);
-}
-
-void ServerController::handle(const Command::StartGame& _) {
+void ServerController::onStart(const Command::StartGame& _) {
     std::optional<Event::GameStarted> started = game_model.startGame();
     if (!started) return;
-    client_gateway.broadcast(*started);
+    client_hub.broadcast(&IClient::onGameStarted, *started);
     enterStage(Stage::PREFLOP);
 }
 
 void ServerController::startNextHand() {
     std::optional<Event::GameStarted> started = game_model.startNextHand();
     if (!started) return;
-    client_gateway.broadcast(*started);
+    client_hub.broadcast(&IClient::onGameStarted, *started);
     enterStage(Stage::PREFLOP);
 }
 
-void ServerController::handle(const Command::JoinRequest& command) {
+void ServerController::onJoin(IClient& client, const Command::JoinRequest& command) {
     Event::PlayerJoined joined = game_model.joinNewPlayer();
     joined.uid = command.uid;
-    client_gateway.broadcast(joined);
-    // 新玩家需要知道自己的座位；JoinResponse 只发给本人
-    client_gateway.sendTo(joined.seat,
-                          Event::JoinResponse{.uid = command.uid, .seat = joined.seat});
+
+    // 先登记，再发送：JoinResponse 需要能按座位找到这个 endpoint。
+    client_hub.add(joined.seat, client);
+    client_hub.broadcast(&IClient::onPlayerJoined, joined);
+    client_hub.sendTo(joined.seat, &IClient::onJoinResponse,
+                      Event::JoinResponse{.uid = command.uid, .seat = joined.seat});
 }
 
-void ServerController::handle(const Command::SubmitAction& event) {
-    std::optional<Event::PlayerActed> acted = game_model.handlePlayerAction(event);
+void ServerController::onSubmit(const Command::SubmitAction& command) {
+    std::optional<Event::PlayerActed> acted = game_model.handlePlayerAction(command);
     if (!acted) {
         // 无效行动：保持当前行动者不变，重新请求其行动
         if (auto waiting = game_model.awaitPlayerAction())
-            client_gateway.sendTo(waiting->player, *waiting);
+            client_hub.sendTo(waiting->player, &IClient::onTurnStarted, *waiting);
         return;
     }
-    client_gateway.broadcast(*acted);
+    client_hub.broadcast(&IClient::onPlayerActed, *acted);
 
     if (!game_model.isBettingRoundEnded()) {
         game_model.moveActingPlayer();
         if (auto waiting = game_model.awaitPlayerAction())
-            client_gateway.sendTo(waiting->player, *waiting);
+            client_hub.sendTo(waiting->player, &IClient::onTurnStarted, *waiting);
         return;
     }
 
@@ -58,7 +54,8 @@ void ServerController::handle(const Command::SubmitAction& event) {
 
     switch (decideAfterBettingRound()) {
     case AfterRound::HandOver:
-        client_gateway.broadcast(game_model.finishGame()); // 冗余防御：无人在局
+        client_hub.broadcast(&IClient::onGameEnded,
+                             game_model.finishGame()); // 冗余防御：无人在局
         break;
     case AfterRound::UncontestedSettle: enterUncontestedSettle(); break;
     case AfterRound::RunoutShowdown: enterStage(Stage::SHOWDOWN); break;
@@ -75,7 +72,7 @@ ServerController::AfterRound ServerController::decideAfterBettingRound() const {
 }
 
 void ServerController::enterStage(Stage stage) {
-    client_gateway.broadcast(game_model.changeStage(stage)); // 发布 StageChanged
+    client_hub.broadcast(&IClient::onStageChanged, game_model.changeStage(stage));
     if (isPreflop(stage)) {
         enterPreflop();
     } else if (isPostflop(stage)) {
@@ -89,48 +86,51 @@ void ServerController::enterStage(Stage stage) {
 void ServerController::enterPreflop() {
     game_model.shuffleDeck();
     for (const auto& event : game_model.dealHoleCards())
-        client_gateway.sendTo(event.player_seat, event); // 私密：单传
+        client_hub.sendTo(event.player_seat, &IClient::onHoleCardsDealt, event); // 私密：单传
     game_model.startBettingRound();
-    client_gateway.broadcast(game_model.postSmallBlind());
-    client_gateway.broadcast(game_model.postBigBlind());
+    client_hub.broadcast(&IClient::onBlindPosted, game_model.postSmallBlind());
+    client_hub.broadcast(&IClient::onBlindPosted, game_model.postBigBlind());
     game_model.startActionRound();
     if (auto waiting = game_model.awaitPlayerAction())
-        client_gateway.sendTo(waiting->player, *waiting); // 只通知当前行动者
+        client_hub.sendTo(waiting->player, &IClient::onTurnStarted, *waiting);
 }
 
 void ServerController::enterPostflop() {
-    client_gateway.broadcast(game_model.dealCommunityCards());
+    client_hub.broadcast(&IClient::onCommunityCardsDealt, game_model.dealCommunityCards());
     game_model.startBettingRound();
     game_model.startActionRound();
     if (auto waiting = game_model.awaitPlayerAction())
-        client_gateway.sendTo(waiting->player, *waiting);
+        client_hub.sendTo(waiting->player, &IClient::onTurnStarted, *waiting);
 }
 
 void ServerController::enterShowdown() {
-    client_gateway.broadcast(game_model.dealCommunityCards()); // 补发剩余公共牌
+    client_hub.broadcast(&IClient::onCommunityCardsDealt,
+                         game_model.dealCommunityCards()); // 补发剩余公共牌
     for (const auto& event : game_model.revealHoleCards())
-        client_gateway.broadcast(event); // 摊牌：公开
+        client_hub.broadcast(&IClient::onHoleCardsRevealed, event); // 摊牌：公开
     enterSettlement();
 }
 
 void ServerController::enterSettlement() {
-    client_gateway.broadcast(game_model.changeStage(Stage::SETTLEMENT));
+    client_hub.broadcast(&IClient::onStageChanged,
+                         game_model.changeStage(Stage::SETTLEMENT));
     game_model.splitPot();
     for (const auto& event : game_model.distributePots())
-        client_gateway.broadcast(event);
-    client_gateway.broadcast(game_model.finishGame());
+        client_hub.broadcast(&IClient::onPotAwarded, event);
+    client_hub.broadcast(&IClient::onGameEnded, game_model.finishGame());
 }
 
 void ServerController::enterUncontestedSettle() {
-    client_gateway.broadcast(game_model.changeStage(Stage::SETTLEMENT));
-    client_gateway.broadcast(game_model.settleUncontested());
-    client_gateway.broadcast(game_model.finishGame());
+    client_hub.broadcast(&IClient::onStageChanged,
+                         game_model.changeStage(Stage::SETTLEMENT));
+    client_hub.broadcast(&IClient::onPotAwarded, game_model.settleUncontested());
+    client_hub.broadcast(&IClient::onGameEnded, game_model.finishGame());
 }
 
 void ServerController::finishBettingRound() {
     // 先处理 Uncalled Bet（依赖本轮的 bet 数据），再重置下注轮状态
     if (auto uncalled = game_model.returnUncalledBet())
-        client_gateway.broadcast(*uncalled);
+        client_hub.broadcast(&IClient::onUncalledBetReturned, *uncalled);
     game_model.closeBettingRound();
 }
 } // namespace poker
