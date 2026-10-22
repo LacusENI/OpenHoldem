@@ -1,31 +1,43 @@
 #include <gtest/gtest.h>
 
 #include <optional>
+#include <variant>
 #include <vector>
 
-#include "ClientGateway.h"
+#include "ClientHandler.h"
 #include "Event.hpp"
-#include "EventBus.hpp"
-#include "GameSession.h"
 #include "GameTypes.hpp"
 #include "MockDeck.hpp"
+#include "ServerHandler.h"
+#include "ServerSession.h"
 
 using namespace poker;
 
 namespace {
+/* 记录测试关心的事件；其余事件忽略。 */
+struct RecordingClient final : NullClient {
+    std::vector<Event::TurnStarted> turn_started;
+    std::vector<Event::PotAwarded> pot_awarded;
+
+    void on(const GameEvent& event) override {
+        if (const auto* e = std::get_if<Event::TurnStarted>(&event)) turn_started.push_back(*e);
+        if (const auto* e = std::get_if<Event::PotAwarded>(&event)) pot_awarded.push_back(*e);
+    }
+};
+
 struct GameRig {
     MockEmptyDeck deck; // 本测试不发牌
-    ClientGateway client_gateway;
-    GameSession session{deck, client_gateway};
+    ServerSession session{deck};
+    RecordingClient recorder;
 
     // 便捷别名（指向 session 的成员）
-    EventBus& event_bus = session.event_bus;
     PlayerSet& player_set = session.player_set;
     SeatManager& seat_manager = session.seat_manager;
     BettingRound& betting_round = session.betting_round;
     CardsManager& cards_manager = session.cards_manager;
     PotManager& pot_manager = session.pot_manager;
     GameModel& model = session.model;
+    ClientHub& client_hub = session.client_hub;
 
     /* 落座并设置筹码、按钮 */
     void seatPlayers(const std::vector<chips_t>& stacks, seat_t btn) {
@@ -148,20 +160,18 @@ TEST(GameModelTest, ValidActionIsAccepted) {
 }
 
 // 控制器收到无效行动后应重新请求同一玩家，而不是切换行动者（P0-3 回归）
-TEST(GameControllerTest, RejectsInvalidActionAndReprompts) {
+TEST(ServerControllerTest, RejectsInvalidActionAndReprompts) {
     GameRig rig;
-    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0);
     const seat_t acting = rig.betting_round.getActingPlayer();
+    rig.client_hub.add(acting, rig.recorder);
 
-    std::vector<seat_t> prompted;
-    rig.event_bus.subscribe<Event::TurnStarted>(
-        [&prompted](const Event::TurnStarted& event) { prompted.push_back(event.player); });
+    ServerController controller(rig.client_hub, rig.model);
+    const ClientSession sender{1, rig.recorder};
+    controller.on(Command::SubmitAction{.target_bet = 1, .is_fold = false}, sender);
 
-    controller.handle(Command::SubmitAction{.target_bet = 1, .is_fold = false});
-
-    ASSERT_EQ(1u, prompted.size());
-    EXPECT_EQ(acting, prompted.front());
+    ASSERT_EQ(1u, rig.recorder.turn_started.size());
+    EXPECT_EQ(acting, rig.recorder.turn_started.front().player);
     EXPECT_EQ(acting, rig.betting_round.getActingPlayer());
 }
 
@@ -287,18 +297,17 @@ TEST(GameModelTest, AwaitPlayerActionWithoutActingPlayerDoesNotCrash) {
 }
 
 // 无人竞争（只剩一人）时整池直接判给唯一存活者，不切分底池
-TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
+TEST(ServerControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
     GameRig rig;
-    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
     rig.startPreflop({1000, 1000, 1000}, 0); // SB=1(5), BB=2(10), UTG=0
+    rig.client_hub.add(1, rig.recorder);
 
-    int winners_declared = 0;
-    rig.event_bus.subscribe<Event::PotAwarded>(
-        [&winners_declared](const Event::PotAwarded&) { ++winners_declared; });
+    ServerController controller(rig.client_hub, rig.model);
+    const ClientSession sender{1, rig.recorder};
 
     const Command::SubmitAction fold = {.target_bet = 0, .is_fold = true};
-    controller.handle(fold); // UTG 弃牌
-    controller.handle(fold); // SB 弃牌，只剩 BB
+    controller.on(fold, sender); // UTG 弃牌
+    controller.on(fold, sender); // SB 弃牌，只剩 BB
 
     ASSERT_TRUE(rig.model.isOnlyOnePlayerAlive());
     // 整池 = 0 + 5 + 10 = 15，全部判给 BB（起始 1000 - 10 + 15 = 1005）
@@ -306,7 +315,7 @@ TEST(GameControllerTest, UncontestedWinAwardsWholePotWithoutSplitting) {
     EXPECT_EQ(995, rig.pot_manager.getPlayerChipsAt(1));
     EXPECT_EQ(1000, rig.pot_manager.getPlayerChipsAt(0));
     EXPECT_TRUE(rig.pot_manager.getPots().empty());
-    EXPECT_EQ(1, winners_declared); // 不再有"单人池"产生的多余赢池事件
+    EXPECT_EQ(1u, rig.recorder.pot_awarded.size()); // 不再有"单人池"产生的多余赢池事件
 }
 
 // 唯一最高注者未被跟注的部分在轮末退还给本人
@@ -357,9 +366,9 @@ TEST(GameModelTest, RefundLiftsAllInStatus) {
 }
 
 // 结束下注轮：先退还多余筹码，再重置下注状态
-TEST(GameControllerTest, FinishBettingRoundReturnsUncalledBet) {
+TEST(ServerControllerTest, FinishBettingRoundReturnsUncalledBet) {
     GameRig rig;
-    ServerController controller(rig.event_bus, rig.client_gateway, rig.model);
+    ServerController controller(rig.client_hub, rig.model);
     rig.seatPlayers({1000, 1000, 1000}, 0);
 
     rig.player_set.playerAt(0).payChips(200);

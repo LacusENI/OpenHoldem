@@ -1,6 +1,6 @@
 # 重开下注（Re-Opening the Bet）规则说明
 
-> 状态：**结论已定，实现待做**（见 `docs/ROADMAP.md` P0）；相关决策见 `docs/DECISIONS.md`。
+> 状态：**结论已定，实现待做**（见 `docs/roadmap.md` P0）。
 > 目的：把 TDA "Re-Opening the Bet" 规则、常见误解、易错例子与正确实现（含伪代码与等价算法）讲清楚，供人或 AI 阅读/实现。
 > 适用范围：无限注（no-limit）/ 底池限注（pot-limit）德州扑克的一轮下注。
 > 相关规则：TDA Rule 47（2022/2024；早年版为 Rule 44 / 37-38）、Robert's Rules of Poker。

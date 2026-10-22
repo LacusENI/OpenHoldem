@@ -24,7 +24,7 @@ struct GameDependencies {
 
 /**
  * @brief 游戏领域模型
- * @details 不依赖 EventBus：各方法返回"应当发布"的事件，由 GameController 负责发布。
+ * @details 不依赖 EventBus：各方法返回"应当发布"的事件，由 ServerController 负责发布。
  *          单事件返回具体事件类型；多事件返回 std::vector<具体事件>。
  */
 class GameModel {

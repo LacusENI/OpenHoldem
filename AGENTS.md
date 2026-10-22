@@ -51,14 +51,14 @@ ctest --test-dir cmake-build-debug
 - **application（应用层）**：`network` · `serialization` · `logging` · `presentation` + `src/*_main.cpp`
 - **test**：GoogleTest 用例
 
-详见 `docs/ARCHITECTURE.md`。
+详见 `docs/architecture.md`。
 
 ## 编码约定
 
 - **显式优于隐式**：合法则接受，非法则**拒绝/断言**，**不要静默改写**。
 - **早失败**：关键路径加 `assert`，别让错误悄悄传播。
 - 命名空间 `poker`（实验性下注模型草稿用 `poker::betting`）。
-- 所有权用值/引用表达；非拥有引用注入（组合根 `GameSession` 持有全部组件）。
+- 所有权用值/引用表达；非拥有引用注入（组合根 `ServerSession` 持有全部组件）。
 - 头文件 `#pragma once`；公共头文件顶部可写**简短文件级 `@brief`**（职责 + 契约）。**不要求**每个文件都写"总纲"，更不要写"是什么"的流水账。
 - 风格与周围代码保持一致。
 
@@ -75,12 +75,10 @@ type(scope): 中文描述
 
 ## 先读哪些文档
 
-- `docs/ARCHITECTURE.md` — 架构 / 模块 / 数据流 / 不变量
-- `docs/DECISIONS.md` — 已定决策（ADR）。**改设计前先查这里有没有冲突**。
-- `docs/ROADMAP.md` — 路线图与当前待办
-- `docs/GLOSSARY.md` — 术语表（通用语言，人和 AI 对齐用）
-- `docs/TESTING.md` — 测试策略
-- `docs/design/` — 设计提案（过程）
+- `docs/architecture.md` — 架构 / 模块 / 数据流 / 不变量
+- `docs/roadmap.md` — 路线图与当前待办
+- `docs/glossary.md` — 术语表（通用语言，人和 AI 对齐用）
+- `docs/design/README.md` — 设计提案与讨论笔记索引
 - `README.md` — 人类视角：是什么 / 怎么跑
 
 ## 关键不变量 / 易错点（务必遵守）

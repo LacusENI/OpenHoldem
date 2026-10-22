@@ -90,9 +90,18 @@
 
 | 名称 | 定义 |
 |---|---|
-| `GameSession` | **组合根**：持有并装配全部服务端组件；依赖用引用注入。 |
+| `ServerSession` | **组合根**：持有并装配全部服务端组件；依赖用引用注入。 |
+| `ClientGateway` | 服务器出站端口：`broadcast(event)` / `sendTo(seat, event)`；由 `ClientHub` 实现。 |
+| `ServerGateway` | 客户端出站端口：`send(command)`（不带身份）。 |
+| `ClientHandler` | 客户端入站端口：`on(GameEvent)`；`ClientController` 实现。 |
+| `ServerHandler` | 服务器入站端口：`on(GameCommand, ClientSession)`；`ServerController` 实现。 |
+| `ClientSession` | 客户端会话：`{ client_id_t id; ClientHandler& handler; }`，由服务器侧适配器提供。 |
+| `ClientHub` | 服务器出站扇出：按座位保存非拥有 `ClientHandler*`，实现 `ClientGateway`。 |
+| `LocalLink` | 本地异步双向 FIFO 回环：`serverSide()`=ClientHandler、`clientSide()`=ServerGateway。 |
 | `GameModel` | 领域模型/规则：方法**返回事件**，不直接发布。 |
-| `GameController` | 状态机：决策 + `enterStage`/`enter*`；**负责发布事件**。 |
+| `ServerController` | 服务端状态机（实现 `ServerHandler`）：`enterStage`/`enter*` + 纯决策；经 `ClientGateway` 出站。 |
+| `ClientController` | 客户端投影（实现 `ClientHandler`）：事件 → `ClientModel`；持有 `ServerGateway&` 发命令。 |
+| `ClientModel` | 客户端展示状态（扁平结构，待收敛）。 |
 | `BettingRound` | 一轮下注：金额 + 行动顺序 + `applyAction(...) -> optional<PlayerActed>`。 |
 | `Player` | **筹码与 all-in 的唯一入口**：`payChips`/`winChips`/`commit`/`refund`（含 `assert`）。 |
 | `PlayerSet` | 玩家集合（座位 → 玩家）。 |
@@ -100,10 +109,11 @@
 | `SeatManager` | 座位/按钮/行动顺序。 |
 | `CardsManager` | 牌堆、公共牌、发牌。 |
 | `Deck` | 牌堆，**可播种**（`Deck(seed)`）以便复现。 |
-| `EventBus` | 进程内事件总线（主要承担**入站**）。 |
-| `GameEvent` | 事件变体（`Event::*` 与 `NetworkEvent::*`）。见 `Event.hpp`。 |
+| `EventBus` | 进程内事件总线；**核心主链路已不再使用**，仅旧应用层（network/logging/mains）残留。 |
+| `GameEvent` | 事件变体；供**序列化/日志**与 `ClientHandler::on` 使用。 |
+| `GameCommand` | 命令变体（`JoinRequest` / `StartGame` / `SubmitAction`），供 `ServerHandler::on` 使用。 |
 | `PlayerActed` | 玩家一次行动的结果事件（含是否全下等）。 |
-| `chips_t` / `seat_t` | 筹码量 / 座位号类型。见 `GameTypes.hpp`。 |
+| `chips_t` / `seat_t` / `client_id_t` | 筹码量 / 座位号 / 连接标识类型。见 `GameTypes.hpp`。 |
 
 ## F. 缩写
 
@@ -111,6 +121,6 @@
 |---|---|
 | TDA | Poker Tournament Directors Association（规则来源）。 |
 | NL / PL / FL | No-Limit / Pot-Limit / Fixed-Limit。 |
-| ADR | Architecture Decision Record（见 `DECISIONS.md`）。 |
+| ADR | Architecture Decision Record（本项目用 `docs/design/` 提案记录设计与结论）。 |
 | DDD | Domain-Driven Design（本项目的设计取向之一）。 |
 | SB / BB / BTN / UTG / CO / HJ / MP | 位置缩写（见 §A）。 |

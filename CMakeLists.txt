@@ -50,8 +50,10 @@ add_library(poker_core
         src/core/server/GameModel.cpp
         src/core/server/ServerController.cpp
         include/core/interface/Logger.h
-        include/core/interface/IClient.h
-        include/core/interface/IServer.h
+        include/core/interface/ClientHandler.h
+        include/core/interface/ServerHandler.h
+        include/core/interface/ClientGateway.h
+        include/core/interface/ServerGateway.h
         include/core/interface/ClientHub.h
         include/core/interface/LocalLink.h
 )

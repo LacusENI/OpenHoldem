@@ -1,25 +1,23 @@
 #pragma once
 
 #include "ClientHub.h"
-#include "IServer.h"
+#include "ServerHandler.h"
 
 namespace poker {
 class GameModel;
 
 /**
  * @brief 服务器游戏控制器（状态机）
- * @details 实现 IServer（接收客户端命令），通过 ClientHub 出站。
+ * @details 实现 ServerHandler（接收命令 + ClientSession），通过 ClientGateway / ClientHub 出站。
  *          阶段迁移：下注轮结束时由纯决策函数决定去向，再统一经 enterStage 进入。
  */
-class ServerController : public IServer {
+class ServerController : public ServerHandler {
 public:
     ServerController(ClientHub& client_hub, GameModel& model)
         : client_hub(client_hub), game_model(model) {}
     ~ServerController() override = default;
 
-    void onJoin(IClient& client, const Command::JoinRequest& command) override;
-    void onStart(const Command::StartGame& command) override;
-    void onSubmit(const Command::SubmitAction& command) override;
+    void on(const GameCommand& command, const ClientSession& sender) override;
 
     /* 开始下一手牌（重置状态并轮转按钮） */
     void startNextHand();
@@ -41,6 +39,11 @@ private:
     void enterShowdown();
     void enterSettlement();
     void enterUncontestedSettle();
+
+    /* 命令处理（由 on() 经 std::visit 分发） */
+    void handle(const Command::JoinRequest& command, const ClientSession& sender);
+    void handle(const Command::StartGame& command, const ClientSession& sender);
+    void handle(const Command::SubmitAction& command, const ClientSession& sender);
 
     ClientHub& client_hub;
     GameModel& game_model;

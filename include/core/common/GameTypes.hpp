@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include <magic_enum/magic_enum.hpp>
@@ -7,9 +8,13 @@
 namespace poker {
 using seat_t = int;  // 玩家座位
 using chips_t = int; // 筹码数量
+using client_id_t = std::uint32_t; // 连接 / 客户端标识（join 前即可用）
 
 /* 无效座位/行动者标识 */
 inline constexpr seat_t INVALID_SEAT = -1;
+
+/* 无效客户端标识（有效 id 从 1 开始） */
+inline constexpr client_id_t INVALID_CLIENT_ID = 0;
 
 enum class Stage { IDLE, PREFLOP, FLOP, TURN, RIVER, SHOWDOWN, SETTLEMENT };
 

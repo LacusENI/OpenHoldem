@@ -16,7 +16,7 @@ namespace poker {
  * @details 拥有全部游戏组件与 ClientHub，负责构造顺序与生命周期，并以引用注入依赖。
  *          IDeck 由外部注入（调用方拥有），以便测试注入 MockDeck。
  */
-struct GameSession {
+struct ServerSession {
     ClientHub client_hub;
     PlayerSet player_set;
     SeatManager seat_manager{player_set};
@@ -26,7 +26,7 @@ struct GameSession {
     GameModel model;
     ServerController controller;
 
-    explicit GameSession(IDeck& deck)
+    explicit ServerSession(IDeck& deck)
         : cards_manager(deck, player_set),
           model(GameDependencies{
               .betting_round = betting_round,
@@ -37,7 +37,7 @@ struct GameSession {
           }),
           controller(client_hub, model) {}
 
-    GameSession(const GameSession&) = delete;
-    GameSession& operator=(const GameSession&) = delete;
+    ServerSession(const ServerSession&) = delete;
+    ServerSession& operator=(const ServerSession&) = delete;
 };
 } // namespace poker

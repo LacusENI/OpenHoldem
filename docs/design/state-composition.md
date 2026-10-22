@@ -2,7 +2,7 @@
 
 > 状态：**未来方向（Deferred）** · 2026-10-12
 > ⚠️ **现在不做**：实现时机过早。等**真正开始搭建客户端 / 需要两端共享状态与规则**时再启动。
-> 关联：`docs/design/client-gateway.md`（出站端口）、`docs/GLOSSARY.md`、`docs/ROADMAP.md`。
+> 关联：`docs/design/2026-10-22.md`（`IClient` / `IServer`）、`docs/glossary.md`、`docs/roadmap.md`。
 > 说明：本提案只取 ECS 的**"组合"**思想，**不是 ECS**——没有实体 id、没有"系统遍历组件集合"。
 
 ## 1. 背景与动机

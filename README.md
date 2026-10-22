@@ -5,19 +5,20 @@
 ![Vcpkg](https://img.shields.io/badge/vcpkg-enabled-blue)
 ![Platform](https://img.shields.io/badge/Linux-FCC624?logo=linux&logoColor=black)
 ![Status](https://img.shields.io/badge/status-alpha-orange)
-![Version](https://img.shields.io/badge/version-demo_v5-yellow)
+![Version](https://img.shields.io/badge/version-demo_v9-yellow)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 一个基于 C++ 的德州扑克游戏，支持局域网联机对战。
 
-> 当前状态：核心逻辑 + 网络联机已跑通，可进行单局对战。
+> 当前状态：核心逻辑可运行（本地回环 demo）；局域网联机适配器与应用层整理中。
 
 ## 功能特性
-- [ ] 完整的德州扑克规则
+- [ ] 完整的德州扑克规则（重开下注待补）
 - [x] 事件驱动的游戏状态机
-- [x] 服务端 / 客户端网络架构
-- [x] JSON 序列化（nlohmann/json）
-- [ ] AI 对手
+- [x] 服务端 / 客户端接口化（4 端口 + 本地异步回环）
+- [x] All-in 与边池结算
+- [ ] JSON 序列化 / 局域网联机（应用层待对齐）
+- [ ] AI 对手（demo 有 check/call bot 雏形）
 - [ ] 锦标赛模式
 - [ ] 图形界面
 
@@ -72,7 +73,9 @@ ctest --preset test
 
 # 下一步计划
 
-- [ ] 实现 All-in 和边池计算
-- [ ] 加入简单 AI（随机策略）
+- [ ] 累计 short all-in 重开规则（TDA 47）
+- [ ] 恢复不变量 / fuzz 测试
+- [ ] 序列化对齐 + 重写 `server_main` / `client_main`，打通局域网联机
+- [ ] 加入简单 AI（随机/半随机策略）
 - [ ] 控制台 UI 增强（彩色输出）
 - [ ] 图形界面（Qt 或 SFML）

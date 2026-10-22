@@ -4,19 +4,18 @@
 #include <cstddef>
 #include <vector>
 
+#include "ClientGateway.h"
+#include "ClientHandler.h"
 #include "GameTypes.hpp"
-#include "IClient.h"
 
 namespace poker {
 /**
- * @brief 服务器 → 客户端的扇出/单传
- * @details 暂时兼管 client 的注册生命周期（add/remove/find）。
- *          只保存**非拥有**的 IClient*；对象由组合根/会话管理器拥有。
- *          分发用成员函数指针，调用点仍保留 `IClient::onXXX` 的显式签名。
+ * @brief 服务器出站扇出：`ClientGateway` 的本地实现 + 座位登记
+ * @details 按座位保存**非拥有**的 `ClientHandler*`；对象由组合根 / 会话管理器拥有。
  */
-class ClientHub {
+class ClientHub : public ClientGateway {
 public:
-    void add(seat_t seat, IClient& client) {
+    void add(seat_t seat, ClientHandler& client) {
         assert(seat >= 0 && "ClientHub::add: 非法座位");
         if (static_cast<std::size_t>(seat) >= clients_.size()) {
             clients_.resize(static_cast<std::size_t>(seat) + 1, nullptr);
@@ -31,30 +30,36 @@ public:
         }
     }
 
-    [[nodiscard]] IClient* find(seat_t seat) const {
+    [[nodiscard]] ClientHandler* find(seat_t seat) const {
         if (seat < 0 || static_cast<std::size_t>(seat) >= clients_.size()) return nullptr;
         return clients_[seat];
     }
 
-    [[nodiscard]] const std::vector<IClient*>& clients() const { return clients_; }
+    /** @brief 反查某客户端的座位；未登记返回 INVALID_SEAT。 */
+    [[nodiscard]] seat_t seatOf(const ClientHandler& client) const {
+        for (std::size_t i = 0; i < clients_.size(); ++i) {
+            if (clients_[i] == &client) return static_cast<seat_t>(i);
+        }
+        return INVALID_SEAT;
+    }
 
-    template <typename Event>
-    void broadcast(void (IClient::*method)(const Event&), const Event& event) const {
+    [[nodiscard]] const std::vector<ClientHandler*>& clients() const { return clients_; }
+
+    void broadcast(const GameEvent& event) override {
         // 快照：投递期间 add/remove 不会破坏遍历（对象本身仍需由外部保证存活）
-        const std::vector<IClient*> snapshot = clients_;
-        for (IClient* client : snapshot) {
-            if (client != nullptr) (client->*method)(event);
+        const std::vector<ClientHandler*> snapshot = clients_;
+        for (ClientHandler* client : snapshot) {
+            if (client != nullptr) client->on(event);
         }
     }
 
-    template <typename Event>
-    void sendTo(seat_t seat, void (IClient::*method)(const Event&), const Event& event) const {
-        IClient* client = find(seat);
+    void sendTo(seat_t seat, const GameEvent& event) override {
+        ClientHandler* client = find(seat);
         assert(client != nullptr && "ClientHub::sendTo: 目标座位没有客户端");
-        if (client != nullptr) (client->*method)(event);
+        if (client != nullptr) client->on(event);
     }
 
 private:
-    std::vector<IClient*> clients_;
+    std::vector<ClientHandler*> clients_;
 };
 } // namespace poker
