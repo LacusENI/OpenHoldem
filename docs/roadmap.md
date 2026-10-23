@@ -31,7 +31,7 @@
 
 ### P3 · 应用层（"打通局域网联机"）
 
-**联机基座（上网络前必须；评审见 `docs/design/2026-10-22-review.md`）**
+**联机基座（上网络前必须；评审见 `docs/note/2026-10-22-review.md`）**
 
 - [x] **4 端口 + 身份**：`ClientGateway` / `ServerGateway`（出站）+ `ClientHandler` / `ServerHandler`（入站）；`ServerHandler::on(GameCommand, ClientSession)` 的 sender 由服务器侧适配器提供；`client_id_t` 已加入。
 - [ ] **校验发送者座位**：维护 `ClientId → seat` 映射；在 `handle(SubmitAction)` 中校验"提交者 == 当前行动者"（不再依赖 `ClientHub::seatOf`）。

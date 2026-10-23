@@ -51,6 +51,15 @@ concept FactoryConvertible = HasToString<T> && requires(std::string_view str) {
 template <typename T>
 concept StringConvertible = EnumConvertible<T> || FactoryConvertible<T>;
 
+/** @brief 探测类型是否提供成员 `visit(V&&)`（由 POKER_FIELDS_VISITOR 生成）。 */
+struct VisitProbe {
+    template <typename T>
+    void operator()(std::string_view, T&) const {}
+};
+
+template <typename T>
+concept HasVisit = requires(T& value) { value.visit(VisitProbe{}); };
+
 template <typename T>
 struct GeneralSerializer {
     static void to_json(nlohmann::json& j, const T& value) { j = to_string(value); }
@@ -70,4 +79,24 @@ namespace nlohmann {
 /** @brief 自动为所有 StringConvertible 类型提供 adl_serializer。 */
 template <poker::StringConvertible T>
 struct adl_serializer<T> : poker::GeneralSerializer<T> {};
+
+/** @brief 有 visit 的类型（事件/命令）自动按字段名序列化。 */
+template <poker::HasVisit T>
+    requires(!poker::StringConvertible<T>)
+struct adl_serializer<T> {
+    static void to_json(nlohmann::json& j, const T& value) {
+        j = nlohmann::json::object();
+        value.visit([&](std::string_view name, const auto& field) {
+            j[std::string(name)] = field;
+        });
+    }
+
+    static void from_json(const nlohmann::json& j, T& value) {
+        value.visit([&](std::string_view name, auto& field) {
+            if (j.contains(std::string(name))) {
+                j.at(std::string(name)).get_to(field);
+            }
+        });
+    }
+};
 } // namespace nlohmann

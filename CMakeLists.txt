@@ -14,6 +14,7 @@ find_package(magic_enum CONFIG REQUIRED)
 # 业务核心
 add_library(poker_core
         include/core/common/Card.hpp
+        include/core/common/FieldsVisitor.hpp
         include/core/common/Deck.hpp
         include/core/common/GameTypes.hpp
         include/core/common/HandValue.hpp

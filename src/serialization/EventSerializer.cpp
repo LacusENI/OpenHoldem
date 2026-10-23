@@ -13,32 +13,6 @@
 #include "Event.hpp"
 #include "GeneralSerializer.hpp"
 
-namespace poker::Event {
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(JoinResponse, uid, seat)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerJoined, uid, seat, player_count)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(GameStarted, btn_seat, big_blind, player_count)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HoleCardsDealt, player_seat, hole_cards)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(StageChanged, stage)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(BlindPosted, player, amount, is_big_blind)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CommunityCardsDealt, community_cards)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TurnStarted, player, player_chips, player_bet, round_bet,
-                                   min_raise, can_raise)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PlayerActed, player, bet, action, is_all_in)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HoleCardsRevealed, players_with_hole_cards)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PotAwarded, pot_index, chips, award_to)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(UncalledBetReturned, player, amount)
-
-/* GameEnded 没有字段，显式给一个空对象，避免把无参宏交给 NLOHMANN 定义。 */
-inline void to_json(nlohmann::json& j, const GameEnded&) { j = nlohmann::json::object(); }
-inline void from_json(const nlohmann::json&, GameEnded&) {}
-} // namespace poker::Event
-
-namespace poker::Command {
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(JoinRequest, uid)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(StartGame, big_blind, initial_chips)
-NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(SubmitAction, target_bet, is_fold)
-} // namespace poker::Command
-
 namespace poker {
 namespace {
 

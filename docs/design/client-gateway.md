@@ -1,6 +1,6 @@
 # 设计提案：显式出站端口 `ClientGateway`
 
-> 状态：**Superseded**（未采用；实际落地为 `IClient` / `IServer` + `ClientHub`，见 `docs/design/2026-10-22.md` 与 `docs/architecture.md`）
+> 状态：**Superseded**（未采用；实际落地为 4 端口，见 `docs/note/2026-10-22.md` 与 `docs/architecture.md`）
 > 关联：拟替代 `include/core/interface/ServerIoAdapter.h`（已删除）
 > 范围：服务端"**领域 → 客户端**"的**出站**通道（不含入站命令、不含网络实现细节、不含序列化格式）
 

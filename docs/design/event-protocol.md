@@ -1,7 +1,7 @@
 # 设计提案：事件协议修订（按方向拆分 + 去派生字段）
 
 > 状态：**Proposed**（待评审）
-> 关联：`docs/design/2026-10-22.md`（`IClient` / `IServer`）；`docs/architecture.md` §5。
+> 关联：`docs/note/2026-10-22.md`（`IClient` / `IServer`）；`docs/architecture.md` §5。
 > 准则：**协议传事实与意图，不传派生量**；权威在服务器，客户端只做投影（派生量由客户端计算）。
 > `NewPlayerJoined` `PlayerJoinResponse` `GameStarted`
 > `HoleCardsDealt` `StageChanged` `BlindPosted` `CommunityCardsDealt`
