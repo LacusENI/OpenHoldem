@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include <optional>
 #include <stdexcept>
 #include <string>
 #include <string_view>
@@ -144,21 +145,4 @@ std::string to_string(const std::array<Card, N>& cards) {
     return result;
 }
 
-template <typename T>
-std::optional<T> from_string(std::string_view str);
-
-template <>
-inline std::optional<Card> from_string(std::string_view str) {
-    return Card::from_string(str);
-}
-
-template <>
-inline std::optional<Suit> from_string(std::string_view str) {
-    return magic_enum::enum_cast<Suit>(str);
-}
-
-template <>
-inline std::optional<Rank> from_string(std::string_view str) {
-    return magic_enum::enum_cast<Rank>(str);
-}
 } // namespace poker

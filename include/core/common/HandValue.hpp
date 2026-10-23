@@ -1,6 +1,10 @@
 #pragma once
 
 #include <format>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <magic_enum/magic_enum.hpp>
@@ -84,6 +88,16 @@ public:
         for (; i < 5; i++) handValue = handValue << 4;
         return HandValue(handValue);
     }
+
+    /** @brief 从十六进制 raw value 还原；失败返回 nullopt。 */
+    static std::optional<HandValue> from_string(std::string_view str) {
+        try {
+            const unsigned long value = std::stoul(std::string{str}, nullptr, 16);
+            return HandValue(static_cast<int>(value));
+        } catch (const std::exception&) {
+            return std::nullopt;
+        }
+    }
 };
 
 inline std::string to_string(HandType hand_type) {
@@ -92,25 +106,5 @@ inline std::string to_string(HandType hand_type) {
 
 inline std::string to_string(HandValue hand_value) {
     return std::format("{:x}", hand_value.get());
-}
-
-template <typename T>
-std::optional<T> from_string(std::string_view str);
-
-template <>
-inline std::optional<HandType> from_string(std::string_view str) {
-    return magic_enum::enum_cast<HandType>(str);
-}
-
-template <>
-inline std::optional<HandValue> from_string(std::string_view str) {
-    try {
-        unsigned long value = std::stoul(std::string{str}, nullptr, 16);
-        return HandValue(static_cast<int>(value));
-    } catch (const std::invalid_argument& e) {
-        return std::nullopt;
-    } catch (const std::out_of_range& e) {
-        return std::nullopt;
-    }
 }
 } // namespace poker

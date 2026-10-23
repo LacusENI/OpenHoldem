@@ -101,16 +101,8 @@ private:
     chips_t committed = 0; // 玩家在本局的总投入
 };
 
-template <typename T>
-std::optional<T> from_string(std::string_view str);
-
 inline std::string to_string(Player::State state) {
     return std::string{magic_enum::enum_name(state)};
-}
-
-template <>
-inline std::optional<Player::State> from_string(std::string_view str) {
-    return magic_enum::enum_cast<Player::State>(str);
 }
 
 enum class PlayerStatus {
@@ -127,11 +119,6 @@ enum class PlayerStatus {
 
 inline std::string to_string(PlayerStatus status) {
     return std::string{magic_enum::enum_name(status)};
-}
-
-template <>
-inline std::optional<PlayerStatus> from_string(std::string_view str) {
-    return magic_enum::enum_cast<PlayerStatus>(str);
 }
 
 } // namespace poker

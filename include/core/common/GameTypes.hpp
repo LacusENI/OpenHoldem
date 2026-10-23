@@ -49,17 +49,4 @@ inline std::string to_string(Stage stage) {
 inline std::string to_string(Action action) {
     return std::string{magic_enum::enum_name(action)};
 }
-
-template <typename T>
-std::optional<T> from_string(std::string_view str);
-
-template <>
-inline std::optional<Stage> from_string(std::string_view str) {
-    return magic_enum::enum_cast<Stage>(str);
-}
-
-template <>
-inline std::optional<Action> from_string(std::string_view str) {
-    return magic_enum::enum_cast<Action>(str);
-}
 } // namespace poker
