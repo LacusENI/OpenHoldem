@@ -86,6 +86,10 @@ struct Card {
 
     constexpr Card() : rank(Rank::NONE), suit(Suit::NONE) {}
     constexpr Card(Rank rank, Suit suit) : rank(rank), suit(suit) {}
+    /**
+     * @brief 以字面量的形式创造 Card
+     * @note 仅供测试等场景使用，编译期运行，必须传入字面量字符串，字符串格式错误时会报错
+     */
     consteval Card(std::string_view str) {
         auto card = from_string(str);
         if (!card) throw std::invalid_argument("Invalid card string: " + std::string(str));

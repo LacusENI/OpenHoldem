@@ -6,7 +6,6 @@
 
 #include <SFML/Network.hpp>
 
-#include "Event.hpp"
 #include "EventBus.hpp"
 
 namespace poker {
